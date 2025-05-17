@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
@@ -12,15 +13,12 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("student_basic_info")
-public class StudentBasicInfo {
+public class StudentBasicInfo implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    /**
-     * 学生姓名，例如：张三
-     */
+    private Long userId;//与user的id绑定
     private String name;
-
     /**
      * 性别，例如：男 / 女
      */

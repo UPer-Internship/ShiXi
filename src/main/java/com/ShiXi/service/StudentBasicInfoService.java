@@ -5,4 +5,5 @@ import com.ShiXi.entity.StudentBasicInfo;
 
 public interface StudentBasicInfoService {
     Result saveStudentBasicInfo(StudentBasicInfo studentBasicInfo);
+    Result getStudentBasicInfo();
 }

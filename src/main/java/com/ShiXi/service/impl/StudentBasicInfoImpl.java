@@ -1,9 +1,11 @@
 package com.ShiXi.service.impl;
 
 import com.ShiXi.dto.Result;
+import com.ShiXi.dto.UserDTO;
 import com.ShiXi.entity.StudentBasicInfo;
 import com.ShiXi.mapper.StudentBasicInfoMapper;
 import com.ShiXi.service.StudentBasicInfoService;
+import com.ShiXi.utils.UserHolder;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,18 +20,32 @@ public class StudentBasicInfoImpl extends ServiceImpl<StudentBasicInfoMapper, St
 
     @Override
     public Result saveStudentBasicInfo(StudentBasicInfo studentBasicInfo) {
-        //检查是否有信息为空
-        if (studentBasicInfo.getName() == null
-                || studentBasicInfo.getGender() == null
-                || studentBasicInfo.getBirthDate() == null
-                || studentBasicInfo.getHighestEducation() == null
-                || studentBasicInfo.getSchoolName() == null
-                || studentBasicInfo.getMajor() == null
-                || studentBasicInfo.getStudyPeriod() == null
-                || studentBasicInfo.getExpectedPosition() == null) {
-            return Result.fail("请填写完整信息");
-        }
+//        检查是否有信息为空
+//        if (studentBasicInfo.getName() == null
+//                || studentBasicInfo.getGender() == null
+//                || studentBasicInfo.getBirthDate() == null
+//                || studentBasicInfo.getHighestEducation() == null
+//                || studentBasicInfo.getSchoolName() == null
+//                || studentBasicInfo.getMajor() == null
+//                || studentBasicInfo.getStudyPeriod() == null
+//                || studentBasicInfo.getExpectedPosition() == null) {
+//            return Result.fail("请填写完整信息");
+//        }
+        UserDTO user = UserHolder.getUser();
+        Long userId = user.getId();
+        studentBasicInfo.setUserId(userId);
         save(studentBasicInfo);
         return Result.ok();
+    }
+    @Override
+    public Result getStudentBasicInfo() {
+        //获取当前用户
+        UserDTO user = UserHolder.getUser();
+
+        if(user == null){
+            return Result.fail("请先登录");
+        }
+
+        return Result.ok(user);
     }
 }

@@ -7,4 +7,5 @@ public class StudentDTO {
     private String icon;
     private enum sex{ MALE, FEMALE;};
     private String phone;
+    private String schoolName;
 }

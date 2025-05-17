@@ -4,10 +4,7 @@ import com.ShiXi.dto.Result;
 import com.ShiXi.entity.StudentBasicInfo;
 import com.ShiXi.service.StudentBasicInfoService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -21,5 +18,9 @@ public class StudentBasicInfoController {
     @PostMapping("/register/basicInfo")
     public Result saveStudentBasicInfo(@RequestBody StudentBasicInfo studentBasicInfo){
         return studentBasicInfoService.saveStudentBasicInfo(studentBasicInfo);
+    }
+    @GetMapping("/me")
+    public Result getStudentBasicInfo(){
+        return studentBasicInfoService.getStudentBasicInfo();
     }
 }
