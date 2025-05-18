@@ -1,2 +1,12 @@
-package com.ShiXi.dto;public class ScrollResult {
+package com.ShiXi.dto;
+
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+public class ScrollResult {
+    private List<?> list;
+    private Long minTime;
+    private Integer offset;
 }

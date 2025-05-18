@@ -1,2 +1,9 @@
-package com.ShiXi.mapper;public interface FollowMapper {
+package com.ShiXi.mapper;
+
+import com.ShiXi.entity.Follow;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+public interface FollowMapper extends BaseMapper<Follow> {
+
 }
+
