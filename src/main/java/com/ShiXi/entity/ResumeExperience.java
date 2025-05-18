@@ -1,0 +1,32 @@
+package com.ShiXi.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
+@TableName("resume_experience")
+public class ResumeExperience implements Serializable {
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id; // 经历ID
+
+    private Long onlineResumeId; // 所属在线简历的ID
+
+    private String type; // 经历类型（工作、实习、项目、作品集）
+
+    private String description; // 经历描述，长文本
+
+    private String link; // 作品的链接，允许为空
+
+    private LocalDateTime createTime; // 创建时间
+
+    private LocalDateTime updateTime; // 更新时间
+}
