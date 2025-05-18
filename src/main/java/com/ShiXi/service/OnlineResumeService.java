@@ -1,11 +1,32 @@
 package com.ShiXi.service;
 
 import com.ShiXi.dto.Result;
+import com.ShiXi.entity.ResumeExperience;
+import com.ShiXi.entity.StudentInfo;
 
 public interface OnlineResumeService {
-    /**
-     * 获取在线简历
-     * @return 在线简历的vo类
+    /*
+    * 保存在线简历
      */
-    Result getOnlineResume();
+     Result saveResumeInfo(StudentInfo studentInfo);
+
+    /**
+     * 添加经历
+     */
+     Result  saveExperienceInfo(ResumeExperience resumeExperience);
+
+     /**
+      * 修改在线简历
+      */
+     Result changeResumeInfo(StudentInfo studentInfo);
+
+     /**
+      * 修改经历
+      */
+     Result changeExperienceInfo(ResumeExperience resumeExperience);
+
+    /*
+    * 获取在线简历
+     */
+     Result getOnlineResume();
 }
