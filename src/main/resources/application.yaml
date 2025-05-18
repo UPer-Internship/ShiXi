@@ -8,11 +8,11 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/shixi?useSSL=false&serverTimezone=UTC
     username: root
-    password: 12345678
+    password: 1234
   redis:
-    host: 192.168.36.129
+    host: 192.168.202.128
     port: 6379
-    password: 111111
+    password: 1234
     lettuce:
       pool:
         max-active: 10
@@ -23,7 +23,6 @@ spring:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:
   type-aliases-package: com.ShiXi.entity # 别名扫描包
-
 logging:
   level:
     com.ShiXi: debug
