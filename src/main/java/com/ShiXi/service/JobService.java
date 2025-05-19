@@ -14,4 +14,6 @@ public interface JobService extends IService<Job> {
     Result pageQuery(JobPageQueryDTO jobPageQueryDTO);
 
     Result queryById(Long id);
+
+    Result deliverResume(Long id);
 }

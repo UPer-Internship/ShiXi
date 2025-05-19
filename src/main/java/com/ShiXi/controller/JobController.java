@@ -32,4 +32,9 @@ public class JobController {
     public Result queryById(@RequestParam("id") Long id){
         return jobService.queryById(id);
     }
+
+    @PostMapping("/deliverResume")
+    public Result deliverResume(@RequestParam("id")Long id){
+        return jobService.deliverResume(id);
+    }
 }

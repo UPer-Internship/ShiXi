@@ -31,12 +31,20 @@ public class EnterpriseController {
     }
     //查询自己已经发布全部岗位
     @GetMapping("/queryMyPubList")
-    Result queryMyPub() {
+    Result queryMyPubList() {
         return enterpriseService.queryMyPubList();
     }
     //更新某个岗位 需要传入更新后的job类 还有这个job的id
     @PostMapping("/updateJob")
     Result updateJob(@RequestBody Job job,@RequestParam("id")Long id) {
         return enterpriseService.updateJob(job,id);
+    }
+    @GetMapping("/queryResumeList")
+    Result queryResumeList() {
+        return enterpriseService.queryResumeList();
+    }
+    @GetMapping("/queryResumeById")
+    Result queryResumeById(@RequestParam("id")Long id) {
+        return enterpriseService.queryResumeById(id);
     }
 }

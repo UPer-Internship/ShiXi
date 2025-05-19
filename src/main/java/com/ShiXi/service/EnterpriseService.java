@@ -13,4 +13,8 @@ public interface EnterpriseService {
     Result updateJob(Job job,Long id);
 
     Result queryPubById(Long id);
+
+    Result queryResumeList();
+
+    Result queryResumeById(Long id);
 }

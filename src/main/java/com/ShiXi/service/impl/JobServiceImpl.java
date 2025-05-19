@@ -1,5 +1,6 @@
 package com.ShiXi.service.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.ShiXi.dto.JobPageQueryDTO;
 import com.ShiXi.dto.PageResult;
 import com.ShiXi.dto.Result;
@@ -10,11 +11,15 @@ import com.ShiXi.mapper.JobMapper;
 import com.ShiXi.mapper.UserMapper;
 import com.ShiXi.service.JobService;
 import com.ShiXi.utils.SystemConstants;
+import com.ShiXi.utils.UserHolder;
+import com.ShiXi.vo.InboxVO;
+import com.ShiXi.vo.OnlineResumeVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -25,6 +30,10 @@ import java.util.List;
 public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobService {
     @Resource
     private JobMapper jobMapper;
+    @Resource
+    StringRedisTemplate stringRedisTemplate;
+    @Resource
+    OnlineResumeServiceImpl onlineResumeService;
     /**
      * 分页模糊匹配
      *
@@ -72,5 +81,28 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     @Override
     public Result queryById(Long id) {
         return Result.ok(getById(id));
+    }
+
+    @Override
+    public Result deliverResume(Long id) {//传入的是job的id
+        //获取job对象
+        //在job对象中找到发布者的id
+        Long HRId=getById(id).getPublisherId();
+        //找出学生的id
+        Long userId=UserHolder.getUser().getId();
+
+        //投递到发布者的收件箱中
+        String key="inbox:"+HRId;//hr的收件箱
+        InboxVO inboxVO=new InboxVO();
+        inboxVO.setJobId(id);
+        inboxVO.setSubmitterId(userId);
+//        inboxVO.setIcon("");
+//        inboxVO.setGender("");
+//        inboxVO.setJobName("");
+//        inboxVO.s
+        String Json=JSONUtil.toJsonStr(inboxVO);
+        stringRedisTemplate.opsForZSet().add(key,Json,System.currentTimeMillis());
+        //TODO 异步回写mysql
+        return Result.ok();
     }
 }

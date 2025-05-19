@@ -1,26 +1,33 @@
 package com.ShiXi.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
+@Accessors(chain = true)
 @TableName("job")
 public class Job implements Serializable {
+
     private static final long serialVersionUID = 1L;
+
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    //TODO 全部改成下划线命名才能生效
+
   //  @TableField("publisher_id")
     private Long publisherId;
     private String title;
     private String salary;//薪水
     private String frequency;//4天/周
-   // @TableField("total_time")
+  // @TableField("total_time")
     private String totalTime;//4个月
    // @TableField("enterprise_type")
     private String enterpriseType;//外企 校友企业

@@ -41,7 +41,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         || studentInfo.getMajor() == null){
             return Result.fail("请填写完整信息");
         }
-        studentInfo.setId(userId);
+        studentInfo.setUserId(userId);
         save(studentInfo);
         return Result.ok();
     }
