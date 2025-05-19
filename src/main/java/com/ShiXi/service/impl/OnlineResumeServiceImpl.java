@@ -6,7 +6,6 @@ import com.ShiXi.entity.StudentInfo;
 import com.ShiXi.mapper.ResumeExperienceMapper;
 import com.ShiXi.mapper.StudentInfoMapper;
 import com.ShiXi.service.OnlineResumeService;
-import com.ShiXi.service.StudentInfoService;
 import com.ShiXi.utils.UserHolder;
 import com.ShiXi.vo.OnlineResumeVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -51,7 +50,7 @@ public class OnlineResumeServiceImpl extends ServiceImpl<StudentInfoMapper, Stud
     public Result saveExperienceInfo(ResumeExperience resumeExperience){
         //Long userId = 1L;
         Long userId = UserHolder.getUser().getId();
-        resumeExperience.setOnlineResumeId(userId);
+        resumeExperience.setStudentInfoId(userId);
         resumeExperienceMapper.insert(resumeExperience);
         return Result.ok();
     }
@@ -78,7 +77,7 @@ public class OnlineResumeServiceImpl extends ServiceImpl<StudentInfoMapper, Stud
     @Override
     public Result changeExperienceInfo(ResumeExperience resumeExperience){
         Long userId = UserHolder.getUser().getId();
-        resumeExperience.setOnlineResumeId(userId);
+        resumeExperience.setStudentInfoId(userId);
         resumeExperienceMapper.updateById(resumeExperience);
         return Result.ok();
     }
@@ -105,12 +104,12 @@ public class OnlineResumeServiceImpl extends ServiceImpl<StudentInfoMapper, Stud
 
         //  查询 resume_experience 表中该简历相关的经历信息
         QueryWrapper<ResumeExperience> experienceQueryWrapper = new QueryWrapper<>();
-        experienceQueryWrapper.eq("online_resume_id", studentInfo.getId());
+        experienceQueryWrapper.eq("student_info_id", studentInfo.getId());
         List<ResumeExperience> resumeExperiences = resumeExperienceMapper.selectList(experienceQueryWrapper);
 
         //  构建 VO 对象并赋值
         OnlineResumeVO onlineResumeVO = new OnlineResumeVO();
-        BeanUtils.copyProperties(onlineResumeVO,studentInfo); // 属性拷贝
+        BeanUtils.copyProperties(studentInfo,onlineResumeVO); // 属性拷贝
 
         //  将不同类型的经历分类放入对应的集合中
         for (ResumeExperience experience : resumeExperiences) {

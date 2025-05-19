@@ -18,7 +18,7 @@ public class ResumeExperience implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id; // 经历ID
 
-    private Long onlineResumeId; // 所属在线简历的ID
+    private Long studentInfoId; // 所属在线简历的ID
 
     private String type; // 经历类型（工作、实习、项目、作品集）
 
