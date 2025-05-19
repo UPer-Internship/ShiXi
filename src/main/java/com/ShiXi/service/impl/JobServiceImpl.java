@@ -1,6 +1,7 @@
 package com.ShiXi.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.ShiXi.dto.JobFuzzyQueryDTO;
 import com.ShiXi.dto.JobPageQueryDTO;
 import com.ShiXi.dto.PageResult;
 import com.ShiXi.dto.Result;
@@ -34,6 +35,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     StringRedisTemplate stringRedisTemplate;
     @Resource
     OnlineResumeServiceImpl onlineResumeService;
+
     /**
      * 分页模糊匹配
      *
@@ -42,7 +44,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
      */
     @Override
     public Result pageQuery(JobPageQueryDTO jobPageQueryDTO) {
-        log.info("分页查询职位信息{}", jobPageQueryDTO);
+        //log.info("分页查询职位信息{}", jobPageQueryDTO);
         // 创建分页对象
         Page<Job> jobPage = new Page<>(jobPageQueryDTO.getPage(), jobPageQueryDTO.getPageSize());
 
@@ -75,6 +77,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
 
     /**
      * 根据id查询职位
+     *
      * @param id id
      * @return Job信息
      */
@@ -87,22 +90,69 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     public Result deliverResume(Long id) {//传入的是job的id
         //获取job对象
         //在job对象中找到发布者的id
-        Long HRId=getById(id).getPublisherId();
+        Long HRId = getById(id).getPublisherId();
         //找出学生的id
-        Long userId=UserHolder.getUser().getId();
+        Long userId = UserHolder.getUser().getId();
 
         //投递到发布者的收件箱中
-        String key="inbox:"+HRId;//hr的收件箱
-        InboxVO inboxVO=new InboxVO();
+        String key = "inbox:" + HRId;//hr的收件箱
+        InboxVO inboxVO = new InboxVO();
         inboxVO.setJobId(id);
         inboxVO.setSubmitterId(userId);
 //        inboxVO.setIcon("");
 //        inboxVO.setGender("");
 //        inboxVO.setJobName("");
 //        inboxVO.s
-        String Json=JSONUtil.toJsonStr(inboxVO);
-        stringRedisTemplate.opsForZSet().add(key,Json,System.currentTimeMillis());
+        String Json = JSONUtil.toJsonStr(inboxVO);
+        stringRedisTemplate.opsForZSet().add(key, Json, System.currentTimeMillis());
         //TODO 异步回写mysql
         return Result.ok();
     }
+
+    /**
+     * 到数据库中模糊查询
+     *
+     * @param jobFuzzyQueryDTO 查询条件
+     * @return 查询结果
+     */
+    @Override
+    public Result fuzzyQuery(JobFuzzyQueryDTO jobFuzzyQueryDTO) {
+        log.info("模糊查询职位信息{}", jobFuzzyQueryDTO);
+        // 创建分页查询信息
+        Page<Job> jobPage = new Page<>(jobFuzzyQueryDTO.getPage(), jobFuzzyQueryDTO.getPageSize());
+
+        // 创建查询条件并使用 QueryWrapper
+        QueryWrapper<Job> queryWrapper = new QueryWrapper<>();
+
+        // 添加模糊查询条件
+        if (jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty()) {
+            queryWrapper.like("title", jobFuzzyQueryDTO.getKeyWord()) // 职位名
+                    .or()
+                    .like("category", jobFuzzyQueryDTO.getKeyWord()) // 类别
+                    .or()
+                    .like("type", jobFuzzyQueryDTO.getKeyWord()) // 类型
+                    .or()
+                    .like("detailed_information", jobFuzzyQueryDTO.getKeyWord()) // 职位描述
+                    .or()
+                    .like("work_location", jobFuzzyQueryDTO.getKeyWord()) // 工作地点
+                    .or()
+                    .like("enterprise_name", jobFuzzyQueryDTO.getKeyWord()) // 公司名
+                    .or()
+                    .like("enterprise_type", jobFuzzyQueryDTO.getKeyWord()) // 公司类型
+                    .or()
+                    .like("enterprise_scale", jobFuzzyQueryDTO.getKeyWord()) // 公司规模
+                    .or()
+                    .like("frequency", jobFuzzyQueryDTO.getKeyWord()) // 工作频率
+                    .or()
+                    .like("salary", jobFuzzyQueryDTO.getKeyWord()); // 薪资
+        }
+
+        // 执行分页查询
+        jobMapper.selectPage(jobPage, queryWrapper);
+
+        // 返回查询结果
+        return Result.ok(new PageResult(jobPage.getTotal(), jobPage.getRecords()));
+    }
+
+
 }

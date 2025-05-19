@@ -1,5 +1,6 @@
 package com.ShiXi.controller;
 
+import com.ShiXi.dto.JobFuzzyQueryDTO;
 import com.ShiXi.dto.JobPageQueryDTO;
 import com.ShiXi.dto.Result;
 import com.ShiXi.service.JobService;
@@ -33,6 +34,15 @@ public class JobController {
         return jobService.queryById(id);
     }
 
+    /**
+     * 模糊查询Job信息
+     * @param  jobFuzzyQueryDTO 模糊查询条件
+     * @return 模糊查询结果
+     */
+    @GetMapping("/fuzzyQuery")
+    public Result fuzzyQuery(@RequestBody JobFuzzyQueryDTO jobFuzzyQueryDTO){
+        return jobService.fuzzyQuery(jobFuzzyQueryDTO);
+    }
     @PostMapping("/deliverResume")
     public Result deliverResume(@RequestParam("id")Long id){
         return jobService.deliverResume(id);
