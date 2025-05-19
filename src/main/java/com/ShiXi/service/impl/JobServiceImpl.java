@@ -3,11 +3,13 @@ package com.ShiXi.service.impl;
 import com.ShiXi.dto.JobPageQueryDTO;
 import com.ShiXi.dto.PageResult;
 import com.ShiXi.dto.Result;
+import com.ShiXi.entity.Blog;
 import com.ShiXi.entity.Job;
 import com.ShiXi.entity.User;
 import com.ShiXi.mapper.JobMapper;
 import com.ShiXi.mapper.UserMapper;
 import com.ShiXi.service.JobService;
+import com.ShiXi.utils.SystemConstants;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -52,6 +55,13 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
 
         // 封装并返回分页结果
         return Result.ok(new PageResult(jobPage.getTotal(), jobPage.getRecords()));
+
+//        Page<Job> jobPage=query().page(new Page<>(1,3));
+//        List<Job> records = jobPage.getRecords();
+//        // 查询用户
+//
+//        return Result.ok(records);
+
     }
 
     /**

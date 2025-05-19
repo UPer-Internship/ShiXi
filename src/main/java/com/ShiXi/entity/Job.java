@@ -14,6 +14,7 @@ public class Job implements Serializable {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
+    //TODO 全部改成下划线命名才能生效
   //  @TableField("publisher_id")
     private Long publisherId;
     private String title;
