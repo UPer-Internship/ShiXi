@@ -44,34 +44,14 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
      */
     @Override
     public Result pageQuery(JobPageQueryDTO jobPageQueryDTO) {
-        //log.info("分页查询职位信息{}", jobPageQueryDTO);
-        // 创建分页对象
-        Page<Job> jobPage = new Page<>(jobPageQueryDTO.getPage(), jobPageQueryDTO.getPageSize());
+        Page<Job> jobPage = query()
+                .eq(jobPageQueryDTO.getType() != null, "type", jobPageQueryDTO.getType())
+                .like(jobPageQueryDTO.getCategory() != null, "category", jobPageQueryDTO.getCategory())
+                .page(new Page<>(jobPageQueryDTO.getPage(), jobPageQueryDTO.getPageSize()));
 
-        // 创建查询条件并使用 QueryWrapper
-        QueryWrapper<Job> queryWrapper = new QueryWrapper<>();
-
-        // 判断type字段是否为空，如果不为空则添加查询条件
-        if (jobPageQueryDTO.getType() != null) {
-            queryWrapper.eq("type", jobPageQueryDTO.getType());
-        }
-
-        // 判断category字段是否为空，如果不为空则添加模糊查询条件
-        if (jobPageQueryDTO.getCategory() != null) {
-            queryWrapper.like("category", jobPageQueryDTO.getCategory());
-        }
-
-        // 执行分页查询
-        jobMapper.selectPage(jobPage, queryWrapper);
-
-        // 封装并返回分页结果
-        return Result.ok(new PageResult(jobPage.getTotal(), jobPage.getRecords()));
-
-//        Page<Job> jobPage=query().page(new Page<>(1,3));
-//        List<Job> records = jobPage.getRecords();
-//        // 查询用户
-//
-//        return Result.ok(records);
+        List<Job> records = jobPage.getRecords();
+        PageResult pageResult = new PageResult(records.size(), records);
+        return Result.ok(pageResult);
 
     }
 
@@ -117,41 +97,35 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
      */
     @Override
     public Result fuzzyQuery(JobFuzzyQueryDTO jobFuzzyQueryDTO) {
-        log.info("模糊查询职位信息{}", jobFuzzyQueryDTO);
-        // 创建分页查询信息
-        Page<Job> jobPage = new Page<>(jobFuzzyQueryDTO.getPage(), jobFuzzyQueryDTO.getPageSize());
+        // 使用 query() 进行模糊查询
+        Page<Job> jobPage = query()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "title", jobFuzzyQueryDTO.getKeyWord()) // 职位名
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "category", jobFuzzyQueryDTO.getKeyWord()) // 类别
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "type", jobFuzzyQueryDTO.getKeyWord()) // 类型
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "detailed_information", jobFuzzyQueryDTO.getKeyWord()) // 职位描述
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "work_location", jobFuzzyQueryDTO.getKeyWord()) // 工作地点
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "enterprise_name", jobFuzzyQueryDTO.getKeyWord()) // 公司名
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "enterprise_type", jobFuzzyQueryDTO.getKeyWord()) // 公司类型
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "enterprise_scale", jobFuzzyQueryDTO.getKeyWord()) // 公司规模
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "frequency", jobFuzzyQueryDTO.getKeyWord()) // 工作频率
+                .or()
+                .like(jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty(), "salary", jobFuzzyQueryDTO.getKeyWord()) // 薪资
+                .page(new Page<>(jobFuzzyQueryDTO.getPage(), jobFuzzyQueryDTO.getPageSize()));
 
-        // 创建查询条件并使用 QueryWrapper
-        QueryWrapper<Job> queryWrapper = new QueryWrapper<>();
-
-        // 添加模糊查询条件
-        if (jobFuzzyQueryDTO.getKeyWord() != null && !jobFuzzyQueryDTO.getKeyWord().isEmpty()) {
-            queryWrapper.like("title", jobFuzzyQueryDTO.getKeyWord()) // 职位名
-                    .or()
-                    .like("category", jobFuzzyQueryDTO.getKeyWord()) // 类别
-                    .or()
-                    .like("type", jobFuzzyQueryDTO.getKeyWord()) // 类型
-                    .or()
-                    .like("detailed_information", jobFuzzyQueryDTO.getKeyWord()) // 职位描述
-                    .or()
-                    .like("work_location", jobFuzzyQueryDTO.getKeyWord()) // 工作地点
-                    .or()
-                    .like("enterprise_name", jobFuzzyQueryDTO.getKeyWord()) // 公司名
-                    .or()
-                    .like("enterprise_type", jobFuzzyQueryDTO.getKeyWord()) // 公司类型
-                    .or()
-                    .like("enterprise_scale", jobFuzzyQueryDTO.getKeyWord()) // 公司规模
-                    .or()
-                    .like("frequency", jobFuzzyQueryDTO.getKeyWord()) // 工作频率
-                    .or()
-                    .like("salary", jobFuzzyQueryDTO.getKeyWord()); // 薪资
-        }
-
-        // 执行分页查询
-        jobMapper.selectPage(jobPage, queryWrapper);
+        // 获取查询结果
+        List<Job> records = jobPage.getRecords();
+        PageResult pageResult = new PageResult(records.size(), records);
 
         // 返回查询结果
-        return Result.ok(new PageResult(jobPage.getTotal(), jobPage.getRecords()));
+        return Result.ok(pageResult);
     }
 
 
