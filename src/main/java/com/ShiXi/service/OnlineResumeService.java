@@ -3,6 +3,7 @@ package com.ShiXi.service;
 import com.ShiXi.dto.Result;
 import com.ShiXi.entity.ResumeExperience;
 import com.ShiXi.entity.StudentInfo;
+import com.ShiXi.vo.OnlineResumeVO;
 
 public interface OnlineResumeService {
     /*
@@ -29,4 +30,6 @@ public interface OnlineResumeService {
     * 获取在线简历
      */
      Result getOnlineResume();
+
+     OnlineResumeVO queryResumeById(Long id);
 }

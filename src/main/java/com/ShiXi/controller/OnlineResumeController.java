@@ -49,5 +49,10 @@ public class OnlineResumeController {
         return onlineResumeService.getOnlineResume();
     }
 
+//    @GetMapping("/resume/queryResumeById")
+//    public Result queryResumeById(@RequestParam("id") Long id) {
+//        return onlineResumeService.queryResumeById(id);
+//    }
+
 
 }

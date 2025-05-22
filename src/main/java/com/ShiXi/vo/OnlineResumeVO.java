@@ -1,8 +1,12 @@
 package com.ShiXi.vo;
 
 import com.ShiXi.entity.ResumeExperience;
+import com.ShiXi.entity.StudentInfo;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,19 +20,18 @@ import java.util.List;
 @EqualsAndHashCode
 public class OnlineResumeVO {
     // 基础简历信息
-    private Long id;
-    private Long userId;
-    private String name;
-    private String schoolName;
-    private String major;
-    private LocalDate graduationDate;
-    private Integer age;
-    private String phone;
-    private String wechat;
-    private String educationLevel;
-    private String advantages;
-    private LocalDateTime createTime;
-    private LocalDateTime updateTime;
+    private String name;//姓名
+    private String gender;//性别
+    private String birthDate;//出生年月
+    private String icon;//头像
+    private String schoolName;//学校名称
+    private String major;//专业
+    private LocalDate graduationDate;//毕业时间
+    private String phone;//手机号
+    private String wechat;//微信
+    private String educationLevel;//学历
+    private String advantages;//优势
+    private String expectedPosition;//期望职位
 
     // 分类后的经历集合
     private List<ResumeExperience> internshipExperiences = new ArrayList<>();//实习
