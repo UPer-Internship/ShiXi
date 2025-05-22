@@ -32,6 +32,7 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     public Result saveStudentBasicInfo(StudentInfo studentInfo){
         UserDTO user = UserHolder.getUser();
         Long userId = user.getId();
+
         //检查是否有信息为空
         if(studentInfo.getName() == null
         || studentInfo.getGender() == null
@@ -41,7 +42,8 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
         || studentInfo.getMajor() == null){
             return Result.fail("请填写完整信息");
         }
-        studentInfo.setId(userId);
+        //studentInfo.setId(userId);
+        studentInfo.setUserId(userId);
         save(studentInfo);
         return Result.ok();
     }
@@ -49,14 +51,15 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     @Override
     public Result getStudentBasicInfo(){
         UserDTO user = UserHolder.getUser();
+        System.out.println(user);
         return Result.ok(user);
     }
 
     @Override
     public Result changeStudentBasicInfo(StudentInfo studentInfo){
-         Long userId = 1L;
-         //Long userId = UserHolder.getUser().getId();
-         studentInfo.setId(userId);
+         //Long userId = 1L;
+         Long userId = UserHolder.getUser().getId();
+         studentInfo.setUserId(userId);
          updateById(studentInfo);
          return Result.ok();
     }

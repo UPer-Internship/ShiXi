@@ -1,6 +1,7 @@
 package com.ShiXi.service;
 
 import com.ShiXi.dto.Result;
+import com.ShiXi.dto.UserDTO;
 import com.ShiXi.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 

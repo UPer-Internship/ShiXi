@@ -6,7 +6,7 @@ CREATE TABLE `user`
 (
     `id`         BIGINT       NOT NULL AUTO_INCREMENT COMMENT '用户ID',
     `phone`      VARCHAR(20)  NOT NULL COMMENT '电话号码',
-    `password`   VARCHAR(255) NOT NULL COMMENT '密码',
+    `password`   VARCHAR(255)  COMMENT '密码',
     `nick_name`   VARCHAR(100) NOT NULL COMMENT '昵称',
     `icon`       VARCHAR(255) DEFAULT '' COMMENT '头像',
     `create_time` DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
