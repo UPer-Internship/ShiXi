@@ -10,6 +10,9 @@ import lombok.experimental.Accessors;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * 简历中的经历类
+ */
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)

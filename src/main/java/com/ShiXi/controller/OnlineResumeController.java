@@ -4,15 +4,10 @@ import com.ShiXi.dto.Result;
 import com.ShiXi.entity.ResumeExperience;
 import com.ShiXi.entity.StudentInfo;
 import com.ShiXi.service.OnlineResumeService;
-import com.ShiXi.utils.UserHolder;
-import com.ShiXi.vo.OnlineResumeVO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 在线简历相关接口

@@ -43,6 +43,12 @@ public class JobController {
     public Result fuzzyQuery(@RequestBody JobFuzzyQueryDTO jobFuzzyQueryDTO){
         return jobService.fuzzyQuery(jobFuzzyQueryDTO);
     }
+
+    /**
+     * 投递简历
+     * @param id 向id的工作投递简历，传入的是Job的id
+     * @return
+     */
     @PostMapping("/deliverResume")
     public Result deliverResume(@RequestParam("id")Long id){
         return jobService.deliverResume(id);

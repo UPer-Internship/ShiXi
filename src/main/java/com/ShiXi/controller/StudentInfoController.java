@@ -1,10 +1,8 @@
 package com.ShiXi.controller;
 
 import com.ShiXi.dto.Result;
-import com.ShiXi.entity.ResumeExperience;
 import com.ShiXi.entity.StudentInfo;
 import com.ShiXi.service.StudentInfoService;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
