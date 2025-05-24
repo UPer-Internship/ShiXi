@@ -1,7 +1,6 @@
 package com.ShiXi.service;
 
 import com.ShiXi.dto.Result;
-import com.ShiXi.entity.ResumeExperience;
 import com.ShiXi.entity.StudentInfo;
 
 public interface StudentInfoService {

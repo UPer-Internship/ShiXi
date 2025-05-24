@@ -5,18 +5,11 @@ import com.ShiXi.dto.JobFuzzyQueryDTO;
 import com.ShiXi.dto.JobPageQueryDTO;
 import com.ShiXi.dto.PageResult;
 import com.ShiXi.dto.Result;
-import com.ShiXi.entity.Blog;
 import com.ShiXi.entity.Job;
-import com.ShiXi.entity.User;
 import com.ShiXi.mapper.JobMapper;
-import com.ShiXi.mapper.UserMapper;
 import com.ShiXi.service.JobService;
-import com.ShiXi.utils.SystemConstants;
 import com.ShiXi.utils.UserHolder;
 import com.ShiXi.vo.InboxVO;
-import com.ShiXi.vo.OnlineResumeVO;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +59,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         return Result.ok(getById(id));
     }
 
+    /**
+     * 投递简历
+     * @param id 岗位id
+     * @return
+     */
     @Override
     public Result deliverResume(Long id) {//传入的是job的id
         //获取job对象
@@ -90,7 +88,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     }
 
     /**
-     * 到数据库中模糊查询
+     * 到数据库中模糊查询相关的职位
      *
      * @param jobFuzzyQueryDTO 查询条件
      * @return 查询结果
