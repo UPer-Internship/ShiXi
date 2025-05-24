@@ -14,8 +14,18 @@ public interface JobService extends IService<Job> {
      */
     Result pageQuery(JobPageQueryDTO jobPageQueryDTO);
 
+    /**
+     * 根据id查询岗位信息
+     * @param id
+     * @return
+     */
     Result queryById(Long id);
 
+    /**
+     * 投递简历
+     * @param id 岗位id
+     * @return
+     */
     Result deliverResume(Long id);
 
     /**

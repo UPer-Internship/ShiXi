@@ -3,6 +3,8 @@ package com.ShiXi.controller;
 import com.ShiXi.dto.Result;
 import com.ShiXi.entity.Job;
 import com.ShiXi.service.EnterpriseService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/enterprise")
+@Api(tags = "企业相关接口")
 public class EnterpriseController {
     @Resource
     EnterpriseService enterpriseService;
@@ -20,6 +23,7 @@ public class EnterpriseController {
      * @param job 岗位类
      * @return
      */
+    @ApiOperation("发布岗位")
     @PostMapping("/pubJob")
     Result pubJob(@RequestBody Job job) {
         return enterpriseService.pubJob(job);
@@ -30,6 +34,7 @@ public class EnterpriseController {
      * @param id
      * @return
      */
+    @ApiOperation("删除岗位")
     @PostMapping("/deleteJob")
     Result pubJob(@RequestParam("id")Long id) {
         return enterpriseService.deleteJob(id);
@@ -37,6 +42,7 @@ public class EnterpriseController {
     /**
      * 根据id查询某个岗位
      */
+    @ApiOperation("根据id查询某个岗位")
     @GetMapping("/queryPubById")
     Result queryPubNyId(@RequestParam("id")Long id) {
         return enterpriseService.queryPubById(id);
@@ -46,6 +52,7 @@ public class EnterpriseController {
      * 查询自己已经发布全部岗位
      * @return
      */
+    @ApiOperation("查询自己已经发布全部岗位")
     @GetMapping("/queryMyPubList")
     Result queryMyPubList() {
         return enterpriseService.queryMyPubList();
@@ -57,6 +64,7 @@ public class EnterpriseController {
      * @param id 要更新的job的id
      * @return
      */
+    @ApiOperation("更新某个岗位")
     @PostMapping("/updateJob")
     Result updateJob(@RequestBody Job job,@RequestParam("id")Long id) {
         return enterpriseService.updateJob(job,id);
@@ -66,6 +74,7 @@ public class EnterpriseController {
      * 查询收到的所有简历
      * @return 所有简历
      */
+    @ApiOperation("查询收到的所有简历")
     @GetMapping("/queryResumeList")
     Result queryResumeList() {
         return enterpriseService.queryResumeList();
@@ -76,6 +85,7 @@ public class EnterpriseController {
      * @param id 要查询的简历的id
      * @return 该简历
      */
+    @ApiOperation("根据id查询某个简历")
     @GetMapping("/queryResumeById")
     Result queryResumeById(@RequestParam("id")Long id) {
         return enterpriseService.queryResumeById(id);

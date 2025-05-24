@@ -59,6 +59,11 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         return Result.ok(getById(id));
     }
 
+    /**
+     * 投递简历
+     * @param id 岗位id
+     * @return
+     */
     @Override
     public Result deliverResume(Long id) {//传入的是job的id
         //获取job对象
