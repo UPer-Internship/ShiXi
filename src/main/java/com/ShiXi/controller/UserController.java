@@ -1,12 +1,10 @@
 package com.ShiXi.controller;
 
 import com.ShiXi.dto.Result;
+import com.ShiXi.dto.UserDTO;
 import com.ShiXi.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -30,6 +28,11 @@ public class UserController {
     @PostMapping("/login/byPhone")
     public Result loginByPhone(@RequestParam("phone")String phone,@RequestParam("code")String code) {
         return userService.loginByPhone(phone,code);
+    }
+
+    @PostMapping("/changeInfo")
+    public Result changeUserInfo(@RequestBody UserDTO userDTO){
+        return userService.changeUserInfo(userDTO);
     }
 
 }

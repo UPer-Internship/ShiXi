@@ -19,8 +19,10 @@ import com.ShiXi.utils.SystemConstants;
 import com.ShiXi.utils.UserHolder;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ import java.util.stream.Collectors;
 import static com.ShiXi.utils.RedisConstants.BLOG_LIKED_KEY;
 import static com.ShiXi.utils.RedisConstants.FEED_KEY;
 
+@Slf4j
+@Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements BlogService {
     @Resource
     private UserService userService;

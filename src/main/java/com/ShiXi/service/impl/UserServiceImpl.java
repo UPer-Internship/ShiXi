@@ -10,6 +10,7 @@ import com.ShiXi.entity.User;
 import com.ShiXi.mapper.UserMapper;
 import com.ShiXi.service.UserService;
 import com.ShiXi.utils.RegexUtils;
+import com.ShiXi.utils.UserHolder;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -121,5 +122,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 2.保存用户
         save(user);
         return user;
+    }
+
+    @Override
+    public Result changeUserInfo(UserDTO userDTO) {
+        //获取当前登录用户
+        UserDTO currentUser = UserHolder.getUser();
+        //获取当前登录用户的id
+        Long userId = currentUser.getId();
+        //根据id查询用户
+        User user = query().eq("id", userId).one();
+        //修改用户信息
+        user.setNickName(userDTO.getNickName());
+        user.setIcon(userDTO.getIcon());
+        UserHolder.removeUser();
+        UserHolder.saveUser(userDTO);
+        updateById(user);
+        return Result.ok(user);
     }
 }

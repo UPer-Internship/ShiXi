@@ -21,7 +21,11 @@ public class JobController {
      * @return 分页查询结果
      */
     @GetMapping("/pageQuery")
-    public Result pageQuery(@RequestBody JobPageQueryDTO jobPageQueryDTO){
+    public Result pageQuery( @RequestParam(required = false) Integer page,
+                             @RequestParam(required = false) Integer pageSize,
+                             @RequestParam(required = false) String type,
+                             @RequestParam(required = false) String category){
+        JobPageQueryDTO jobPageQueryDTO = new JobPageQueryDTO(page, pageSize, type, category);
         return jobService.pageQuery(jobPageQueryDTO);
     }
 
@@ -36,11 +40,14 @@ public class JobController {
 
     /**
      * 模糊查询Job信息
-     * @param  jobFuzzyQueryDTO 模糊查询条件
+     * 模糊查询条件
      * @return 模糊查询结果
      */
     @GetMapping("/fuzzyQuery")
-    public Result fuzzyQuery(@RequestBody JobFuzzyQueryDTO jobFuzzyQueryDTO){
+    public Result fuzzyQuery(@RequestParam(required = false) String keyWord,
+                             @RequestParam(required = false) Integer page,
+                             @RequestParam(required = false) Integer pageSize){
+        JobFuzzyQueryDTO jobFuzzyQueryDTO = new JobFuzzyQueryDTO(keyWord, page, pageSize);
         return jobService.fuzzyQuery(jobFuzzyQueryDTO);
     }
     @PostMapping("/deliverResume")

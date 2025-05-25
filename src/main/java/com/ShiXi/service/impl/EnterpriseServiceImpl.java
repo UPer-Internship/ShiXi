@@ -62,7 +62,7 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
     @Override
     public Result queryMyPubList() {
         Long userId = UserHolder.getUser().getId();
-        List<Job> myPub = query().eq("publisher_id", userId).select("id","title").list();
+        List<Job> myPub = query().eq("publisher_id", userId).select("id","title","work_location","create_time").list();
         return Result.ok(myPub);
     }
 
