@@ -2,21 +2,16 @@ package com.ShiXi.service.impl;
 
 import com.ShiXi.dto.Result;
 import com.ShiXi.dto.UserDTO;
-import com.ShiXi.entity.ResumeExperience;
 import com.ShiXi.entity.StudentInfo;
 import com.ShiXi.mapper.ResumeExperienceMapper;
 import com.ShiXi.mapper.StudentInfoMapper;
 import com.ShiXi.service.StudentInfoService;
 import com.ShiXi.utils.UserHolder;
-import com.ShiXi.vo.OnlineResumeVO;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @Slf4j
 @Service

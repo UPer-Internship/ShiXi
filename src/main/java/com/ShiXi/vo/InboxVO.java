@@ -3,8 +3,9 @@ package com.ShiXi.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.time.LocalDate;
-
+/**
+ * 用于封装与收件箱相关的数据
+ */
 @Data
 @EqualsAndHashCode
 public class InboxVO {
@@ -18,5 +19,4 @@ public class InboxVO {
 //    private String major;
 //    private LocalDate graduationDate;
 //    private String educationLevel;
-
 }
