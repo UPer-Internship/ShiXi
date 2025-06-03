@@ -8,11 +8,11 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://localhost:3306/shixi?useSSL=false&serverTimezone=UTC
     username: "root"
-    password: "061532"
+    password: "1234"
   redis:
-    host: localhost
+    host: 192.168.202.128
     port: 6379
-    password: 061532
+    password: 1234
     lettuce:
       pool:
         max-active: 10
@@ -26,3 +26,9 @@ mybatis-plus:
 logging:
   level:
     com.ShiXi: debug
+
+# 微信相关配置
+shixi:
+  wechat:
+    appid: wxa0f0e0d0e0d0e0d0e
+    secret: 1234567890
