@@ -4,9 +4,10 @@ USE shixi;
 -- 用户表
 CREATE TABLE `user`
 (
-    `id`         BIGINT       NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    `phone`      VARCHAR(20)  NOT NULL COMMENT '电话号码',
-    `password`   VARCHAR(255)  COMMENT '密码',
+    `id`          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '用户ID',
+    `phone`       VARCHAR(20)  NOT NULL COMMENT '电话号码',
+    `openid`      VARCHAR(255) COMMENT '微信开放id',
+    `password`    VARCHAR(255) COMMENT '密码',
     `nick_name`   VARCHAR(100) NOT NULL COMMENT '昵称',
     `icon`        VARCHAR(255) DEFAULT '' COMMENT '头像',
     `create_time` DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -60,10 +61,10 @@ CREATE TABLE student_info
 (
     id                BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT 'ID',
     user_id           BIGINT UNIQUE NOT NULL COMMENT '用户ID, 外键',
-    name              VARCHAR(255) NOT NULL COMMENT '姓名',
-    gender            VARCHAR(10)  COMMENT '性别，例如：男 / 女',
-    phone             VARCHAR(20)  NOT NULL COMMENT '联系电话',
-    birth_date        VARCHAR(10)  COMMENT '出生年月，格式为 yyyy/MM，例如：2003/10',
+    name              VARCHAR(255)  NOT NULL COMMENT '姓名',
+    gender            VARCHAR(10) COMMENT '性别，例如：男 / 女',
+    phone             VARCHAR(20)   NOT NULL COMMENT '联系电话',
+    birth_date        VARCHAR(10) COMMENT '出生年月，格式为 yyyy/MM，例如：2003/10',
     school_name       VARCHAR(255) COMMENT '学校名称',
     major             VARCHAR(255) COMMENT '专业名称',
     icon              VARCHAR(255) DEFAULT '' COMMENT '用户头像路径，默认空字符串',

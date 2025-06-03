@@ -164,7 +164,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 创建用户
         if (user == null) {
             user = new User();
-            user.setOpenId(openid);
+            user.setOpenid(openid);
             save(user);
         }
         //登录流程，和电话流程一样
