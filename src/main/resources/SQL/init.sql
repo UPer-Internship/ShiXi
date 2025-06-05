@@ -119,4 +119,16 @@ CREATE TABLE `job`
   COLLATE = utf8mb4_0900_ai_ci COMMENT = '职位表'
   ROW_FORMAT = Dynamic;
 
+-- 消息表
+CREATE TABLE message (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  sender_id BIGINT NOT NULL,
+  receiver_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  send_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender_id) REFERENCES user(id),
+  FOREIGN KEY (receiver_id) REFERENCES user(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
 SET FOREIGN_KEY_CHECKS = 1;

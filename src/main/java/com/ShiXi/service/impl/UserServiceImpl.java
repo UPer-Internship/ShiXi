@@ -102,11 +102,30 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             // 2.如果不符合，返回错误信息
             return Result.fail("手机号格式错误！");
         }
+
+        // 获取当前时间戳
+        long currentTime = System.currentTimeMillis();
+
+        // 从 Redis 获取该手机号上次发送验证码的时间
+        String key = LOGIN_CODE_KEY + phone;
+        String lastSendTimeStr = stringRedisTemplate.opsForValue().get(key + ":time"); // 使用新key存储时间戳
+
+        if (lastSendTimeStr != null) {
+            long lastSendTime = Long.parseLong(lastSendTimeStr);
+            // 判断是否在60秒内已经发送过
+            if (currentTime - lastSendTime < 60_000) { // 60秒限制
+                return Result.fail("请勿频繁发送验证码");
+            }
+        }
+
         // 3.符合，生成验证码
         String code = RandomUtil.randomNumbers(6);
 
         // 4.保存验证码到 session
         stringRedisTemplate.opsForValue().set(LOGIN_CODE_KEY + phone, code, LOGIN_CODE_TTL, TimeUnit.MINUTES);
+
+        // 保存本次发送时间
+        stringRedisTemplate.opsForValue().set(key + ":time", String.valueOf(currentTime), 60, TimeUnit.SECONDS); // 过期时间可略大于60s
 
         // 5.发送验证码
         log.debug("发送短信验证码成功，验证码：{}", code);
