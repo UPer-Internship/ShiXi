@@ -14,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.util.Date;
 
-/**
- * 替代原来的 ChatController（去掉 @MessageMapping 和 STOMP 相关逻辑）
- */
 @Slf4j
 @RestController
 @Api(tags = "聊天相关接口")
@@ -62,5 +59,11 @@ public class ChatController {
     @ApiOperation("获取历史消息")
     public Result getMessages(@RequestParam Long userId1, @RequestParam Long userId2){
         return messageService.getMessagesBetweenUsers(userId1,userId2);
+    }
+
+    @GetMapping("/contact/getList")
+    @ApiOperation("获取联系人列表")
+    public Result getContactList(@RequestParam Long userId){
+        return messageService.getContactList(userId);
     }
 }

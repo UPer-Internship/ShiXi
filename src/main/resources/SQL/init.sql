@@ -130,5 +130,16 @@ CREATE TABLE message (
   FOREIGN KEY (receiver_id) REFERENCES user(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- 联系人表
+CREATE TABLE contact (
+     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     user_id BIGINT NOT NULL COMMENT '发起者ID',
+     contact_user_id BIGINT NOT NULL COMMENT '被添加的联系人ID',
+     last_contact_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '最后联系时间',
+     is_blocked BOOLEAN DEFAULT FALSE COMMENT '是否屏蔽该联系人',
+     UNIQUE KEY uk_user_contact (user_id, contact_user_id),
+     FOREIGN KEY (user_id) REFERENCES user(id),
+     FOREIGN KEY (contact_user_id) REFERENCES user(id)
+) ENGINE = InnoDB;
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -10,4 +10,11 @@ public interface MessageService extends IService<ChatMessage> {
 
     Result getMessagesBetweenUsers(Long userId1,Long userId2);
 
+    Result buildContactBetweenUsers(Long userId1,Long userId2);
+
+    boolean existsContactBetweenUsers(Long userId1,Long userId2);
+
+    void updateLastContactTime(Long userId1,Long userId2);
+
+    Result getContactList(Long userId);
 }
