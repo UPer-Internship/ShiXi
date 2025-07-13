@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -18,17 +20,17 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    /**
-     * 账号密码登录
-     * @param account
-     * @param password
-     * @return
-     */
-    @PostMapping("/login/byAccount")
-    @ApiOperation("账号密码登录,已弃用")
-    public Result loginByAccount(@RequestParam("account")String account, @RequestParam("password")String password) {
-        return userService.loginByAccount(account,password);
-    }
+//    /**
+//     * 账号密码登录
+//     * @param account
+//     * @param password
+//     * @return
+//     */
+//    @PostMapping("/login/byAccount")
+//    @ApiOperation("账号密码登录,已弃用")
+//    public Result loginByAccount(@RequestParam("account")String account, @RequestParam("password")String password) {
+//        return userService.loginByAccount(account,password);
+//    }
 
     /**
      * 发送验证码
@@ -52,6 +54,20 @@ public class UserController {
     public Result loginByPhone(@RequestParam("phone")String phone,@RequestParam("code")String code) {
         return userService.loginByPhone(phone,code);
     }
+
+    /**
+     * 用户登录
+     *
+     * @param code 微信返回的code
+     * @return 用户信息
+     */
+    @PostMapping("/login/byWechat")
+    @ApiOperation("微信登录")
+    public Result login(@RequestParam  String code) {
+         return userService.loginByWechat(code);
+    }
+
+
 
     @PostMapping("/changeInfo")
     public Result changeUserInfo(@RequestBody UserDTO userDTO){

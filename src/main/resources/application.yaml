@@ -1,28 +1,3 @@
-server:
-  port: 8081
-
 spring:
-  application:
-    name: ShiXi
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://rm-bp17983fx2z2z0922lo.mysql.rds.aliyuncs.com:3306/shixi?useSSL=false&serverTimezone=UTC
-    username: "higherDevPermissionsAdmin"
-    password: "4UperUpIntern"
-  redis:
-    host: localhost
-    port: 6379
-    password: 061532
-    lettuce:
-      pool:
-        max-active: 10
-        max-idle: 10
-        min-idle: 1
-        time-between-eviction-runs: 10s
-  jackson:
-    default-property-inclusion: non_null # JSON处理时忽略非空字段
-mybatis-plus:
-  type-aliases-package: com.ShiXi.entity # 别名扫描包
-logging:
-  level:
-    com.ShiXi: debug
+  profiles:
+    active: dev
