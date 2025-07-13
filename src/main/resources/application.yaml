@@ -6,9 +6,9 @@ spring:
     name: ShiXi
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/shixi?useSSL=false&serverTimezone=UTC
-    username: "root"
-    password: "061532"
+    url: jdbc:mysql://rm-bp17983fx2z2z0922lo.mysql.rds.aliyuncs.com:3306/shixi?useSSL=false&serverTimezone=UTC
+    username: "higherDevPermissionsAdmin"
+    password: "4UperUpIntern"
   redis:
     host: localhost
     port: 6379
