@@ -13,4 +13,6 @@ public interface UserService extends IService<User> {
     Result loginByPhone(String phone, String code);
 
     Result changeUserInfo(UserDTO userDTO);
+
+    Result loginByWechat(String code);
 }

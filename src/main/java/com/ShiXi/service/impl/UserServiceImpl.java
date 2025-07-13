@@ -8,15 +8,21 @@ import com.ShiXi.dto.Result;
 import com.ShiXi.dto.UserDTO;
 import com.ShiXi.entity.User;
 import com.ShiXi.mapper.UserMapper;
+import com.ShiXi.properties.WeChatProperties;
 import com.ShiXi.service.UserService;
+import com.ShiXi.utils.HttpClientUtil;
 import com.ShiXi.utils.RegexUtils;
 import com.ShiXi.utils.UserHolder;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import static com.ShiXi.utils.RedisConstants.*;
@@ -26,6 +32,10 @@ import static com.ShiXi.utils.RedisConstants.*;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    private WeChatProperties weChatProperties;
+    //微信端登录接口请求的url
+    public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
 
     //基本不用密码登录 主要使用验证码登录
     @Override
@@ -33,22 +43,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //根据账号去mysql查询用户
         User user = query().eq("account", account).one();
         //mysql找不到
-        if(user == null){
+        if (user == null) {
             return Result.fail("密码或账号错误！");
         }
         //mysql找到了，对比密码
         String RealPassword = user.getPassword();
         //密码正确
-        if(password.equals(RealPassword)){
+        if (password.equals(RealPassword)) {
             //生成token
             String token = UUID.randomUUID().toString(true);
             //将student对象转换成安全DTO对象
             UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
             //序列化
-            String userDTOJson= JSONUtil.toJsonStr(userDTO);
+            String userDTOJson = JSONUtil.toJsonStr(userDTO);
             //把token作为key，把用户DTO数据作为value存入redis并且设置过期时间
-            stringRedisTemplate.opsForValue().set(token,userDTOJson);
-            stringRedisTemplate.expire(token,30L, TimeUnit.MINUTES);
+            stringRedisTemplate.opsForValue().set(token, userDTOJson);
+            stringRedisTemplate.expire(token, 30L, TimeUnit.MINUTES);
             //返回token
             return Result.ok(token);
         }
@@ -84,10 +94,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String token = UUID.randomUUID().toString(true);
         // 7.2.将User对象转为HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
-        String userDTOJson= JSONUtil.toJsonStr(userDTO);
+        String userDTOJson = JSONUtil.toJsonStr(userDTO);
         // 7.3.存储
         String tokenKey = LOGIN_USER_KEY + token;
-        stringRedisTemplate.opsForValue().set(tokenKey,userDTOJson);
+        stringRedisTemplate.opsForValue().set(tokenKey, userDTOJson);
         // 7.4.设置token有效期
         stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
 
@@ -114,6 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.ok();
 
     }
+
     private User createStudentWithPhone(String phone) {
         // 1.创建用户
         User user = new User();
@@ -139,5 +150,58 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         UserHolder.saveUser(userDTO);
         updateById(user);
         return Result.ok(user);
+    }
+
+    /**
+     * @param code 微信端请求的code
+     * @return
+     */
+    @Override
+    public Result loginByWechat(String code) {
+        //获取 openid
+        String openid = getOpenid(code);
+        User user = query().eq("openid", openid).one();
+        // 创建用户
+        if (user == null) {
+            user = new User();
+            user.setOpenid(openid);
+            save(user);
+        }
+        //登录流程，和电话流程一样
+        String token = UUID.randomUUID().toString(true);
+        // 将User对象转为HashMap存储
+        UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+        String userDTOJson = JSONUtil.toJsonStr(userDTO);
+        // 存储
+        String tokenKey = LOGIN_USER_KEY + token;
+        stringRedisTemplate.opsForValue().set(tokenKey, userDTOJson);
+        // 设置token有效期
+        stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
+        // 返回token
+        return Result.ok(token);
+    }
+
+    /**
+     * 获取用户的openid
+     *
+     * @param code
+     * @return
+     */
+    private String getOpenid(String code) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("appid", weChatProperties.getAppid());
+        map.put("secret", weChatProperties.getSecret());
+        map.put("js_code", code);
+        map.put("grant_type", "authorization_code");
+
+        // 调用微信接口服务，获取微信用户信息
+        String result = HttpClientUtil.doGet(WX_LOGIN, map);
+
+        JSONObject jsonObject = JSON.parseObject(result);
+        String openid = jsonObject.getString("openid");
+        if (openid == null) {
+            throw new RuntimeException("获取微信openid失败");
+        }
+        return openid;
     }
 }
