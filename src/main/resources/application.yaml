@@ -1,34 +1,3 @@
-server:
-  port: 8081
-
 spring:
-  application:
-    name: ShiXi
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/shixi?useSSL=false&serverTimezone=UTC
-    username: "root"
-    password: "1234"
-  redis:
-    host: 192.168.202.128
-    port: 6379
-    password: 1234
-    lettuce:
-      pool:
-        max-active: 10
-        max-idle: 10
-        min-idle: 1
-        time-between-eviction-runs: 10s
-  jackson:
-    default-property-inclusion: non_null # JSON处理时忽略非空字段
-mybatis-plus:
-  type-aliases-package: com.ShiXi.entity # 别名扫描包
-logging:
-  level:
-    com.ShiXi: debug
-
-# 微信相关配置
-shixi:
-  wechat:
-    appid: wx20bd3bea9c9fb6b8
-    secret: 91ddab98a1ed6dd4261f1ce7a2e4c442
+  profiles:
+    active: dev

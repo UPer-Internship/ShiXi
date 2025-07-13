@@ -20,17 +20,17 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    /**
-     * 账号密码登录
-     * @param account
-     * @param password
-     * @return
-     */
-    @PostMapping("/login/byAccount")
-    @ApiOperation("账号密码登录,已弃用")
-    public Result loginByAccount(@RequestParam("account")String account, @RequestParam("password")String password) {
-        return userService.loginByAccount(account,password);
-    }
+//    /**
+//     * 账号密码登录
+//     * @param account
+//     * @param password
+//     * @return
+//     */
+//    @PostMapping("/login/byAccount")
+//    @ApiOperation("账号密码登录,已弃用")
+//    public Result loginByAccount(@RequestParam("account")String account, @RequestParam("password")String password) {
+//        return userService.loginByAccount(account,password);
+//    }
 
     /**
      * 发送验证码
