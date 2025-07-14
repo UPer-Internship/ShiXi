@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 public class OSSClientConfig {
     // 从配置文件读取 OSS 信息
 
-    @Value("${spring.oss.endpoint")
+    @Value("${spring.oss.endpoint}")
     private String endpoint;
 
     @Value("${spring.oss.accessKeyId}")
