@@ -2,6 +2,10 @@ server:
   port: 8081
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
   application:
     name: ShiXi
   datasource:
@@ -20,6 +24,11 @@ spring:
         max-idle: 10    # 最大空闲连接数
         min-idle: 1     # 最小空闲连接数
         time-between-eviction-runs: 10s  # 空闲连接检测周期
+  oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    accessKeyId:
+    accessKeySecret:
+    bucketName: dev-env-oss
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:

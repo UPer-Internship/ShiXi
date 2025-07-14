@@ -31,7 +31,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         String key  = LOGIN_USER_KEY + token;
         String jsonStr = stringRedisTemplate.opsForValue().get(key);
         // 3.判断用户是否存在
-        if (jsonStr.isEmpty()) {
+        if (jsonStr == null || jsonStr.isEmpty()) {
             return true;
         }
         // 5.将查询到的hash数据转为UserDTO
