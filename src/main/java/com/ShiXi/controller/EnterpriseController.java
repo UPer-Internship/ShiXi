@@ -71,6 +71,15 @@ public class EnterpriseController {
     }
 
     /**
+     * 改变岗位状态
+     */
+    @ApiOperation("改变岗位状态")
+    @PostMapping("/changeJobStatus")
+    public Result changeJobStatus(@RequestParam("jobId") Long jobId, @RequestParam("status") Integer status) {
+        return enterpriseService.changeJobStatus(jobId, status);
+    }
+
+    /**
      * 查询收到的所有简历
      * @return 所有简历
      */

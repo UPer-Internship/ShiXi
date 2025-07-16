@@ -54,7 +54,7 @@ CREATE TABLE resume_experience
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='在线简历经历表';
 
-
+-- 职位表
 DROP TABLE IF EXISTS `job`;
 CREATE TABLE `job`
 (
@@ -64,7 +64,8 @@ CREATE TABLE `job`
     `salary_min` double NULL DEFAULT NULL COMMENT '薪水下限',
     `salary_max` double NULL DEFAULT NULL COMMENT '薪水上限',
     `frequency`            varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL DEFAULT NULL COMMENT '4天/周',
-    `total_time`           varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL DEFAULT NULL COMMENT '4个月',
+    `total_time`           varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL DEFAULT NULL COMMENT '实习总时长',
+    `onboard_time`         varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL DEFAULT NULL COMMENT '到岗时间（如一周内、一个月内等）',
     `enterprise_type`      varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '外企/校友企业',
     `publisher`            varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'hr名字',
     `enterprise_name`      varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '企业名称',
@@ -74,14 +75,25 @@ CREATE TABLE `job`
     `detailed_information` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci         NULL COMMENT '职位详情信息',
     `category`             varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '职位类别',
     `type`                 varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL DEFAULT NULL COMMENT '职位类型',
+    `tag`                  varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL DEFAULT NULL COMMENT '岗位标签，使用-分割，如线下-可转正',
     `create_time`          datetime                                                      NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`          datetime                                                      NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `is_deleted`           TINYINT(1)  NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    `status`              TINYINT(1)  NOT NULL DEFAULT 0 COMMENT '岗位状态：0-可申请，1-已截止',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 17
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT = '职位表'
   ROW_FORMAT = Dynamic;
+
+CREATE TABLE job_favorite (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    job_id BIGINT NOT NULL COMMENT '岗位ID',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    KEY idx_user_job (user_id, job_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='岗位收藏表';
 
 SET FOREIGN_KEY_CHECKS = 1;

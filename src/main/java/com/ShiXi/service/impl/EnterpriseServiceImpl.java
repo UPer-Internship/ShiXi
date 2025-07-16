@@ -125,4 +125,15 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
         OnlineResumeVO onlineResumeVO = onlineResumeService.queryResumeById(id);
         return Result.ok(onlineResumeVO);
     }
+
+    @Override
+    public Result changeJobStatus(Long jobId, Integer status) {
+        Job job = getById(jobId);
+        if (job == null) {
+            return Result.fail("岗位不存在");
+        }
+        job.setStatus(status);
+        updateById(job);
+        return Result.ok("岗位状态已更新");
+    }
 }

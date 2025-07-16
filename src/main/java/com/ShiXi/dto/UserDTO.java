@@ -9,4 +9,5 @@ public class UserDTO {
     private String nickName;
     private String icon;
     private String phone;
+    private String major; // 专业
 }
