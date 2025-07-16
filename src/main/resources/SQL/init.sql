@@ -86,7 +86,7 @@ CREATE TABLE `job`
   CHARACTER SET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT = '职位表'
   ROW_FORMAT = Dynamic;
-
+-- 岗位收藏表
 CREATE TABLE job_favorite (
     id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
     user_id BIGINT NOT NULL COMMENT '用户ID',
@@ -95,5 +95,28 @@ CREATE TABLE job_favorite (
     is_deleted TINYINT(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
     KEY idx_user_job (user_id, job_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='岗位收藏表';
+
+-- 消息表
+CREATE TABLE message (
+  id BIGINT AUTO_INCREMENT PRIMARY KEY,
+  sender_id BIGINT NOT NULL,
+  receiver_id BIGINT NOT NULL,
+  content TEXT NOT NULL,
+  send_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (sender_id) REFERENCES user(id),
+  FOREIGN KEY (receiver_id) REFERENCES user(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 联系人表
+CREATE TABLE contact (
+     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     user_id BIGINT NOT NULL COMMENT '发起者ID',
+     contact_user_id BIGINT NOT NULL COMMENT '被添加的联系人ID',
+     last_contact_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '最后联系时间',
+     is_blocked BOOLEAN DEFAULT FALSE COMMENT '是否屏蔽该联系人',
+     UNIQUE KEY uk_user_contact (user_id, contact_user_id),
+     FOREIGN KEY (user_id) REFERENCES user(id),
+     FOREIGN KEY (contact_user_id) REFERENCES user(id)
+) ENGINE = InnoDB;
 
 SET FOREIGN_KEY_CHECKS = 1;
