@@ -3,6 +3,7 @@ package com.ShiXi.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -32,4 +33,6 @@ public class ResumeExperience implements Serializable {
     private LocalDateTime createTime; // 创建时间
 
     private LocalDateTime updateTime; // 更新时间
+    @TableLogic
+    private Integer isDeleted;// 逻辑删除标志，0-未删除，1-已删除
 }

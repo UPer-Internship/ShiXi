@@ -45,7 +45,7 @@ public class JobController {
 
     /**
      * 模糊查询Job信息
-     * @param  jobFuzzyQueryDTO 模糊查询条件
+     * @param  keyWord 模糊查询条件
      * @return 模糊查询结果
      */
     @GetMapping("/fuzzyQuery")

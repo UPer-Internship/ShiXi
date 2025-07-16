@@ -3,6 +3,7 @@ package com.ShiXi.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -24,7 +25,8 @@ public class Job implements Serializable {
   //  @TableField("publisher_id")
     private Long publisherId;
     private String title;
-    private String salary;//薪水
+    private Double salaryMin; // 薪水下限
+    private Double salaryMax; // 薪水上限
     private String frequency;//4天/周
   // @TableField("total_time")
     private String totalTime;//4个月
@@ -45,4 +47,6 @@ public class Job implements Serializable {
     private String type;//实习 兼职 课题
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    @TableLogic
+    private Integer isDeleted;// 逻辑删除标志，0-未删除，1-已删除
 }
