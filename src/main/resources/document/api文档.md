@@ -114,7 +114,8 @@
   "id": 0,
   "publisher": "",
   "publisherId": 0,
-  "salary": "",
+  "salaryMin": 0.0,
+  "salaryMax": 0.0,
   "title": "",
   "totalTime": "",
   "type": "",
@@ -141,7 +142,8 @@
 |&emsp;&emsp;id|||false|integer(int64)||
 |&emsp;&emsp;publisher|||false|string||
 |&emsp;&emsp;publisherId|||false|integer(int64)||
-|&emsp;&emsp;salary|||false|string||
+|&emsp;&emsp;salaryMin|||false|double||
+|&emsp;&emsp;salaryMax|||false|double||
 |&emsp;&emsp;title|||false|string||
 |&emsp;&emsp;totalTime|||false|string||
 |&emsp;&emsp;type|||false|string||
@@ -449,7 +451,8 @@
   "id": 0,
   "publisher": "",
   "publisherId": 0,
-  "salary": "",
+  "salaryMin": 0.0,
+  "salaryMax": 0.0,
   "title": "",
   "totalTime": "",
   "type": "",
@@ -477,7 +480,8 @@
 |&emsp;&emsp;id|||false|integer(int64)||
 |&emsp;&emsp;publisher|||false|string||
 |&emsp;&emsp;publisherId|||false|integer(int64)||
-|&emsp;&emsp;salary|||false|string||
+|&emsp;&emsp;salaryMin|||false|double||
+|&emsp;&emsp;salaryMax|||false|double||
 |&emsp;&emsp;title|||false|string||
 |&emsp;&emsp;totalTime|||false|string||
 |&emsp;&emsp;type|||false|string||

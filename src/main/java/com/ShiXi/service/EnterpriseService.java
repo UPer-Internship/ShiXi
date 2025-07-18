@@ -17,4 +17,6 @@ public interface EnterpriseService {
     Result queryResumeList();
 
     Result queryResumeById(Long id);
+
+    Result changeJobStatus(Long jobId, Integer status);
 }
