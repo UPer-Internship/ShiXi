@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/enterprise")
-@Api(tags = "企业相关接口")
+@Api(tags = "发布岗位相关接口")
 public class EnterpriseController {
     @Resource
     EnterpriseService enterpriseService;

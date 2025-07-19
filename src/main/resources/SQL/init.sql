@@ -54,12 +54,33 @@ CREATE TABLE resume_experience
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='在线简历经历表';
 
+-- 企业表
+CREATE TABLE company (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    name VARCHAR(100) NOT NULL COMMENT '企业名称',
+    logo VARCHAR(255) DEFAULT '' COMMENT '企业Logo图片地址',
+    industry VARCHAR(50) DEFAULT NULL COMMENT '所属行业',
+    description VARCHAR(255) DEFAULT NULL COMMENT '企业简介',
+    location VARCHAR(100) DEFAULT NULL COMMENT '企业所在城市+区',
+    contact_person VARCHAR(20) DEFAULT NULL COMMENT '联系人',
+    contact_phone VARCHAR(20) DEFAULT NULL COMMENT '联系电话',
+    contact_email VARCHAR(50) DEFAULT NULL COMMENT '联系邮箱',
+    website VARCHAR(255) DEFAULT NULL COMMENT '企业官网',
+    scale VARCHAR(50) DEFAULT NULL COMMENT '企业规模',
+    type VARCHAR(50) DEFAULT NULL COMMENT '企业类型',
+    status TINYINT(1) NOT NULL DEFAULT 1 COMMENT '企业状态：0-禁用，1-正常，2-待审核',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    is_deleted TINYINT(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='企业表';
+
 -- 职位表
 DROP TABLE IF EXISTS `job`;
 CREATE TABLE `job`
 (
     `id`                   bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `publisher_id`         bigint                                                        NOT NULL COMMENT '发布者ID',
+    `publisher_id`         bigint                                                        NOT NULL COMMENT '发布者ID，逻辑外键到user表',
+    `company_id`           bigint                                                        NULL DEFAULT NULL COMMENT '企业ID，逻辑外键',
     `title`                varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '职位标题',
     `salary_min` double NULL DEFAULT NULL COMMENT '薪水下限',
     `salary_max` double NULL DEFAULT NULL COMMENT '薪水上限',

@@ -24,6 +24,7 @@ public class Job implements Serializable {
 
   //  @TableField("publisher_id")
     private Long publisherId;
+    private Long companyId; // 企业ID，逻辑外键
     private String title;
     private Double salaryMin; // 薪水下限
     private Double salaryMax; // 薪水上限
