@@ -3,11 +3,13 @@ package com.ShiXi.service.impl;
 import com.ShiXi.dto.ApplicationDTO;
 import com.ShiXi.dto.Result;
 import com.ShiXi.entity.Application;
+import com.ShiXi.entity.ChatMessage;
 import com.ShiXi.mapper.ApplicationMapper;
 import com.ShiXi.service.ApplicationService;
 import com.ShiXi.utils.OSSUtil;
 import com.ShiXi.utils.UserHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,8 +40,8 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
         try {
 
             //  获取当前登录用户 ID
-            Long studentId = UserHolder.getUser().getId();
-            //Long studentId = 1L;
+            //Long studentId = UserHolder.getUser().getId();
+            Long studentId = 1L;
 
             //  构建申请记录
             Application application = new Application();
@@ -79,7 +81,9 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
     @Override
     public Result getApplicationsByJobId(Long jobId) {
         try {
-            List<Application> applications = applicationMapper.selectList(new QueryWrapper<Application>().eq("job_id", jobId));
+            List<Application> applications = applicationMapper.selectList(new QueryWrapper<Application>()
+                    .eq("job_id", jobId)
+                    .eq("is_deleted", 0));
             return Result.ok(applications);
         } catch (Exception e) {
             log.error("查询岗位申请失败，jobId: {}", jobId, e);
@@ -101,11 +105,33 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
             application.setUpdateTime(LocalDateTime.now());
             applicationMapper.updateById(application);
 
+            // 标记申请已读
+            markApplicationAsRead(applicationId);
+
             return Result.ok("申请状态更新成功");
 
         } catch (Exception e) {
             log.error("处理申请失败，applicationId: {}, status: {}", applicationId, status, e);
             return Result.fail("处理申请失败");
         }
+    }
+
+    @Override
+    public Result deleteApplication(Long applicationId){
+        boolean result = update(null,new UpdateWrapper<Application>()
+                .eq("id", applicationId)
+                .set("is_deleted", true));
+        if( result){
+            return Result.ok("删除申请成功");
+        }
+        else{
+            return Result.fail("删除失败");
+        }
+    }
+
+    private void markApplicationAsRead(Long applicationId){
+        update(null,new UpdateWrapper<Application>()
+                .eq("id", applicationId)
+                .set("is_read", true));
     }
 }

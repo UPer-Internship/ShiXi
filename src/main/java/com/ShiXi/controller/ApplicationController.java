@@ -38,4 +38,9 @@ public class ApplicationController {
     public Result handleApplication(@RequestParam Long applicationId,@RequestParam String status){
         return applicationService.handleApplication(applicationId,status);
     }
+
+    @PostMapping("/deleteApplication")
+    public Result deleteApplication(@RequestParam Long applicationId){
+        return applicationService.deleteApplication(applicationId);
+    }
 }

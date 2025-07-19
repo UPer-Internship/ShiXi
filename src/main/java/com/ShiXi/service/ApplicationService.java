@@ -14,4 +14,6 @@ public interface ApplicationService extends IService<Application> {
     Result getApplicationsByJobId(Long jobId);
 
     Result handleApplication(Long applicationId,String status);
+
+    Result deleteApplication(Long applicationId);
 }
