@@ -138,7 +138,7 @@ CREATE TABLE contact (
      contact_user_id BIGINT NOT NULL COMMENT '被添加的联系人ID',
      remark VARCHAR(255) COMMENT '联系人备注信息',
      last_contact_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '最后联系时间',
-     is_blocked TINYINT(1) DEFAULT FALSE COMMENT '是否屏蔽该联系人',
+     is_deleted TINYINT(1) DEFAULT FALSE COMMENT '是否屏蔽该联系人',
      is_read TINYINT(1) DEFAULT FALSE COMMENT '是否已读（0:未读 1:已读）',
      UNIQUE KEY uk_user_contact (user_id, contact_user_id)
 ) ENGINE = InnoDB;

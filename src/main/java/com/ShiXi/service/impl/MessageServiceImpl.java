@@ -90,7 +90,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     public Result getContactList(Long userId) {
         List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>()
                 .eq("user_id", userId)
-                .eq("is_blocked", false));
+                .eq("is_deleted", false));
         return Result.ok(contacts);
     }
 
@@ -114,7 +114,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     public Result deleteMessage(Long messageId) {
         boolean result = update(null,new UpdateWrapper<ChatMessage>()
                 .eq("id", messageId)
-                .set("is_delete", true));
+                .set("is_deleted", true));
         if( result){
             return Result.ok();
         }
@@ -142,7 +142,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         boolean result = update(null,new UpdateWrapper<ChatMessage>()
                 .eq("sender_id", userId1)
                 .eq("receiver_id", userId2)
-                .set("is_blocked", true));
+                .set("is_deleted", true));
         if( result){
             return Result.ok();
         }
