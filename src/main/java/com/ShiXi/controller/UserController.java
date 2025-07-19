@@ -64,7 +64,7 @@ public class UserController {
     @PostMapping("/login/byWechat")
     @ApiOperation("微信登录")
     public Result login(@RequestParam  String code) {
-         return userService.loginByWechat(code);
+        return userService.loginByWechat(code);
     }
 
 

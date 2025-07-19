@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/enterprise")
-@Api(tags = "企业相关接口")
+@Api(tags = "发布岗位相关接口")
 public class EnterpriseController {
     @Resource
     EnterpriseService enterpriseService;
@@ -68,6 +68,15 @@ public class EnterpriseController {
     @PostMapping("/updateJob")
     Result updateJob(@RequestBody Job job,@RequestParam("id")Long id) {
         return enterpriseService.updateJob(job,id);
+    }
+
+    /**
+     * 改变岗位状态
+     */
+    @ApiOperation("改变岗位状态")
+    @PostMapping("/changeJobStatus")
+    public Result changeJobStatus(@RequestParam("jobId") Long jobId, @RequestParam("status") Integer status) {
+        return enterpriseService.changeJobStatus(jobId, status);
     }
 
     /**
