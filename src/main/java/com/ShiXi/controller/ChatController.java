@@ -61,9 +61,39 @@ public class ChatController {
         return messageService.getMessagesBetweenUsers(userId1,userId2);
     }
 
+    @PostMapping("/message/markAsRead")
+    @ApiOperation("标记为已读")
+    public Result markAsRead(@RequestParam Long userId1, @RequestParam Long userId2){
+        return messageService.markMessageAsRead(userId1,userId2);
+    }
+
+    @PostMapping("/message/delete")
+    @ApiOperation("删除消息")
+    public Result deleteMessage(@RequestParam Long messageId){
+        return messageService.deleteMessage(messageId);
+    }
+
     @GetMapping("/contact/getList")
     @ApiOperation("获取联系人列表")
     public Result getContactList(@RequestParam Long userId){
         return messageService.getContactList(userId);
+    }
+
+    @PostMapping("/contact/markAsRead")
+    @ApiOperation("标记联系人为已读")
+    public Result markContactAsRead(@RequestParam Long userId1,@RequestParam Long userId2){
+        return messageService.markContactAsRead(userId1,userId2);
+    }
+
+    @PostMapping("/contact/delete")
+    @ApiOperation("删除联系人")
+    public Result deleteContact(@RequestParam Long userId1,@RequestParam Long userId2){
+        return messageService.deleteContact(userId1,userId2);
+    }
+
+    @PostMapping("/contact/remark")
+    @ApiOperation("备注联系人")
+    public Result remarkContact(@RequestParam Long userId1,@RequestParam Long userId2,@RequestParam String remark){
+        return messageService.remarkContact(userId1,userId2,remark);
     }
 }

@@ -36,3 +36,6 @@ mybatis-plus:
 logging:
   level:
     com.ShiXi: debug
+oss:
+  resume:
+    dir: D:\oss\resume

@@ -7,6 +7,7 @@ import com.ShiXi.mapper.ContactMapper;
 import com.ShiXi.mapper.MessageMapper;
 import com.ShiXi.service.MessageService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
@@ -41,8 +42,7 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         return Result.ok(messages);
     }
 
-    @Override
-    public Result buildContactBetweenUsers(Long userId1,Long userId2) {
+    private void buildContactBetweenUsers(Long userId1,Long userId2) {
         //将两个用户设置为彼此的联系人
         if (!existsContactBetweenUsers(userId1, userId2)) {
             Contact contact1 = new Contact();
@@ -57,18 +57,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             contact2.setLastContactTime(LocalDateTime.now());
             contact2.setIsBlocked(false);
             contactMapper.insert(contact2);
-            return Result.ok();
         }
-        return Result.fail("已存在该联系人");
     }
 
-    @Override
-    public boolean existsContactBetweenUsers(Long userId1,Long userId2) {
+    private boolean existsContactBetweenUsers(Long userId1,Long userId2) {
         return contactMapper.selectCount(new QueryWrapper<Contact>().eq("user_id", userId1).eq("contact_user_id", userId2)) > 0;
     }
 
-    @Override
-    public void updateLastContactTime(Long userId1, Long userId2) {
+    private void updateLastContactTime(Long userId1, Long userId2) {
         // 更新 userId1 -> userId2 的 lastContactTime
         Contact contact1 = new Contact();
         contact1.setUserId(userId1);
@@ -92,7 +88,84 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
 
     @Override
     public Result getContactList(Long userId) {
-        List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>().eq("user_id", userId));
+        List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>()
+                .eq("user_id", userId)
+                .eq("is_deleted", false));
         return Result.ok(contacts);
+    }
+
+
+    @Override
+    public Result markMessageAsRead(Long userId1,Long userId2) {
+        boolean result = update(null,new UpdateWrapper<ChatMessage>()
+                .eq("sender_id", userId2)
+                .eq("receiver_id", userId1)
+                .set("is_read", true));
+
+        if( result){
+            return Result.ok();
+        }
+        else{
+            return Result.fail("标记为已读失败");
+        }
+    }
+
+    @Override
+    public Result deleteMessage(Long messageId) {
+        boolean result = update(null,new UpdateWrapper<ChatMessage>()
+                .eq("id", messageId)
+                .set("is_deleted", true));
+        if( result){
+            return Result.ok();
+        }
+        else{
+            return Result.fail("删除失败");
+        }
+    }
+
+    @Override
+    public Result markContactAsRead(Long userId1, Long userId2) {
+        boolean result = update(null,new UpdateWrapper<ChatMessage>()
+                .eq("sender_id", userId1)
+                .eq("receiver_id", userId2)
+                .set("is_read", true));
+        if( result){
+            return Result.ok();
+        }
+        else{
+            return Result.fail("标记为已读失败");
+        }
+    }
+
+    @Override
+    public Result deleteContact(Long userId1, Long userId2){
+        boolean result = update(null,new UpdateWrapper<ChatMessage>()
+                .eq("sender_id", userId1)
+                .eq("receiver_id", userId2)
+                .set("is_deleted", true));
+        if( result){
+            return Result.ok();
+        }
+        else{
+            return Result.fail("删除失败");
+        }
+    }
+
+    @Override
+    public Result remarkContact(Long userId1, Long userId2, String remark) {
+        try {
+            Contact contact = contactMapper.selectOne(new QueryWrapper<Contact>()
+                    .eq("user_id", userId1)
+                    .eq("contact_user_id", userId2));
+            if (contact != null) {
+                contact.setRemark(remark);
+                contactMapper.updateById(contact);
+                return Result.ok();
+            } else {
+                return Result.fail("联系人不存在");
+            }
+        } catch (Exception e) {
+            return Result.fail("修改备注失败");
+        }
     }
 }

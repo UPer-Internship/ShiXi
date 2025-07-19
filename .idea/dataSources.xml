@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="shixi@127.0.0.1" uuid="46fe74d2-daf9-4c49-9cd2-5124c2f29e5a">
-      <driver-ref>mysql</driver-ref>
+    <data-source source="LOCAL" name="@rm-bp1t7lrt59wy71ty8xo.mysql.rds.aliyuncs.com" uuid="dd344a5b-9cb7-456d-ae78-ca4ddb6c8bdd">
+      <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
-      <imported>true</imported>
-      <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
-      <jdbc-url>jdbc:mysql://127.0.0.1:3306/shixi?useSSL=false&amp;serverTimezone=UTC</jdbc-url>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://rm-bp1t7lrt59wy71ty8xo.mysql.rds.aliyuncs.com:3306</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />

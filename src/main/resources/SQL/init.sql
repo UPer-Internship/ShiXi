@@ -16,6 +16,47 @@ CREATE TABLE `user`
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4 COMMENT ='用户表';
+
+-- 插入测试用户
+#INSERT INTO `user` (`phone`, `password`, `nick_name`, `icon`)
+#VALUES ('18378059289', 'password', 'admin', 'https://**');
+# -- 学生基本信息表
+# CREATE TABLE student_basic_info
+# (
+#     id                BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '学生基本信息 ID',
+#     user_id           BIGINT       NOT NULL COMMENT '与user的id绑定',
+#     name              VARCHAR(255) NOT NULL COMMENT '姓名',
+#     gender            VARCHAR(10) COMMENT '性别，例如：男 / 女',
+#     birth_date        VARCHAR(10) COMMENT '出生年月，格式为 yyyy/MM，例如：2003/10',
+#     highest_education VARCHAR(50) COMMENT '最高学历，例如：本科',
+#     school_name       VARCHAR(255) COMMENT '学校名称，例如：华南理工大学',
+#     major             VARCHAR(255) COMMENT '专业名称，例如：计算机科学与技术',
+#     study_period      VARCHAR(50) COMMENT '就读时间',
+#     expected_position VARCHAR(255) COMMENT '期望职位，例如：互联网-产品实习生',
+#     create_time       DATETIME COMMENT '创建时间',
+#     update_time       DATETIME COMMENT '更新时间',
+#     INDEX idx_user_id (user_id)
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4 COMMENT ='学生基本信息表';
+# -- 在线简历表
+# CREATE TABLE online_resume
+# (
+#     id              BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '简历ID',
+#     user_id      BIGINT                                        NOT NULL COMMENT '用户ID,外键',
+#     name            VARCHAR(100)                                  NOT NULL COMMENT '姓名',
+#     icon            VARCHAR(255) DEFAULT '' COMMENT '用户头像路径，默认空字符串', -- 考虑到简历可能要用证件照，这里不用student表里面的
+#     school_name     VARCHAR(255)                                  NOT NULL COMMENT '学校名称',
+#     major           VARCHAR(255)                                  NOT NULL COMMENT '专业名称',
+#     graduation_date DATE COMMENT '毕业时间，格式：YYYY-MM-DD',
+#     age             INT COMMENT '年龄',
+#     phone           VARCHAR(20) COMMENT '联系电话',
+#     wechat          VARCHAR(50) COMMENT '微信号',
+#     education_level ENUM ('本科', '大专', '硕士', '博士', '其他') NOT NULL COMMENT '学历（本科、大专等）',
+#     advantages      TEXT COMMENT '个人优势，长文本',
+#     create_time     DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+#     update_time     DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+# ) ENGINE = InnoDB
+#   DEFAULT CHARSET = utf8mb4 COMMENT ='在线简历表';
 -- 在线简历表
 CREATE TABLE student_info
 (
@@ -124,8 +165,8 @@ CREATE TABLE message (
   receiver_id BIGINT NOT NULL,
   content TEXT NOT NULL,
   send_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (sender_id) REFERENCES user(id),
-  FOREIGN KEY (receiver_id) REFERENCES user(id)
+  is_read TINYINT(1) DEFAULT 0 COMMENT '是否已读（0:未读 1:已读）',
+  is_delete TINYINT(1) DEFAULT 0 COMMENT '是否删除（0:未删除 1:已删除）'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 联系人表
@@ -133,9 +174,26 @@ CREATE TABLE contact (
      id BIGINT AUTO_INCREMENT PRIMARY KEY,
      user_id BIGINT NOT NULL COMMENT '发起者ID',
      contact_user_id BIGINT NOT NULL COMMENT '被添加的联系人ID',
+     remark VARCHAR(255) COMMENT '联系人备注信息',
      last_contact_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '最后联系时间',
-     is_blocked BOOLEAN DEFAULT FALSE COMMENT '是否屏蔽该联系人',
-     UNIQUE KEY uk_user_contact (user_id, contact_user_id),
-     FOREIGN KEY (user_id) REFERENCES user(id),
-     FOREIGN KEY (contact_user_id) REFERENCES user(id)
+     is_deleted TINYINT(1) DEFAULT FALSE COMMENT '是否屏蔽该联系人',
+     is_read TINYINT(1) DEFAULT FALSE COMMENT '是否已读（0:未读 1:已读）',
+     UNIQUE KEY uk_user_contact (user_id, contact_user_id)
 ) ENGINE = InnoDB;
+
+-- 申请表
+CREATE TABLE application (
+     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+     student_id BIGINT NOT NULL COMMENT '学生ID',
+     enterprise_id BIGINT NOT NULL COMMENT '企业用户ID',
+     job_id BIGINT NOT NULL COMMENT '岗位ID',
+     resume_url VARCHAR(255) NOT NULL COMMENT '简历文件URL',
+     message TEXT COMMENT '附加信息',
+     status ENUM('pending', 'accepted', 'rejected') DEFAULT 'pending' COMMENT '申请状态',
+     is_read TINYINT(1) DEFAULT 0 COMMENT '是否已读（0:未读 1:已读）',
+     is_deleted TINYINT(1) DEFAULT 0 COMMENT '是否删除（0:未删除 1:已删除）',
+     apply_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SET FOREIGN_KEY_CHECKS = 1;
