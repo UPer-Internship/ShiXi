@@ -9,7 +9,7 @@ spring:
   application:
     name: ShiXi
   datasource:
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://rm-bp1t7lrt59wy71ty8xo.mysql.rds.aliyuncs.com:3306/4_uper_up_intern?useSSL=true&requireSSL=false&serverTimezone=UTC
     username: higherDevPermissionsAdmin
     password: 4UperUpIntern
