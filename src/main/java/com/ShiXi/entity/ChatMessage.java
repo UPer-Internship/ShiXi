@@ -1,5 +1,6 @@
 package com.ShiXi.entity;
 
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -13,5 +14,7 @@ public class ChatMessage {
     private Long senderId;
     private Long receiverId;
     private LocalDateTime sendTime;
+    @TableLogic
+    private Integer isDeleted; // 逻辑删除标志，0-未删除，1-已删除
 }
 
