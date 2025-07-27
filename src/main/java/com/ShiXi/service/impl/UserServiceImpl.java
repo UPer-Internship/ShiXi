@@ -32,6 +32,8 @@ import static com.ShiXi.utils.RedisConstants.*;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private FeishuService feishuService;
     @Autowired
     private WeChatProperties weChatProperties;
     //微信端登录接口请求的url
@@ -139,6 +141,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 5.发送验证码
         log.debug("发送短信验证码成功，验证码：{}", code);
+        feishuService.sendTextMessage(phone+":"+ code);
         // 返回ok
         return Result.ok();
 

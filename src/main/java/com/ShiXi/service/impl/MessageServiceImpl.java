@@ -49,13 +49,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             contact1.setUserId(userId1);
             contact1.setContactUserId(userId2);
             contact1.setLastContactTime(LocalDateTime.now());
-            contact1.setIsBlocked(false);
+//            contact1.setIsBlocked(false);
             contactMapper.insert(contact1);
             Contact contact2 = new Contact();
             contact2.setUserId(userId2);
             contact2.setContactUserId(userId1);
             contact2.setLastContactTime(LocalDateTime.now());
-            contact2.setIsBlocked(false);
+//            contact2.setIsBlocked(false);
             contactMapper.insert(contact2);
         }
     }
