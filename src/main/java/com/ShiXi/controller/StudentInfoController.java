@@ -1,6 +1,7 @@
 package com.ShiXi.controller;
 
 import com.ShiXi.dto.Result;
+import com.ShiXi.dto.studentBasicInfoReqDTO;
 import com.ShiXi.entity.StudentInfo;
 import com.ShiXi.service.StudentInfoService;
 import io.swagger.annotations.Api;
@@ -20,13 +21,13 @@ public class StudentInfoController {
 
     /**
      * 保存学生基本信息
-     * @param studentInfo 学生基本信息
+     * @param reqDTO 学生基本信息
      * @return 保存结果
      */
     @PostMapping("/register/basicInfo")
     @ApiOperation("保存学生基本信息")
-    public Result saveStudentBasicInfo(@RequestBody StudentInfo studentInfo) {
-        return studentInfoService.saveStudentBasicInfo(studentInfo);
+    public Result saveStudentBasicInfo(@RequestBody studentBasicInfoReqDTO reqDTO) {
+        return studentInfoService.saveStudentBasicInfo(reqDTO);
     }
 
     /**

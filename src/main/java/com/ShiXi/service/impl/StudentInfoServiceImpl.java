@@ -2,6 +2,7 @@ package com.ShiXi.service.impl;
 
 import com.ShiXi.dto.Result;
 import com.ShiXi.dto.UserDTO;
+import com.ShiXi.dto.studentBasicInfoReqDTO;
 import com.ShiXi.entity.StudentInfo;
 import com.ShiXi.mapper.ResumeExperienceMapper;
 import com.ShiXi.mapper.StudentInfoMapper;
@@ -24,20 +25,38 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
     // 保存学生基本信息
     // 基本信息包括姓名、性别、出生日期、电话, 学校名称、专业
     @Override
-    public Result saveStudentBasicInfo(StudentInfo studentInfo){
+    public Result saveStudentBasicInfo(studentBasicInfoReqDTO reqDTO){
         UserDTO user = UserHolder.getUser();
         Long userId = user.getId();
+        String phone= user.getPhone();
         //检查是否有信息为空
-        if(studentInfo.getName() == null
-        || studentInfo.getGender() == null
-        || studentInfo.getBirthDate() == null
-        ||  studentInfo.getPhone() == null
-        || studentInfo.getSchoolName() == null
-        || studentInfo.getMajor() == null){
+        if(reqDTO.getName() == null
+        ||reqDTO.getGender() == null
+        ||reqDTO.getBirthDate() == null
+        ||reqDTO.getSchoolName() == null
+        ||reqDTO.getMajor() == null){
             return Result.fail("请填写完整信息");
         }
-        studentInfo.setUserId(userId);
-        save(studentInfo);
+        StudentInfo existingStudent = query().eq("user_id", userId).one();
+        StudentInfo studentInfo = new StudentInfo();
+        {
+            studentInfo.setUserId(userId);
+            studentInfo.setName(reqDTO.getName());
+            studentInfo.setGender(reqDTO.getGender());
+            studentInfo.setBirthDate(reqDTO.getBirthDate());
+            studentInfo.setSchoolName(reqDTO.getSchoolName());
+            studentInfo.setMajor(reqDTO.getMajor());
+            studentInfo.setPhone(phone);
+        }
+        if (existingStudent != null) {
+            // 存在则更新，设置主键ID
+            studentInfo.setId(existingStudent.getId());
+            // 如果需要保留原有未修改的字段，可以从existingStudent中获取
+            updateById(studentInfo);
+        } else {
+            // 不存在则新增
+            save(studentInfo);
+        }
         return Result.ok();
     }
 
