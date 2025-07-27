@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 //@MapperScan("com.xl.mapper")
 @SpringBootApplication
-@MapperScan("com.ShiXi.mapper")
+@MapperScan("com.ShiXi.common.mapper")
 public class ShiXiApplication {
     public static void main(String[] args) {
         SpringApplication.run(ShiXiApplication.class, args);
