@@ -2,6 +2,7 @@ package com.ShiXi.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ public class Contact implements Serializable {
     private Long contactUserId;
     private String remark;
     private LocalDateTime lastContactTime;
-    private Boolean isBlocked;
+    @TableLogic
+    private Integer isDeleted; // 逻辑删除标志，0-未删除，1-已删除
     private Integer isRead;
 }
