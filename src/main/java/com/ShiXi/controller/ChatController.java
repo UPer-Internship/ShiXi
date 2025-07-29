@@ -57,14 +57,14 @@ public class ChatController {
 
     @GetMapping("/message/getMessages")
     @ApiOperation("获取历史消息")
-    public Result getMessages(@RequestParam Long userId1, @RequestParam Long userId2){
-        return messageService.getMessagesBetweenUsers(userId1,userId2);
+    public Result getMessages(@RequestParam Long userId2){
+        return messageService.getMessagesBetweenUsers(userId2);
     }
 
     @PostMapping("/message/markAsRead")
     @ApiOperation("标记为已读")
-    public Result markAsRead(@RequestParam Long userId1, @RequestParam Long userId2){
-        return messageService.markMessageAsRead(userId1,userId2);
+    public Result markAsRead(@RequestParam Long userId2){
+        return messageService.markMessageAsRead(userId2);
     }
 
     @PostMapping("/message/delete")
@@ -75,25 +75,25 @@ public class ChatController {
 
     @GetMapping("/contact/getList")
     @ApiOperation("获取联系人列表")
-    public Result getContactList(@RequestParam Long userId){
-        return messageService.getContactList(userId);
+    public Result getContactList(){
+        return messageService.getContactList();
     }
 
     @PostMapping("/contact/markAsRead")
     @ApiOperation("标记联系人为已读")
-    public Result markContactAsRead(@RequestParam Long userId1,@RequestParam Long userId2){
-        return messageService.markContactAsRead(userId1,userId2);
+    public Result markContactAsRead(@RequestParam Long userId2){
+        return messageService.markContactAsRead(userId2);
     }
 
     @PostMapping("/contact/delete")
     @ApiOperation("删除联系人")
-    public Result deleteContact(@RequestParam Long userId1,@RequestParam Long userId2){
-        return messageService.deleteContact(userId1,userId2);
+    public Result deleteContact(@RequestParam Long userId2){
+        return messageService.deleteContact(userId2);
     }
 
     @PostMapping("/contact/remark")
     @ApiOperation("备注联系人")
-    public Result remarkContact(@RequestParam Long userId1,@RequestParam Long userId2,@RequestParam String remark){
-        return messageService.remarkContact(userId1,userId2,remark);
+    public Result remarkContact(@RequestParam Long userId2,@RequestParam String remark){
+        return messageService.remarkContact(userId2,remark);
     }
 }

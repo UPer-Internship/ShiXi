@@ -40,8 +40,8 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
         try {
 
             //  获取当前登录用户 ID
-            //Long studentId = UserHolder.getUser().getId();
-            Long studentId = 1L;
+            Long studentId = UserHolder.getUser().getId();
+            //Long studentId = 1L;
 
             //  构建申请记录
             Application application = new Application();
