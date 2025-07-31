@@ -21,7 +21,7 @@ public class SwaggerConfig {
                 .apiInfo(apiInfo())
                 .enable(true)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.ShiXi.controller"))
+                .apis(RequestHandlerSelectors.basePackage("com.ShiXi"))
                 .paths(PathSelectors.any())
                 .build();
     }

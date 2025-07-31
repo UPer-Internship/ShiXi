@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.ShiXi.common.config.smsClientConfig;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.login.domin.dto.UserDTO;
 import com.ShiXi.login.entity.User;
@@ -16,6 +17,9 @@ import com.ShiXi.common.utils.RegexUtils;
 import com.ShiXi.common.utils.UserHolder;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyun.dysmsapi20170525.Client;
+import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
+import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +30,8 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import static com.ShiXi.common.utils.MessageConstants.LOGIN_CODE_TEMPLATE_CODE;
+import static com.ShiXi.common.utils.MessageConstants.SIGN_NAME;
 import static com.ShiXi.common.utils.RedisConstants.*;
 
 @Slf4j
@@ -143,6 +149,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         // 5.发送验证码
         log.debug("发送短信验证码成功，验证码：{}", code);
         feishuService.sendTextMessage(phone+":"+ code);
+        // 构造请求对象
+        try{
+            Client client = smsClientConfig.createClient();
+            SendSmsRequest sendSmsRequest = new SendSmsRequest()
+                    .setPhoneNumbers(phone)
+                    .setSignName(SIGN_NAME)
+                    .setTemplateCode(LOGIN_CODE_TEMPLATE_CODE)
+                    // TemplateParam 为序列化后的 JSON 字符串。其中\"表示转义后的双引号。
+                    .setTemplateParam("{\"code\":\""+code+"\"}");
+
+            // 发送 API 请求
+            SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
         // 返回ok
         return Result.ok();
 

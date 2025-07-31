@@ -105,6 +105,12 @@
             <version>1.2.62</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.aliyun</groupId>
+            <artifactId>dysmsapi20170525</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+
     </dependencies>
     <build>
         <plugins>

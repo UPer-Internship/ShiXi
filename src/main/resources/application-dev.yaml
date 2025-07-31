@@ -25,6 +25,10 @@ spring:
         min-idle: 1     # 最小空闲连接数
         time-between-eviction-runs: 10s  # 空闲连接检测周期
   oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    accessKeyId:
+    accessKeySecret:
+    bucketName: dev-env-oss
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:
@@ -35,7 +39,9 @@ logging:
 oss:
   resume:
     dir: D:\oss\resume
-
 feishu:
   webhook:
     url: https://open.feishu.cn/open-apis/bot/v2/hook/1c70bec6-1e50-43c5-9cb7-f7f741a8b748
+aliyun:
+  accessKeyId:
+  accessKeySecret:
