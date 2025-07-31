@@ -1,11 +1,11 @@
-package com.ShiXi.chat.service.impl;
+package com.ShiXi.service.impl;
 
-import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.chat.entity.ChatMessage;
-import com.ShiXi.chat.entity.Contact;
-import com.ShiXi.common.mapper.ContactMapper;
-import com.ShiXi.common.mapper.MessageMapper;
-import com.ShiXi.chat.service.MessageService;
+import com.ShiXi.dto.Result;
+import com.ShiXi.entity.ChatMessage;
+import com.ShiXi.entity.Contact;
+import com.ShiXi.mapper.ContactMapper;
+import com.ShiXi.mapper.MessageMapper;
+import com.ShiXi.service.MessageService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -25,26 +25,33 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Override
     public Result saveMessage(ChatMessage message) {
         message.setSendTime(LocalDateTime.now());
+        Long userId = UserHolder.getUser().getId();
+        message.setSenderId(userId);
+
         boolean save = save(message);
         if(save){
             //自动添加联系人
-            buildContactBetweenUsers(message.getSenderId(),message.getReceiverId());
-            updateLastContactTime(message.getSenderId(),message.getReceiverId());
+            buildContactBetweenUsers(message.getReceiverId());
+            updateLastContactTime(message.getReceiverId());
             return Result.ok();
         }
         return Result.fail("保存失败");
     }
 
     @Override
-    public Result getMessagesBetweenUsers(Long userId1,Long userId2){
+    public Result getMessagesBetweenUsers(Long userId2){
+        Long userId1 = UserHolder.getUser().getId();
         //查询这两个用户之间的消息
-        List<ChatMessage> messages = messageMapper.selectList(null);
+        List<ChatMessage> messages = messageMapper.selectList(new QueryWrapper<ChatMessage>()
+                .eq("sender_id", userId1)
+                .eq("receiver_id", userId2));
         return Result.ok(messages);
     }
 
-    private void buildContactBetweenUsers(Long userId1,Long userId2) {
+    private void buildContactBetweenUsers(Long userId2) {
+        Long userId1 = UserHolder.getUser().getId();
         //将两个用户设置为彼此的联系人
-        if (!existsContactBetweenUsers(userId1, userId2)) {
+        if (!existsContactBetweenUsers(userId2)) {
             Contact contact1 = new Contact();
             contact1.setUserId(userId1);
             contact1.setContactUserId(userId2);
@@ -60,11 +67,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         }
     }
 
-    private boolean existsContactBetweenUsers(Long userId1,Long userId2) {
-        return contactMapper.selectCount(new QueryWrapper<Contact>().eq("user_id", userId1).eq("contact_user_id", userId2)) > 0;
+    private boolean existsContactBetweenUsers(Long userId2) {
+        Long userId1 = UserHolder.getUser().getId();
+        return contactMapper.selectCount(new QueryWrapper<Contact>()
+                .eq("user_id", userId1)
+                .eq("contact_user_id", userId2)) > 0;
     }
 
-    private void updateLastContactTime(Long userId1, Long userId2) {
+    private void updateLastContactTime(Long userId2) {
+        Long userId1 = UserHolder.getUser().getId();
         // 更新 userId1 -> userId2 的 lastContactTime
         Contact contact1 = new Contact();
         contact1.setUserId(userId1);
@@ -87,7 +98,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result getContactList(Long userId) {
+    public Result getContactList() {
+        Long userId = UserHolder.getUser().getId();
         List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>()
                 .eq("user_id", userId)
                 .eq("is_deleted", false));
@@ -96,7 +108,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
 
 
     @Override
-    public Result markMessageAsRead(Long userId1,Long userId2) {
+    public Result markMessageAsRead(Long userId2) {
+        Long userId1 = UserHolder.getUser().getId();
         boolean result = update(null,new UpdateWrapper<ChatMessage>()
                 .eq("sender_id", userId2)
                 .eq("receiver_id", userId1)
@@ -124,12 +137,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result markContactAsRead(Long userId1, Long userId2) {
-        boolean result = update(null,new UpdateWrapper<ChatMessage>()
-                .eq("sender_id", userId1)
-                .eq("receiver_id", userId2)
+    public Result markContactAsRead(Long userId2) {
+        Long userId1 = UserHolder.getUser().getId();
+        int result = contactMapper.update(null,new UpdateWrapper<Contact>()
+                .eq("user_id", userId1)
+                .eq("contact_user_id", userId2)
                 .set("is_read", true));
-        if( result){
+        if(result==1){
             return Result.ok();
         }
         else{
@@ -138,12 +152,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result deleteContact(Long userId1, Long userId2){
-        boolean result = update(null,new UpdateWrapper<ChatMessage>()
-                .eq("sender_id", userId1)
-                .eq("receiver_id", userId2)
+    public Result deleteContact(Long userId2){
+        Long userId1 = UserHolder.getUser().getId();
+        int result = contactMapper.update(null,new UpdateWrapper<Contact>()
+                .eq("user_id", userId1)
+                .eq("contact_user_id", userId2)
                 .set("is_deleted", true));
-        if( result){
+        if(result==1){
             return Result.ok();
         }
         else{
@@ -152,7 +167,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result remarkContact(Long userId1, Long userId2, String remark) {
+    public Result remarkContact(Long userId2, String remark) {
+        Long userId1 = UserHolder.getUser().getId();
         try {
             Contact contact = contactMapper.selectOne(new QueryWrapper<Contact>()
                     .eq("user_id", userId1)
