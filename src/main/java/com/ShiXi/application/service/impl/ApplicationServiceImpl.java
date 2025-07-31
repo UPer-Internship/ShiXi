@@ -6,6 +6,7 @@ import com.ShiXi.application.entity.Application;
 import com.ShiXi.common.mapper.ApplicationMapper;
 import com.ShiXi.application.service.ApplicationService;
 import com.ShiXi.common.utils.OSSUtil;
+import com.ShiXi.common.utils.UserHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
