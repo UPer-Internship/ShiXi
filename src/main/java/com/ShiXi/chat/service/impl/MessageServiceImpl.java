@@ -1,11 +1,13 @@
-package com.ShiXi.service.impl;
+package com.ShiXi.chat.service.impl;
 
-import com.ShiXi.dto.Result;
-import com.ShiXi.entity.ChatMessage;
-import com.ShiXi.entity.Contact;
-import com.ShiXi.mapper.ContactMapper;
-import com.ShiXi.mapper.MessageMapper;
-import com.ShiXi.service.MessageService;
+
+import com.ShiXi.chat.entity.ChatMessage;
+import com.ShiXi.chat.entity.Contact;
+import com.ShiXi.chat.service.MessageService;
+import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.mapper.ContactMapper;
+import com.ShiXi.common.mapper.MessageMapper;
+import com.ShiXi.common.utils.UserHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
