@@ -226,4 +226,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return openid;
     }
+
+    @Override
+    public Result getUserInfoById(Long id) {
+        // 根据id查询用户
+        User user = query().eq("id", id).one();
+        if(user == null){
+            return Result.fail("用户不存在");
+        }
+        return Result.ok(user);
+    }
 }

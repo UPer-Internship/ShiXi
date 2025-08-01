@@ -25,6 +25,10 @@ spring:
         min-idle: 1     # 最小空闲连接数
         time-between-eviction-runs: 10s  # 空闲连接检测周期
   oss:
+    endpoint: oss-cn-hangzhou.aliyuncs.com
+    accessKeyId:
+    accessKeySecret:
+    bucketName: dev-env-oss
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:

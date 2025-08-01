@@ -41,11 +41,12 @@ public interface MessageService extends IService<ChatMessage> {
     Result deleteMessage(Long messageId);
 
     /**
-     * 标记该联系人为已读
+     * 标记该联系人状态
      * @param userId2 联系人id
+     * @param status 状态
      * @return
      */
-    Result markContactAsRead(Long userId2);
+    Result markContactAsRead(Long userId2,Integer status);
 
     /**
      * 删除联系人

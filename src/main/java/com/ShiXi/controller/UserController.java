@@ -74,4 +74,8 @@ public class UserController {
         return userService.changeUserInfo(userDTO);
     }
 
+    @GetMapping("/getUserInfoById")
+    public Result getUserInfoById(@RequestParam Long id){
+        return userService.getUserInfoById(id);
+    }
 }

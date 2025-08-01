@@ -79,10 +79,10 @@ public class ChatController {
         return messageService.getContactList();
     }
 
-    @PostMapping("/contact/markAsRead")
-    @ApiOperation("标记联系人为已读")
-    public Result markContactAsRead(@RequestParam Long userId2){
-        return messageService.markContactAsRead(userId2);
+    @PostMapping("/contact/markReadStatus")
+    @ApiOperation("标记联系人状态")
+    public Result markContactAsRead(@RequestParam Long userId2,@RequestParam Integer status){
+        return messageService.markContactAsRead(userId2,status);
     }
 
     @PostMapping("/contact/delete")

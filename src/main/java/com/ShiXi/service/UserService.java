@@ -15,4 +15,6 @@ public interface UserService extends IService<User> {
     Result changeUserInfo(UserDTO userDTO);
 
     Result loginByWechat(String code);
+
+    Result getUserInfoById(Long id);
 }

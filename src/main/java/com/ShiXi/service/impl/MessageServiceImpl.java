@@ -138,17 +138,17 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result markContactAsRead(Long userId2) {
+    public Result markContactAsRead(Long userId2,Integer status) {
         Long userId1 = UserHolder.getUser().getId();
         int result = contactMapper.update(null,new UpdateWrapper<Contact>()
                 .eq("user_id", userId1)
                 .eq("contact_user_id", userId2)
-                .set("is_read", true));
+                .set("is_read", status));
         if(result==1){
             return Result.ok();
         }
         else{
-            return Result.fail("标记为已读失败");
+            return Result.fail("标记失败");
         }
     }
 
