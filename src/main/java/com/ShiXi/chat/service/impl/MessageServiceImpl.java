@@ -35,6 +35,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             //自动添加联系人
             buildContactBetweenUsers(message.getReceiverId());
             updateLastContactTime(message.getReceiverId());
+            //对方将当前用户标记为未读
+            contactMapper.update(null,new UpdateWrapper<Contact>()
+                    .eq("user_id", message.getReceiverId())
+                    .eq("contact_user_id", userId)
+                    .set("is_read", 0));
             return Result.ok();
         }
         return Result.fail("保存失败");
