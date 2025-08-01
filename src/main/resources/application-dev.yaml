@@ -39,7 +39,9 @@ logging:
 oss:
   resume:
     dir: D:\oss\resume
-
 feishu:
   webhook:
     url: https://open.feishu.cn/open-apis/bot/v2/hook/1c70bec6-1e50-43c5-9cb7-f7f741a8b748
+aliyun:
+  accessKeyId:
+  accessKeySecret:
