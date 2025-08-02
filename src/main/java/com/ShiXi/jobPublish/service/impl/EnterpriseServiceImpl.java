@@ -2,7 +2,7 @@ package com.ShiXi.jobPublish.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
+import com.ShiXi.user.domin.dto.UserDTO;
 import com.ShiXi.jobQuery.entity.Job;
 import com.ShiXi.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.JobMapper;

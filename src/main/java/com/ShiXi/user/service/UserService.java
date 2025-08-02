@@ -1,8 +1,8 @@
-package com.ShiXi.login.service;
+package com.ShiXi.user.service;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
-import com.ShiXi.login.entity.User;
+import com.ShiXi.user.domin.dto.UserDTO;
+import com.ShiXi.user.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface UserService extends IService<User> {

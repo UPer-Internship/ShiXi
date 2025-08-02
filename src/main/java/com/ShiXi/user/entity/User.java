@@ -1,4 +1,4 @@
-package com.ShiXi.login.entity;
+package com.ShiXi.user.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

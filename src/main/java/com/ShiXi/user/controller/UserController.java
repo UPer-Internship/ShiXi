@@ -1,8 +1,8 @@
-package com.ShiXi.login.controller;
+package com.ShiXi.user.controller;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
-import com.ShiXi.login.service.UserService;
+import com.ShiXi.user.domin.dto.UserDTO;
+import com.ShiXi.user.service.UserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

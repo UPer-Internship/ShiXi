@@ -2,7 +2,7 @@ package com.ShiXi.common.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.ShiXi.login.domin.dto.UserDTO;
+import com.ShiXi.user.domin.dto.UserDTO;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
 

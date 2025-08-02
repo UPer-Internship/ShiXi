@@ -1,7 +1,7 @@
 package com.ShiXi.blog.controller;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
+import com.ShiXi.user.domin.dto.UserDTO;
 import com.ShiXi.blog.entity.Blog;
 import com.ShiXi.blog.service.BlogService;
 import com.ShiXi.common.utils.SystemConstants;

@@ -1,7 +1,7 @@
 package com.ShiXi.studentInfo.service.impl;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
+import com.ShiXi.user.domin.dto.UserDTO;
 import com.ShiXi.studentInfo.domin.dto.studentBasicInfoReqDTO;
 import com.ShiXi.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.ResumeExperienceMapper;

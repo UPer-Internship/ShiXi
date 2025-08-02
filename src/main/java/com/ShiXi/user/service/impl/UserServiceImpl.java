@@ -1,4 +1,4 @@
-package com.ShiXi.login.service.impl;
+package com.ShiXi.user.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
@@ -6,11 +6,11 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.config.smsClientConfig;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
-import com.ShiXi.login.entity.User;
+import com.ShiXi.user.domin.dto.UserDTO;
+import com.ShiXi.user.entity.User;
 import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.properties.WeChatProperties;
-import com.ShiXi.login.service.UserService;
+import com.ShiXi.user.service.UserService;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;

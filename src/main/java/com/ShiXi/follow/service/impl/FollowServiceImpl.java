@@ -2,11 +2,11 @@ package com.ShiXi.follow.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.login.domin.dto.UserDTO;
+import com.ShiXi.user.domin.dto.UserDTO;
 import com.ShiXi.follow.entity.Follow;
 import com.ShiXi.common.mapper.FollowMapper;
 import com.ShiXi.follow.service.FollowService;
-import com.ShiXi.login.service.UserService;
+import com.ShiXi.user.service.UserService;
 import com.ShiXi.common.utils.UserHolder;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
