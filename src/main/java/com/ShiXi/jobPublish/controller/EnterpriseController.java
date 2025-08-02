@@ -1,8 +1,8 @@
-package com.ShiXi.enterprise.controller;
+package com.ShiXi.jobPublish.controller;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.job.entity.Job;
-import com.ShiXi.enterprise.service.EnterpriseService;
+import com.ShiXi.jobQuery.entity.Job;
+import com.ShiXi.jobPublish.service.EnterpriseService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;

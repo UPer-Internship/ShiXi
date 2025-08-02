@@ -1,13 +1,13 @@
-package com.ShiXi.enterprise.service.impl;
+package com.ShiXi.jobPublish.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.login.domin.dto.UserDTO;
-import com.ShiXi.job.entity.Job;
+import com.ShiXi.jobQuery.entity.Job;
 import com.ShiXi.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.JobMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
-import com.ShiXi.enterprise.service.EnterpriseService;
+import com.ShiXi.jobPublish.service.EnterpriseService;
 import com.ShiXi.onlineResume.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.domin.vo.InboxVO;

@@ -1,4 +1,4 @@
-package com.ShiXi.job.domin.dto;
+package com.ShiXi.jobQuery.domin.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

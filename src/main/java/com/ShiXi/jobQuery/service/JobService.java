@@ -1,9 +1,9 @@
-package com.ShiXi.job.service;
+package com.ShiXi.jobQuery.service;
 
-import com.ShiXi.job.domin.dto.JobFuzzyQueryDTO;
-import com.ShiXi.job.domin.dto.JobPageQueryDTO;
+import com.ShiXi.jobQuery.domin.dto.JobFuzzyQueryDTO;
+import com.ShiXi.jobQuery.domin.dto.JobPageQueryDTO;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.job.entity.Job;
+import com.ShiXi.jobQuery.entity.Job;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface JobService extends IService<Job> {

@@ -1,7 +1,7 @@
-package com.ShiXi.enterprise.service;
+package com.ShiXi.jobPublish.service;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.job.entity.Job;
+import com.ShiXi.jobQuery.entity.Job;
 
 public interface EnterpriseService {
     Result pubJob(Job job);

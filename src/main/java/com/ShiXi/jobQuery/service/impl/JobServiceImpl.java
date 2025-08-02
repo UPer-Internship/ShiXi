@@ -1,14 +1,14 @@
-package com.ShiXi.job.service.impl;
+package com.ShiXi.jobQuery.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.ShiXi.job.domin.dto.JobFuzzyQueryDTO;
-import com.ShiXi.job.domin.dto.JobPageQueryDTO;
+import com.ShiXi.jobQuery.domin.dto.JobFuzzyQueryDTO;
+import com.ShiXi.jobQuery.domin.dto.JobPageQueryDTO;
 import com.ShiXi.common.domin.dto.PageResult;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.job.entity.Job;
+import com.ShiXi.jobQuery.entity.Job;
 import com.ShiXi.common.mapper.JobMapper;
 import com.ShiXi.onlineResume.service.impl.OnlineResumeServiceImpl;
-import com.ShiXi.job.service.JobService;
+import com.ShiXi.jobQuery.service.JobService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.domin.vo.InboxVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

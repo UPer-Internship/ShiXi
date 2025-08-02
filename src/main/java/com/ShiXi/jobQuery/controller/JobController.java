@@ -1,9 +1,9 @@
-package com.ShiXi.job.controller;
+package com.ShiXi.jobQuery.controller;
 
-import com.ShiXi.job.domin.dto.JobFuzzyQueryDTO;
-import com.ShiXi.job.domin.dto.JobPageQueryDTO;
+import com.ShiXi.jobQuery.domin.dto.JobFuzzyQueryDTO;
+import com.ShiXi.jobQuery.domin.dto.JobPageQueryDTO;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.job.service.JobService;
+import com.ShiXi.jobQuery.service.JobService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
