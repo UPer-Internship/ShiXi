@@ -19,6 +19,6 @@ public class ReceiveResumeListVO {
     private String icon;//头像
     private String schoolName;//学校名称
     private String major;//专业
-    private LocalDate graduationDate;//毕业时间
+    private String graduationDate;//毕业时间
     private String educationLevel;//学历水平
 }

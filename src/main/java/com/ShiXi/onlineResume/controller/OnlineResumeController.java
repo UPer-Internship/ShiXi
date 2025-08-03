@@ -2,7 +2,7 @@ package com.ShiXi.onlineResume.controller;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.onlineResume.entity.ResumeExperience;
-import com.ShiXi.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
 import com.ShiXi.onlineResume.service.OnlineResumeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

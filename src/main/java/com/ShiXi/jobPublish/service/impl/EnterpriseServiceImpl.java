@@ -2,9 +2,10 @@ package com.ShiXi.jobPublish.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.domin.dto.UserDTO;
+import com.ShiXi.common.mapper.UserMapper;
+import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.jobQuery.entity.Job;
-import com.ShiXi.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.JobMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
 import com.ShiXi.jobPublish.service.EnterpriseService;
@@ -13,6 +14,7 @@ import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.domin.vo.InboxVO;
 import com.ShiXi.onlineResume.domin.vo.OnlineResumeVO;
 import com.ShiXi.onlineResume.domin.vo.ReceiveResumeListVO;
+import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -34,7 +36,8 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
     StudentInfoMapper studentInfoMapper;
     @Resource
     OnlineResumeService onlineResumeService;
-
+    @Resource
+    UserMapper userMapper;
     @Override
     public Result pubJob(Job job) {
         UserDTO user = UserHolder.getUser();
@@ -78,6 +81,7 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
 
     @Override
     public Result queryResumeList() {
+        //获取当前用户的全量信息
         Long userId = UserHolder.getUser().getId();
         //查收自己的redis收件箱 获取一个信件的set集合 这些信件的内容是job的id和投递者的id
         String key = "inbox:"+userId;
@@ -96,23 +100,27 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
             InboxVO inboxVO = JSONUtil.toBean(Json, InboxVO.class);
             inboxVOS.add(inboxVO);
         }
-
+        //构造返回对象列
         List<ReceiveResumeListVO> receiveResumeListVOs = new ArrayList<>();
-
         for(InboxVO inboxVO : inboxVOS){
+            //获取岗位信息
             Job job = getById(inboxVO.getJobId());
+            //获取投递的学生信息
             StudentInfo studentInfo=studentInfoMapper.selectById(inboxVO.getSubmitterId());
+            //获取投递的用户信息
+            User user=userMapper.selectById(studentInfo.getUserId());
+            //构造返回对象
             ReceiveResumeListVO receiveResumeListVO = new ReceiveResumeListVO();
             receiveResumeListVO.setJobId(job.getId());
             receiveResumeListVO.setJobName(job.getTitle());
-            receiveResumeListVO.setSubmitterId(studentInfo.getId());
-            receiveResumeListVO.setSubmitterName(studentInfo.getName());
-            receiveResumeListVO.setGender(studentInfo.getGender());
+            receiveResumeListVO.setSubmitterId(studentInfo.getUserId());
+            receiveResumeListVO.setSubmitterName(user.getName());
+            receiveResumeListVO.setGender(user.getGender());
             receiveResumeListVO.setSchoolName(studentInfo.getSchoolName());
             receiveResumeListVO.setEducationLevel(studentInfo.getEducationLevel());
             receiveResumeListVO.setGraduationDate(studentInfo.getGraduationDate());
             receiveResumeListVO.setMajor(studentInfo.getMajor());
-            receiveResumeListVO.setIcon(studentInfo.getIcon());
+            receiveResumeListVO.setIcon(user.getIcon());
             receiveResumeListVOs.add(receiveResumeListVO);
         }
         //return  Result.ok(inboxVOS);

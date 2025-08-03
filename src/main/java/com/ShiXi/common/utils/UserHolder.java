@@ -1,7 +1,7 @@
 package com.ShiXi.common.utils;
 
 
-import com.ShiXi.user.domin.dto.UserDTO;
+import com.ShiXi.user.common.domin.dto.UserDTO;
 
 public class UserHolder {
     private static final ThreadLocal<UserDTO> tl = new ThreadLocal<>();

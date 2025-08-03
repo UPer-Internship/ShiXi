@@ -1,10 +1,10 @@
 package com.ShiXi.icon.service.impl;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.domin.dto.UserDTO;
-import com.ShiXi.user.entity.User;
+import com.ShiXi.user.common.domin.dto.UserDTO;
+import com.ShiXi.user.common.entity.User;
 import com.ShiXi.icon.service.IconService;
-import com.ShiXi.user.service.UserService;
+import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.common.utils.OSSUtil;
 import com.ShiXi.common.utils.UserHolder;
 import lombok.extern.slf4j.Slf4j;

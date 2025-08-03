@@ -2,7 +2,7 @@ package com.ShiXi.onlineResume.service;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.onlineResume.entity.ResumeExperience;
-import com.ShiXi.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
 import com.ShiXi.onlineResume.domin.vo.OnlineResumeVO;
 
 public interface OnlineResumeService {
