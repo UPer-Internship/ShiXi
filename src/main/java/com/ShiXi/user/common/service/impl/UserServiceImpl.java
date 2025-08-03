@@ -7,9 +7,12 @@ import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.config.smsClientConfig;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.common.domin.dto.UserDTO;
+import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.properties.WeChatProperties;
+import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.common.utils.HttpClientUtil;
@@ -41,6 +44,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private StringRedisTemplate stringRedisTemplate;
     @Resource
     private FeishuService feishuService;
+    @Resource
+    private IdentificationService identificationService;
     @Autowired
     private WeChatProperties weChatProperties;
     //微信端登录接口请求的url
@@ -269,4 +274,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = query().eq("id", userId).one();
         return user;
     }
+
+
 }

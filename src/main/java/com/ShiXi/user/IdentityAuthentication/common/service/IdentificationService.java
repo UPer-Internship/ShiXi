@@ -1,0 +1,9 @@
+package com.ShiXi.user.IdentityAuthentication.common.service;
+
+import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.baomidou.mybatisplus.extension.service.IService;
+
+public interface IdentificationService extends IService<Identification> {
+    Result getIdentification();
+}

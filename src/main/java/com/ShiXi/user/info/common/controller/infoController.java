@@ -1,6 +1,7 @@
 package com.ShiXi.user.info.common.controller;
 
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.user.info.common.domin.dto.changeInfoDTO;
 import com.ShiXi.user.info.studentInfo.domin.dto.StudentChangeInfoDTO;
 
@@ -21,6 +22,8 @@ public class infoController {
 
     @Resource
     private StudentInfoService studentInfoService;
+    @Resource UserService userService;
+
 
     @PostMapping("/changeInfo")
     @ApiOperation("修改用户信息")

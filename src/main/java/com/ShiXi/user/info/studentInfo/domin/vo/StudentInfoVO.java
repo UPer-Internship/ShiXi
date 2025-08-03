@@ -23,10 +23,6 @@ public class StudentInfoVO {
 
     private String phone;// 手机号
 
-    private String openid;// 微信openId
-
-    private String password;// 密码
-
     private String nickName;// 昵称
 
     private String icon = "";// 头像

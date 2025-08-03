@@ -21,4 +21,6 @@ public interface UserService extends IService<User> {
 //    User getUserById(Long id);
     //获取自己的用户信息
     User getMyUserInfo();
+
+//    Result getIdentification();
 }

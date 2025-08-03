@@ -143,10 +143,10 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         User user = new User();
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
-        user.setIsStudent(0);
-        user.setIsTeacher(0);
-        user.setIsSchoolFriend(0);
-        user.setIsEnterprise(0);
+//        user.setIsStudent(0);
+//        user.setIsTeacher(0);
+//        user.setIsSchoolFriend(0);
+//        user.setIsEnterprise(0);
 
         // 2.保存用户
         save(user);
