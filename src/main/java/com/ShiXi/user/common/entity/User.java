@@ -39,7 +39,6 @@ public class User implements Serializable {
 
     private LocalDateTime updateTime;// 更新时间
 
-    private Integer isStudent;// 是否通过学生验证，0-否，1-是
 
 //    private Integer schoolFriendIdentification;// 是否通过校友验证，0-否，1-是
 //
@@ -57,6 +56,5 @@ public class User implements Serializable {
     private String name;
 
     private String wechat;
-
 
 }

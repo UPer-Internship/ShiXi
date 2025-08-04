@@ -1,35 +1,39 @@
 package com.ShiXi.onlineResume.service;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.onlineResume.entity.ResumeExperience;
-import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
-import com.ShiXi.onlineResume.domin.vo.OnlineResumeVO;
+import com.ShiXi.onlineResume.domin.dto.UpdateResumeDTO;
+import com.ShiXi.onlineResume.entity.Resume;
+import com.baomidou.mybatisplus.extension.service.IService;
 
-public interface OnlineResumeService {
-    /*
-    * 保存在线简历
-     */
-     Result saveResumeInfo(StudentInfo studentInfo);
+public interface OnlineResumeService extends IService<Resume> {
+//    /*
+//    * 保存在线简历
+//     */
+//     Result saveResumeInfo(StudentInfo studentInfo);
+//
+//    /**
+//     * 添加经历
+//     */
+//     Result  saveExperienceInfo(ResumeExperience resumeExperience);
+//
+//     /**
+//      * 修改在线简历
+//      */
+//     Result changeResumeInfo(StudentInfo studentInfo);
+//
+//     /**
+//      * 修改经历
+//      */
+//     Result changeExperienceInfo(ResumeExperience resumeExperience);
+//
+//    /*
+//    * 获取在线简历
+//     */
+//     Result getOnlineResume();
+//
+    Result getResumeByResumeId(Long id);
 
-    /**
-     * 添加经历
-     */
-     Result  saveExperienceInfo(ResumeExperience resumeExperience);
+    Result getMyResume();
 
-     /**
-      * 修改在线简历
-      */
-     Result changeResumeInfo(StudentInfo studentInfo);
-
-     /**
-      * 修改经历
-      */
-     Result changeExperienceInfo(ResumeExperience resumeExperience);
-
-    /*
-    * 获取在线简历
-     */
-     Result getOnlineResume();
-
-     OnlineResumeVO queryResumeById(Long id);
+    Result updateMyExperience(UpdateResumeDTO reqDTO);
 }

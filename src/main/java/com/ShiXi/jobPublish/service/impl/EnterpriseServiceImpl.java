@@ -3,6 +3,7 @@ package com.ShiXi.jobPublish.service.impl;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.UserMapper;
+import com.ShiXi.onlineResume.domin.vo.ResumeVO;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.jobQuery.entity.Job;
 import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
@@ -12,7 +13,6 @@ import com.ShiXi.jobPublish.service.EnterpriseService;
 import com.ShiXi.onlineResume.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.domin.vo.InboxVO;
-import com.ShiXi.onlineResume.domin.vo.OnlineResumeVO;
 import com.ShiXi.onlineResume.domin.vo.ReceiveResumeListVO;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -130,8 +130,8 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
     @Override
     public Result queryResumeById(Long id) {//传入投递者的简历id
 
-        OnlineResumeVO onlineResumeVO = onlineResumeService.queryResumeById(id);
-        return Result.ok(onlineResumeVO);
+        return onlineResumeService.getResumeByResumeId(id);
+
     }
 
     @Override

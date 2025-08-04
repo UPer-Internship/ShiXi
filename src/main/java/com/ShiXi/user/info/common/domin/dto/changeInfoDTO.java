@@ -16,8 +16,9 @@ public class changeInfoDTO {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;// 用户id
     private String identification;
-    private String nickName;// 昵称
-    private String icon = "";// 头像
+
+    private String nickName;
+    private String icon = "";
     private String gender;
     private String birthDate;
     private String name;

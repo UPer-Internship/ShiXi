@@ -21,11 +21,11 @@ public class StudentInfoVO {
 
     private String expectedPosition;
 
-    private String phone;// 手机号
+    private String phone;
 
-    private String nickName;// 昵称
+    private String nickName;
 
-    private String icon = "";// 头像
+    private String icon = "";
 
     private String gender;
 
