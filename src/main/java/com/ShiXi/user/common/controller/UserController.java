@@ -28,5 +28,8 @@ public class UserController {
         return userService.getUserInfoById(id);
     }
 
-
+//    @GetMapping("/isLogin")
+//    public Result isLogin(@RequestParam String token){
+//
+//    }
 }

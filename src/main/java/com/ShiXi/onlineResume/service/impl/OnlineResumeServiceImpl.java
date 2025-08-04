@@ -215,6 +215,9 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
         Resume resumeExperience = lambdaQuery()
                 .eq(Resume::getUserId, id)  // 直接引用实体类的userId字段
                 .one();
+        if(resumeExperience==null){
+            return Result.fail("此用户还没有上传简历");
+        }
         //获取用户基本信息
         ResumeVO resumeExperienceVO = new ResumeVO();
         resumeExperienceVO.setId(resumeExperience.getId())
@@ -263,22 +266,18 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
         } else {
             // 无记录则新建
             Resume newExperience = new Resume();
-            lambdaUpdate()
-                    .eq(Resume::getUserId, userId)
-                    .set(Resume::getWorkAndInternshipExperiences, JSONUtil.toJsonStr(reqDTO.getWorkAndInternshipExperiences()))
-                    .set(Resume::getProjectExperiences, JSONUtil.toJsonStr(reqDTO.getProjectExperiences()))
-                    .set(Resume::getResumeLink, reqDTO.getResumeLink())
-                    .set(Resume::getEducationExperiences, JSONUtil.toJsonStr(reqDTO.getEducationExperiences()))
-                    .set(Resume::getExpectedPosition, reqDTO.getExpectedPosition())
-                    .set(Resume::getAdvantages, reqDTO.getAdvantages())
-                    .set(Resume::getExpectedPosition,reqDTO.getExpectedPosition())
-                    .set(Resume::getAdvantages,reqDTO.getAdvantages())
-                    .set(Resume::getBirthDate,reqDTO.getBirthDate())
-                    .set(Resume::getName,reqDTO.getName())
-                    .set(Resume::getPhone,reqDTO.getPhone())
-                    .set(Resume::getWechat,reqDTO.getWechat())
-                    .set(Resume::getGender,reqDTO.getGender())
-                    .update();
+            newExperience.setUserId(userId);
+            newExperience.setWorkAndInternshipExperiences(JSONUtil.toJsonStr(reqDTO.getWorkAndInternshipExperiences()));
+            newExperience.setProjectExperiences(JSONUtil.toJsonStr(reqDTO.getProjectExperiences()));
+            newExperience.setResumeLink(reqDTO.getResumeLink());
+            newExperience.setEducationExperiences(JSONUtil.toJsonStr(reqDTO.getEducationExperiences()));
+            newExperience.setExpectedPosition(reqDTO.getExpectedPosition());
+            newExperience.setAdvantages(reqDTO.getAdvantages());
+            newExperience.setBirthDate(reqDTO.getBirthDate());
+            newExperience.setName(reqDTO.getName());
+            newExperience.setPhone(reqDTO.getPhone());
+            newExperience.setWechat(reqDTO.getWechat());
+            newExperience.setGender(reqDTO.getGender());
             boolean saveSuccess = onlineResumeService.save(newExperience);
             if (saveSuccess) {
                 return Result.ok();

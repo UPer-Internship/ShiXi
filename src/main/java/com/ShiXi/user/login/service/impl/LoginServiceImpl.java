@@ -6,11 +6,18 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.config.smsClientConfig;
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.entity.Options;
 import com.ShiXi.common.mapper.UserMapper;
+import com.ShiXi.common.service.OptionsService;
 import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
+import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
+import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.impl.StudentIdentificationServiceImpl;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.login.service.LoginService;
@@ -21,8 +28,10 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -40,8 +49,14 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     private FeishuService feishuService;
     @Resource
     private WeChatProperties weChatProperties;
+    @Resource
+    private IdentificationService identificationService;
+    @Resource
+    private OptionsService optionsService;
     //微信端登录接口请求的url
     public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
+    @Resource
+    private StudentIdentificationService studentIdentificationService;
 
 
     @Override
@@ -118,38 +133,44 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         log.debug("发送短信验证码成功，验证码：{}", code);
         feishuService.sendTextMessage(phone+":"+ code);
         // 构造请求对象
-        try{
-            Client client = smsClientConfig.createClient();
-            SendSmsRequest sendSmsRequest = new SendSmsRequest()
-                    .setPhoneNumbers(phone)
-                    .setSignName(SIGN_NAME)
-                    .setTemplateCode(LOGIN_CODE_TEMPLATE_CODE)
-                    // TemplateParam 为序列化后的 JSON 字符串。其中\"表示转义后的双引号。
-                    .setTemplateParam("{\"code\":\""+code+"\"}");
+        Options sms = optionsService.lambdaQuery()
+                .eq(Options::getOptionName, "sms").one();
+        Integer status = sms.getOptionStatus();
+        if(status==1) {
+            try {
+                Client client = smsClientConfig.createClient();
+                SendSmsRequest sendSmsRequest = new SendSmsRequest()
+                        .setPhoneNumbers(phone)
+                        .setSignName(SIGN_NAME)
+                        .setTemplateCode(LOGIN_CODE_TEMPLATE_CODE)
+                        // TemplateParam 为序列化后的 JSON 字符串。其中\"表示转义后的双引号。
+                        .setTemplateParam("{\"code\":\"" + code + "\"}");
 
-            // 发送 API 请求
-            SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
-        }catch (Exception e){
-            e.printStackTrace();
+                // 发送 API 请求
+                SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
         // 返回ok
         return Result.ok();
 
     }
-
-    private User createStudentWithPhone(String phone) {
+    @Transactional
+    public User createStudentWithPhone(String phone) {
         // 1.创建用户
         User user = new User();
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
-//        user.setIsStudent(0);
-//        user.setIsTeacher(0);
-//        user.setIsSchoolFriend(0);
-//        user.setIsEnterprise(0);
-
-        // 2.保存用户
         save(user);
+        //初始化身份认证
+        Identification identification = new Identification();
+        identification.setUserId(user.getId());
+        identificationService.save(identification);
+        //初始化学生认证资料
+        StudentIdentification studentIdentification = new StudentIdentification();
+        studentIdentification.setUserId(user.getId());
+        studentIdentificationService.save(studentIdentification);
         return user;
     }
 
