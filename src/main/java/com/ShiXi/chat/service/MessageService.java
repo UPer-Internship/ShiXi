@@ -62,4 +62,11 @@ public interface MessageService extends IService<ChatMessage> {
      * @return
      */
     Result remarkContact(Long userId2, String remark);
+
+    /**
+     * 根据id添加联系人
+     * @param userId2
+     * @return
+     */
+    Result addContactById(Long userId2);
 }

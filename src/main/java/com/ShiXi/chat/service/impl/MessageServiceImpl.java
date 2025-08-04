@@ -46,14 +46,16 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result getMessagesBetweenUsers(Long userId2){
+    public Result getMessagesBetweenUsers(Long userId2) {
         Long userId1 = UserHolder.getUser().getId();
-        //查询这两个用户之间的消息
+        // 查询两个用户之间的所有消息（包括发送和接收的）
         List<ChatMessage> messages = messageMapper.selectList(new QueryWrapper<ChatMessage>()
-                .eq("sender_id", userId1)
-                .eq("receiver_id", userId2));
+                .and(wrapper -> wrapper.eq("sender_id", userId1).eq("receiver_id", userId2))
+                .or(wrapper -> wrapper.eq("sender_id", userId2).eq("receiver_id", userId1))
+                .orderByAsc("send_time")); // 按时间升序排列
         return Result.ok(messages);
     }
+
 
     private void buildContactBetweenUsers(Long userId2) {
         Long userId1 = UserHolder.getUser().getId();
@@ -190,5 +192,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         } catch (Exception e) {
             return Result.fail("修改备注失败");
         }
+    }
+
+    @Override
+    public Result addContactById(Long userId2) {
+        if (!existsContactBetweenUsers(userId2)) {
+            buildContactBetweenUsers(userId2);
+            return Result.ok("添加联系人成功");
+        }
+        return Result.fail("该用户已添加");
     }
 }

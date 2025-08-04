@@ -96,4 +96,10 @@ public class ChatController {
     public Result remarkContact(@RequestParam Long userId2,@RequestParam String remark){
         return messageService.remarkContact(userId2,remark);
     }
+
+    @PostMapping("/contact/addContact")
+    @ApiOperation("添加联系人")
+    public Result addContactById(@RequestParam Long userId2){
+        return messageService.addContactById(userId2);
+    }
 }
