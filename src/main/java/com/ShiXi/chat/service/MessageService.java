@@ -24,7 +24,7 @@ public interface MessageService extends IService<ChatMessage> {
      * 获取联系人列表
      * @return
      */
-    Result getContactList();
+    Result getContactListByType(String contactType);
 
     /**
      * 标记消息为已读
@@ -62,4 +62,11 @@ public interface MessageService extends IService<ChatMessage> {
      * @return
      */
     Result remarkContact(Long userId2, String remark);
+
+    /**
+     * 根据id添加联系人
+     * @param userId2
+     * @return
+     */
+    Result addContactById(Long userId2,String contactType);
 }

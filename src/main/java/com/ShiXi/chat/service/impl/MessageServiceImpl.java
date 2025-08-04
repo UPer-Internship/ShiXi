@@ -32,8 +32,6 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
 
         boolean save = save(message);
         if(save){
-            //自动添加联系人
-            buildContactBetweenUsers(message.getReceiverId());
             updateLastContactTime(message.getReceiverId());
             //对方将当前用户标记为未读
             contactMapper.update(null,new UpdateWrapper<Contact>()
@@ -46,16 +44,18 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result getMessagesBetweenUsers(Long userId2){
+    public Result getMessagesBetweenUsers(Long userId2) {
         Long userId1 = UserHolder.getUser().getId();
-        //查询这两个用户之间的消息
+        // 查询两个用户之间的所有消息（包括发送和接收的）
         List<ChatMessage> messages = messageMapper.selectList(new QueryWrapper<ChatMessage>()
-                .eq("sender_id", userId1)
-                .eq("receiver_id", userId2));
+                .and(wrapper -> wrapper.eq("sender_id", userId1).eq("receiver_id", userId2))
+                .or(wrapper -> wrapper.eq("sender_id", userId2).eq("receiver_id", userId1))
+                .orderByAsc("send_time")); // 按时间升序排列
         return Result.ok(messages);
     }
 
-    private void buildContactBetweenUsers(Long userId2) {
+
+    private void buildContactBetweenUsers(Long userId2,String contactType) {
         Long userId1 = UserHolder.getUser().getId();
         //将两个用户设置为彼此的联系人
         if (!existsContactBetweenUsers(userId2)) {
@@ -63,13 +63,13 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             contact1.setUserId(userId1);
             contact1.setContactUserId(userId2);
             contact1.setLastContactTime(LocalDateTime.now());
-//            contact1.setIsBlocked(false);
+            contact1.setContactType(contactType);
             contactMapper.insert(contact1);
             Contact contact2 = new Contact();
             contact2.setUserId(userId2);
             contact2.setContactUserId(userId1);
             contact2.setLastContactTime(LocalDateTime.now());
-//            contact2.setIsBlocked(false);
+            contact2.setContactType(contactType);
             contactMapper.insert(contact2);
         }
     }
@@ -105,11 +105,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     }
 
     @Override
-    public Result getContactList() {
+    public Result getContactListByType(String contactType) {
         Long userId = UserHolder.getUser().getId();
         List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>()
                 .eq("user_id", userId)
-                .eq("is_deleted", false));
+                .eq("is_deleted", false)
+                .eq("contact_type", contactType));
         return Result.ok(contacts);
     }
 
@@ -190,5 +191,14 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         } catch (Exception e) {
             return Result.fail("修改备注失败");
         }
+    }
+
+    @Override
+    public Result addContactById(Long userId2,String contactType) {
+        if (!existsContactBetweenUsers(userId2)) {
+            buildContactBetweenUsers(userId2, contactType);
+            return Result.ok("添加联系人成功");
+        }
+        return Result.fail("该用户已添加");
     }
 }
