@@ -11,4 +11,6 @@ public interface StudentIdentificationService extends IService<StudentIdentifica
     Result toIdentification(String type , MultipartFile file);
 
     Result getMyIdentification(String identification, String type);
+
+    Result getIdentificationDataByUserId(Integer userId,String identification, String type);
 }

@@ -23,7 +23,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
    StudentIdentificationService studentIdentificationService;
 
     @Override
-    public Result getIdentification() {
+    public Result getIdentificationStatus() {
         //获取用户id
         Long id = UserHolder.getUser().getId();
         Identification identification = lambdaQuery()
@@ -57,6 +57,23 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     public Result getMyIdentification(String identification, String type) {
         if(identification.equals("student")){
             return studentIdentificationService.getMyIdentification(identification,type);
+        }
+        else if(identification.equals("teacher")){
+
+        }
+        else if(identification.equals("schoolFriend")){
+
+        }
+        else if(identification.equals("enterprise")){
+
+        }
+        return Result.fail("发生错误");
+    }
+
+    @Override
+    public Result getIdentificationDataByUserId(Integer userId, String identification, String type) {
+        if(identification.equals("student")){
+            return studentIdentificationService.getIdentificationDataByUserId(userId,identification,type);
         }
         else if(identification.equals("teacher")){
 

@@ -110,6 +110,36 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         }
         return Result.fail("未知错误");
     }
+
+    @Override
+    public Result getIdentificationDataByUserId(Integer userId,String identification, String type) {
+        StudentIdentification studentIdentification = lambdaQuery().eq(StudentIdentification::getUserId, userId).one();
+        if(studentIdentification==null){
+            return Result.fail("此用户无此数据");
+        }
+        if(type.equals("identityCard")){
+            String url = studentIdentification.getIdentityCard();
+            if(url==null||url.equals("")){
+                return Result.fail("图片路径为空，请检查是否上传过资料");
+            }
+            return Result.ok(url);
+        }
+        else if(type.equals("graduationCertificate")){
+            String url = studentIdentification.getGraduationCertificate();
+            if(url==null||url.equals("")){
+                return Result.fail("图片路径为空，请检查是否上传过资料");
+            }
+            return Result.ok(url);
+        }
+        else if(type.equals("studentIdCard")){
+            String url = studentIdentification.getStudentIdCard();
+            if(url==null||url.equals("")){
+                return Result.fail("图片路径为空，请检查是否上传过资料");
+            }
+            return Result.ok(url);
+        }
+        return Result.fail("未知错误");
+    }
 }
 
 
