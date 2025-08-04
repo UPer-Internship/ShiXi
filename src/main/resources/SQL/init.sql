@@ -135,6 +135,7 @@ CREATE TABLE contact (
      user_id BIGINT NOT NULL COMMENT '发起者ID',
      contact_user_id BIGINT NOT NULL COMMENT '被添加的联系人ID',
      remark VARCHAR(255) COMMENT '联系人备注信息',
+     contact_type VARCHAR(20) DEFAULT 'PERSONAL' COMMENT '联系人类型：WORK-工作好友，PERSONAL-普通好友',
      last_contact_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '最后联系时间',
      is_deleted TINYINT(1) DEFAULT FALSE COMMENT '是否屏蔽该联系人',
      is_read TINYINT(1) DEFAULT FALSE COMMENT '是否已读（0:未读 1:已读）',
