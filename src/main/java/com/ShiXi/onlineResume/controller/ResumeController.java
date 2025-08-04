@@ -25,13 +25,13 @@ public class ResumeController {
      * @return 在线简历的vo类
      */
     @GetMapping("/getMyResume")
-    @ApiOperation("获取在线简历信息")
+    @ApiOperation("获取我的简历")
     public Result getMyResume() {
         return onlineResumeService.getMyResume();
     }
 
-    @PostMapping("/updateMyExperience")
-    @ApiOperation("修改在线简历中的经历(工作经历 项目经历 作品集 简历附件)信息")
+    @PostMapping("/updateMyResume")
+    @ApiOperation("修改我的简历")
     public Result updateMyExperience(@RequestBody UpdateResumeDTO reqDTO) {
         return onlineResumeService.updateMyExperience(reqDTO);
     }
