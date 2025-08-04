@@ -39,7 +39,6 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     public Result toIdentification(String  identification, String type, MultipartFile file) {
         if(identification.equals("student")){
            return studentIdentificationService.toIdentification(type,file);
-
         }
         else if(identification.equals("teacher")){
 
