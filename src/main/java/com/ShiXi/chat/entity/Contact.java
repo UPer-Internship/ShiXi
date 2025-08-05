@@ -1,9 +1,6 @@
 package com.ShiXi.chat.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -28,4 +25,10 @@ public class Contact implements Serializable {
     @TableLogic
     private Integer isDeleted; // 逻辑删除标志，0-未删除，1-已删除
     private Integer isRead;
+
+    //  用户数据,非数据库字段
+    @TableField(exist = false)
+    private String contactUserName;
+    @TableField(exist = false)
+    private String contactUserIcon;
 }

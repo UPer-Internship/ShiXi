@@ -7,15 +7,20 @@ import com.ShiXi.chat.service.MessageService;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.ContactMapper;
 import com.ShiXi.common.mapper.MessageMapper;
+import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> implements MessageService {
@@ -23,6 +28,8 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     private MessageMapper messageMapper;
     @Resource
     private ContactMapper contactMapper;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public Result saveMessage(ChatMessage message) {
@@ -107,10 +114,23 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Override
     public Result getContactListByType(String contactType) {
         Long userId = UserHolder.getUser().getId();
+        //查询联系人列表
         List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>()
                 .eq("user_id", userId)
+                .eq("contact_type", contactType)
                 .eq("is_deleted", false)
-                .eq("contact_type", contactType));
+                .orderByDesc("last_contact_time"));
+
+        // 为每个联系人查询对应的用户信息
+        for (Contact contact : contacts) {
+            // 根据 contactUserId 查询用户信息
+            User user = userMapper.selectById(contact.getContactUserId());
+            if (user != null) {
+                // 设置用户信息到联系人对象中
+                contact.setContactUserName(user.getNickName());
+                contact.setContactUserIcon(user.getIcon());
+            }
+        }
         return Result.ok(contacts);
     }
 

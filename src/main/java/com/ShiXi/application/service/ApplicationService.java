@@ -13,6 +13,8 @@ public interface ApplicationService extends IService<Application> {
 
     Result getApplicationsByJobId(Long jobId);
 
+    Result getApplicationsByStudentIdAndPublisherId(Long studentId,Long publisherId);
+
     Result handleApplication(Long applicationId,String status);
 
     Result deleteApplication(Long applicationId);

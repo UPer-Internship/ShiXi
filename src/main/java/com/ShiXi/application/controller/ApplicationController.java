@@ -33,6 +33,11 @@ public class ApplicationController {
         return applicationService.getApplicationsByJobId(jobId);
     }
 
+    @GetMapping("/getApplicationsById")
+    public Result getApplicationsById(@RequestParam Long studentId,@RequestParam Long enterpriseId){
+        return applicationService.getApplicationsByStudentIdAndPublisherId(studentId,enterpriseId);
+    }
+
     @PostMapping("/handleApplication")
     public Result handleApplication(@RequestParam Long applicationId,@RequestParam String status){
         return applicationService.handleApplication(applicationId,status);

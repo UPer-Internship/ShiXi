@@ -91,6 +91,20 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
     }
 
     @Override
+    public Result getApplicationsByStudentIdAndPublisherId(Long studentId, Long enterpriseId) {
+        try {
+            List<Application> applications = applicationMapper.selectList(new QueryWrapper<Application>()
+                    .eq("student_id", studentId)
+                    .eq("enterprise_id", enterpriseId)
+                    .eq("is_deleted", 0));
+            return Result.ok(applications);
+        } catch (Exception e) {
+            log.error("查询学生申请失败，studentId: {}, enterpriseId: {}", studentId, enterpriseId, e);
+            return Result.fail("查询学生申请失败");
+        }
+    }
+
+    @Override
     public Result handleApplication(Long applicationId, String status){
         try {
             // 查询申请是否存在
