@@ -12,7 +12,7 @@ public class UpdateResumeDTO {
 
     private String advantages;
 
-    private String expectedPosition;
+    private List<String> expectedPosition;
 
     private String phone;// 手机号
 

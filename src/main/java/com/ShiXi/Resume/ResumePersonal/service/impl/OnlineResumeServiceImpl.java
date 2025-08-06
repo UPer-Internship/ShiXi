@@ -1,5 +1,6 @@
 package com.ShiXi.Resume.ResumePersonal.service.impl;
 
+import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
@@ -228,7 +229,10 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
                 .setBirthDate(resumeExperience.getBirthDate())
                 .setName(resumeExperience.getName())
                 .setPhone(resumeExperience.getPhone())
-                .setWechat(resumeExperience.getWechat());
+                .setWechat(resumeExperience.getWechat())
+                .setResumeLink(resumeExperienceVO.getResumeLink())
+                .setAdvantages(resumeExperience.getAdvantages())
+                .setExpectedPosition(JSONUtil.toList(resumeExperience.getExpectedPosition(),String.class));
         return Result.ok(resumeExperienceVO);
     }
 
@@ -248,7 +252,7 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
                     .set(Resume::getProjectExperiences, JSONUtil.toJsonStr(reqDTO.getProjectExperiences()))
                     .set(Resume::getResumeLink, reqDTO.getResumeLink())
                     .set(Resume::getEducationExperiences,JSONUtil.toJsonStr(reqDTO.getEducationExperiences()))
-                    .set(Resume::getExpectedPosition,reqDTO.getExpectedPosition())
+                    .set(Resume::getExpectedPosition,JSONUtil.toJsonStr(reqDTO.getExpectedPosition()))
                     .set(Resume::getAdvantages,reqDTO.getAdvantages())
                     .set(Resume::getBirthDate,reqDTO.getBirthDate())
                     .set(Resume::getName,reqDTO.getName())
@@ -270,7 +274,7 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
             newExperience.setProjectExperiences(JSONUtil.toJsonStr(reqDTO.getProjectExperiences()));
             newExperience.setResumeLink(reqDTO.getResumeLink());
             newExperience.setEducationExperiences(JSONUtil.toJsonStr(reqDTO.getEducationExperiences()));
-            newExperience.setExpectedPosition(reqDTO.getExpectedPosition());
+            newExperience.setExpectedPosition(JSONUtil.toJsonStr(reqDTO.getExpectedPosition()));
             newExperience.setAdvantages(reqDTO.getAdvantages());
             newExperience.setBirthDate(reqDTO.getBirthDate());
             newExperience.setName(reqDTO.getName());

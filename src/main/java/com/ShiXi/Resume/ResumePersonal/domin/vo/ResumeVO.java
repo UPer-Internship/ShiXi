@@ -15,7 +15,7 @@ public class ResumeVO {
 
     private String advantages;
 
-    private String expectedPosition;
+    private List<String> expectedPosition;
 
     private String phone;// 手机号
 
