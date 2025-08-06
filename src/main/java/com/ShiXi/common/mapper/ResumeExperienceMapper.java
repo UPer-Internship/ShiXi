@@ -1,6 +1,6 @@
 package com.ShiXi.common.mapper;
 
-import com.ShiXi.onlineResume.entity.Resume;
+import com.ShiXi.Resume.ResumePersonal.entity.Resume;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
