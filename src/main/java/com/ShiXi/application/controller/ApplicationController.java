@@ -34,8 +34,8 @@ public class ApplicationController {
     }
 
     @GetMapping("/getApplicationsById")
-    public Result getApplicationsById(@RequestParam Long studentId,@RequestParam Long enterpriseId){
-        return applicationService.getApplicationsByStudentIdAndPublisherId(studentId,enterpriseId);
+    public Result getApplicationsById(@RequestParam Long enterpriseId){
+        return applicationService.getApplicationsByEnterpriseId(enterpriseId);
     }
 
     @PostMapping("/handleApplication")
