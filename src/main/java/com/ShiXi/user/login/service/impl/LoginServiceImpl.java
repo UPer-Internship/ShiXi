@@ -15,9 +15,14 @@ import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.SchoolFriendIdentification;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.impl.StudentIdentificationServiceImpl;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.login.service.LoginService;
@@ -40,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import static com.ShiXi.common.utils.MessageConstants.LOGIN_CODE_TEMPLATE_CODE;
 import static com.ShiXi.common.utils.MessageConstants.SIGN_NAME;
 import static com.ShiXi.common.utils.RedisConstants.*;
+
 @Slf4j
 @Service
 public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements LoginService {
@@ -53,11 +59,17 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     private IdentificationService identificationService;
     @Resource
     private OptionsService optionsService;
-    //微信端登录接口请求的url
+    // 微信端登录接口请求的url
     public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
     @Resource
     private StudentIdentificationService studentIdentificationService;
 
+    @Resource
+    private TeacherIdentificationService teacherIdentificationService;
+    @Resource
+    private EnterpriseIdentificationService enterpriseIdentificationService;
+    @Resource
+    private SchoolFriendIdentificationService schoolFriendIdentificationService;
 
     @Override
     public Result loginByPhone(String phone, String code) {
@@ -97,7 +109,6 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         return Result.ok(token);
     }
 
-
     @Override
     public Result sendCode(String phone) {
         if (RegexUtils.isPhoneInvalid(phone)) {
@@ -131,12 +142,12 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
 
         // 5.发送验证码
         log.debug("发送短信验证码成功，验证码：{}", code);
-        feishuService.sendTextMessage(phone+":"+ code);
+        feishuService.sendTextMessage(phone + ":" + code);
         // 构造请求对象
         Options sms = optionsService.lambdaQuery()
                 .eq(Options::getOptionName, "sms").one();
         Integer status = sms.getOptionStatus();
-        if(status==1) {
+        if (status == 1) {
             try {
                 Client client = smsClientConfig.createClient();
                 SendSmsRequest sendSmsRequest = new SendSmsRequest()
@@ -156,6 +167,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         return Result.ok();
 
     }
+
     @Transactional
     public User createStudentWithPhone(String phone) {
         // 1.创建用户
@@ -163,18 +175,28 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
         save(user);
-        //初始化身份认证
+        // 初始化身份认证
         Identification identification = new Identification();
         identification.setUserId(user.getId());
         identificationService.save(identification);
-        //初始化学生认证资料
+        // 初始化学生认证资料
         StudentIdentification studentIdentification = new StudentIdentification();
         studentIdentification.setUserId(user.getId());
         studentIdentificationService.save(studentIdentification);
+        // 初始化教师认证资料
+        TeacherIdentification teacherIdentification = new TeacherIdentification();
+        teacherIdentification.setUserId(user.getId());
+        teacherIdentificationService.save(teacherIdentification);
+        // 初始化企业认证资料
+        EnterpriseIdentification enterpriseIdentification = new EnterpriseIdentification();
+        enterpriseIdentification.setUserId(user.getId());
+        enterpriseIdentificationService.save(enterpriseIdentification);
+        // 初始化校友认证资料
+        SchoolFriendIdentification schoolFriendIdentification = new SchoolFriendIdentification();
+        schoolFriendIdentification.setUserId(user.getId());
+        schoolFriendIdentificationService.save(schoolFriendIdentification);
         return user;
     }
-
-
 
     /**
      * @param code 微信端请求的code
@@ -182,7 +204,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
      */
     @Override
     public Result loginByWechat(String code) {
-        //获取 openid
+        // 获取 openid
         String openid = getOpenid(code);
         User user = query().eq("openid", openid).one();
         // 创建用户
@@ -191,7 +213,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
             user.setOpenid(openid);
             save(user);
         }
-        //登录流程，和电话流程一样
+        // 登录流程，和电话流程一样
         String token = UUID.randomUUID().toString(true);
         // 将User对象转为HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
@@ -228,6 +250,5 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         }
         return openid;
     }
-
 
 }
