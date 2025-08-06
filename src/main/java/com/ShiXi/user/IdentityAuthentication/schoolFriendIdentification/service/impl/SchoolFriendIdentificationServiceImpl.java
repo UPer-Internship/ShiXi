@@ -1,11 +1,11 @@
-package com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.impl;
+package com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.impl;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.common.mapper.EnterpriseIdentificationMapper;
+import com.ShiXi.common.mapper.SchoolFriendIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
-import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
-import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.SchoolFriendIdentification;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -17,19 +17,19 @@ import javax.annotation.Resource;
 
 @Slf4j
 @Service
-public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseIdentificationMapper, EnterpriseIdentification> implements EnterpriseIdentificationService {
+public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFriendIdentificationMapper, SchoolFriendIdentification> implements SchoolFriendIdentificationService {
 
     @Resource
     OSSUploadService ossPictureService;
 
     @Resource
-    private EnterpriseIdentificationService enterpriseIdentificationService;
+    private SchoolFriendIdentificationService schoolFriendIdentificationService;
 
     @Value("${spring.oss.bucketName}")
     private String bucketName;
 
     // 存储目录
-    private static final String ENTERPRISE_ID_CARD_DIR = "enterpriseIdCard/";
+    private static final String GRADUATION_CERTIFICATE_DIR = "graduationCertificate/";
 
     @Override
     public Result toIdentification(String type, MultipartFile file) {
@@ -38,16 +38,16 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         String url = "";
         boolean success = false;
         
-        if (type.equals("enterpriseIdCard")) {
+        if (type.equals("graduationCertificate")) {
             // 删除旧的认证
-            EnterpriseIdentification enterpriseIdentification = lambdaQuery().eq(EnterpriseIdentification::getUserId, userId).one();
-            url = enterpriseIdentification.getEnterpriseIdCard();
+            SchoolFriendIdentification schoolFriendIdentification = lambdaQuery().eq(SchoolFriendIdentification::getUserId, userId).one();
+            url = schoolFriendIdentification.getGraduationCertificate();
             ossPictureService.deletePicture(url);
             // 上传新的认证
-            url = ossPictureService.uploadPicture(file, ENTERPRISE_ID_CARD_DIR);
-            LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
-            updateWrapper.set(EnterpriseIdentification::getEnterpriseIdCard, url);
+            url = ossPictureService.uploadPicture(file, GRADUATION_CERTIFICATE_DIR);
+            LambdaUpdateWrapper<SchoolFriendIdentification> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(SchoolFriendIdentification::getUserId, userId);
+            updateWrapper.set(SchoolFriendIdentification::getGraduationCertificate, url);
             success = update(updateWrapper);
         }
 
@@ -60,15 +60,15 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
     @Override
     public Result getMyIdentification(String identification, String type) {
         Long userId = UserHolder.getUser().getId();
-        EnterpriseIdentification enterpriseIdentification = enterpriseIdentificationService.lambdaQuery()
-                .eq(EnterpriseIdentification::getUserId, userId)
+        SchoolFriendIdentification schoolFriendIdentification = schoolFriendIdentificationService.lambdaQuery()
+                .eq(SchoolFriendIdentification::getUserId, userId)
                 .one();
-        if (enterpriseIdentification == null) {
+        if (schoolFriendIdentification == null) {
             return Result.fail("出现错误");
         }
         
-        if (type.equals("enterpriseIdCard")) {
-            String url = enterpriseIdentification.getEnterpriseIdCard();
+        if (type.equals("graduationCertificate")) {
+            String url = schoolFriendIdentification.getGraduationCertificate();
             if (url == null || url.equals("")) {
                 return Result.fail("图片路径为空，请检查是否上传过资料");
             }
@@ -80,13 +80,13 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
 
     @Override
     public Result getIdentificationDataByUserId(Integer userId, String identification, String type) {
-        EnterpriseIdentification enterpriseIdentification = lambdaQuery().eq(EnterpriseIdentification::getUserId, userId).one();
-        if (enterpriseIdentification == null) {
+        SchoolFriendIdentification schoolFriendIdentification = lambdaQuery().eq(SchoolFriendIdentification::getUserId, userId).one();
+        if (schoolFriendIdentification == null) {
             return Result.fail("此用户无此数据");
         }
         
-        if (type.equals("enterpriseIdCard")) {
-            String url = enterpriseIdentification.getEnterpriseIdCard();
+        if (type.equals("graduationCertificate")) {
+            String url = schoolFriendIdentification.getGraduationCertificate();
             if (url == null || url.equals("")) {
                 return Result.fail("图片路径为空，请检查是否上传过资料");
             }

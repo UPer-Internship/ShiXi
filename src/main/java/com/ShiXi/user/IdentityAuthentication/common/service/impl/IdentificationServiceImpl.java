@@ -4,11 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.IdentificationMapper;
 import com.ShiXi.common.utils.UserHolder;
-import com.ShiXi.user.IdentityAuthentication.common.domin.dto.InitiateIdentificationDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,15 @@ import javax.annotation.Resource;
 public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper, Identification> implements IdentificationService {
    @Resource
    StudentIdentificationService studentIdentificationService;
+   
+   @Resource
+   TeacherIdentificationService teacherIdentificationService;
+   
+   @Resource
+   EnterpriseIdentificationService enterpriseIdentificationService;
+   
+   @Resource
+   SchoolFriendIdentificationService schoolFriendIdentificationService;
 
     @Override
     public Result getIdentificationStatus() {
@@ -41,13 +52,13 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
            return studentIdentificationService.toIdentification(type,file);
         }
         else if(identification.equals("teacher")){
-
+           return teacherIdentificationService.toIdentification(type,file);
         }
         else if(identification.equals("schoolFriend")){
-
+           return schoolFriendIdentificationService.toIdentification(type,file);
         }
         else if(identification.equals("enterprise")){
-
+           return enterpriseIdentificationService.toIdentification(type,file);
         }
         return Result.fail("发生错误");
     }
@@ -58,13 +69,13 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return studentIdentificationService.getMyIdentification(identification,type);
         }
         else if(identification.equals("teacher")){
-
+            return teacherIdentificationService.getMyIdentification(identification,type);
         }
         else if(identification.equals("schoolFriend")){
-
+            return schoolFriendIdentificationService.getMyIdentification(identification,type);
         }
         else if(identification.equals("enterprise")){
-
+            return enterpriseIdentificationService.getMyIdentification(identification,type);
         }
         return Result.fail("发生错误");
     }
@@ -75,13 +86,13 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return studentIdentificationService.getIdentificationDataByUserId(userId,identification,type);
         }
         else if(identification.equals("teacher")){
-
+            return teacherIdentificationService.getIdentificationDataByUserId(userId,identification,type);
         }
         else if(identification.equals("schoolFriend")){
-
+            return schoolFriendIdentificationService.getIdentificationDataByUserId(userId,identification,type);
         }
         else if(identification.equals("enterprise")){
-
+            return enterpriseIdentificationService.getIdentificationDataByUserId(userId,identification,type);
         }
         return Result.fail("发生错误");
     }

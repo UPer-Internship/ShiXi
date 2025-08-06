@@ -1,4 +1,4 @@
-package com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity;
+package com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -11,8 +11,8 @@ import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
-@TableName("enterprise_identification")
-public class EnterpriseIdentification implements Serializable {
+@TableName("school_friend_identification")
+public class SchoolFriendIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @TableId(value = "id", type = IdType.AUTO)
@@ -20,13 +20,7 @@ public class EnterpriseIdentification implements Serializable {
     
     private Long userId;
     
-    private String enterpriseName;
-    
-    private String enterpriseType;
-    
-    private String enterpriseScale;
-    
-    private String enterpriseIdCard;
+    private String graduationCertificate;
     @TableLogic
     private Integer isDeleted;
 }

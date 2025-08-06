@@ -1,8 +1,7 @@
 package com.ShiXi.common.mapper;
 
-import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
-import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface TeacherIdentificationMapper extends BaseMapper<TeacherIdentification> {
+public interface EnterpriseIdentificationMapper extends BaseMapper<EnterpriseIdentification> {
 }
