@@ -91,7 +91,8 @@ public class ApplicationServiceImpl extends ServiceImpl<ApplicationMapper, Appli
     }
 
     @Override
-    public Result getApplicationsByStudentIdAndPublisherId(Long studentId, Long enterpriseId) {
+    public Result getApplicationsByEnterpriseId(Long enterpriseId) {
+        Long studentId = UserHolder.getUser().getId();
         try {
             List<Application> applications = applicationMapper.selectList(new QueryWrapper<Application>()
                     .eq("student_id", studentId)
