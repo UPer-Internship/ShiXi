@@ -47,11 +47,12 @@ public class loginController {
      * 用户登录
      *
      * @param code 微信返回的code
+     * @param phone 手机号（新用户必填）
      * @return 用户信息
      */
     @PostMapping("/byWechat")
     @ApiOperation("微信登录")
-    public Result login(@RequestParam  String code) {
-        return loginService.loginByWechat(code);
+    public Result login(@RequestParam String code, @RequestParam(required = false) String phone) {
+        return loginService.loginByWechat(code, phone);
     }
 }

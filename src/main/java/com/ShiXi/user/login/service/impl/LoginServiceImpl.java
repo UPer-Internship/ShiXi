@@ -207,19 +207,42 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
 
     /**
      * @param code 微信端请求的code
+     * @param phone 手机号（新用户必填）
      * @return
      */
     @Override
-    public Result loginByWechat(String code) {
+    public Result loginByWechat(String code, String phone) {
         // 获取 openid
         String openid = getOpenid(code);
         User user = query().eq("openid", openid).one();
+        
         // 创建用户
         if (user == null) {
-            user = new User();
-            user.setOpenid(openid);
-            save(user);
+            // 新用户必须提供手机号
+            if (phone == null || phone.isEmpty()) {
+                return Result.fail("新用户首次登录必须提供手机号");
+            }
+            
+            // 验证手机号格式
+            if (RegexUtils.isPhoneInvalid(phone)) {
+                return Result.fail("手机号格式错误！");
+            }
+            
+            // 检查手机号是否已被使用
+            User existingUser = query().eq("phone", phone).one();
+            if (existingUser != null) {
+                // 如果手机号已存在，则将openid绑定到已有账号
+                existingUser.setOpenid(openid);
+                updateById(existingUser);
+                user = existingUser;
+            } else {
+                // 创建新用户，使用createStudentWithPhone方法并设置openid
+                user = createStudentWithPhone(phone);
+                user.setOpenid(openid);
+                updateById(user);
+            }
         }
+        
         // 登录流程，和电话流程一样
         String token = UUID.randomUUID().toString(true);
         // 将User对象转为HashMap存储
