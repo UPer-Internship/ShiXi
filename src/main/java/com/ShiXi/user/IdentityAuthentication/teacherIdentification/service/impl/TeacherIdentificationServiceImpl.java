@@ -95,4 +95,9 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
         
         return Result.fail("未知错误");
     }
+
+    @Override
+    public Result changeIdentification(String identification) {
+        return null;
+    }
 }

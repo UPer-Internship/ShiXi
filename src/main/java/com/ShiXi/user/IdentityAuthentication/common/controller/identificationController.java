@@ -16,6 +16,19 @@ public class identificationController {
     @Resource
     IdentificationService identificationService;
 
+    @PostMapping("/changeIdentification")
+    @ApiOperation("切换身份")
+    public Result changeIdentification(@RequestParam String identification){
+        return identificationService.changeIdentification(identification);
+    }
+
+    @GetMapping("/getCurrentIdentification")
+    @ApiOperation("获取当前身份 0：游客身份 1：学生 2：校友 3：老师 4：企业 5：团队")
+    public Result getCurrentIdentification(){
+        return identificationService.getCurrentIdentification();
+    }
+
+
     @GetMapping("/getIdentificationStatus")
     @ApiOperation("获取用户的四种身份信息是否通过认证 0:未通过 1：已通过")
     public Result getIdentificationStatus(){

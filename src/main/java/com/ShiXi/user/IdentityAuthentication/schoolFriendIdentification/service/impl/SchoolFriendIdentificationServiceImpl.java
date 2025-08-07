@@ -95,4 +95,9 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
         
         return Result.fail("未知错误");
     }
+
+    @Override
+    public Result changeIdentification(String identification) {
+        return null;
+    }
 }
