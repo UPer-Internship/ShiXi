@@ -3,6 +3,7 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.StudentIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -17,6 +18,9 @@ import javax.annotation.Resource;
 @Slf4j
 @Service
 public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentificationMapper, StudentIdentification> implements StudentIdentificationService {
+
+    @Resource
+    IdentificationService identificationService;
 
     @Resource
     OSSUploadService ossPictureService;
@@ -140,6 +144,15 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         }
         return Result.fail("未知错误");
     }
+
+//    @Override
+//    public Result changeIdentificationData(String identification) {
+//        UserHolder.getUser().getId();
+//        identificationService.lambdaUpdate().eq(Identification::getUserId, UserHolder.getUser().getId())
+//                .set(Identification::getIdentification, identification)
+//                .update();
+//        return null;
+//    }
 }
 
 

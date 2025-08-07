@@ -11,4 +11,6 @@ public interface TeacherIdentificationService extends IService<TeacherIdentifica
     Result getMyIdentification(String identification, String type);
 
     Result getIdentificationDataByUserId(Integer userId, String identification, String type);
+
+    Result changeIdentification(String identification);
 }

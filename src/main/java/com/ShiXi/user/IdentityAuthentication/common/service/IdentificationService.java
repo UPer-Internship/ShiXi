@@ -13,4 +13,8 @@ public interface IdentificationService extends IService<Identification> {
     Result getMyIdentification(String identification, String type);
 
     Result getIdentificationDataByUserId(Integer userId, String identification, String type);
+
+    Result changeIdentification(String identification);
+
+    Result getCurrentIdentification();
 }

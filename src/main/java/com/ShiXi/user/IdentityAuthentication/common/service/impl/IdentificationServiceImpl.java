@@ -5,7 +5,9 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.IdentificationMapper;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
+import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.IdentityAuthentication.common.service.CurrentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
@@ -33,6 +35,8 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
    @Resource
    SchoolFriendIdentificationService schoolFriendIdentificationService;
 
+   @Resource
+    CurrentIdentificationService currentIdentificationService;;
     @Override
     public Result getIdentificationStatus() {
         //获取用户id
@@ -95,5 +99,79 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return enterpriseIdentificationService.getIdentificationDataByUserId(userId,identification,type);
         }
         return Result.fail("发生错误");
+    }
+
+    @Override
+    public Result changeIdentification(String identification) {
+        Long userId = UserHolder.getUser().getId();
+        CurrentIdentification currentIdentification = currentIdentificationService.lambdaQuery().eq(CurrentIdentification::getUserId, userId).one();
+        Identification identificationStatus = lambdaQuery().eq(Identification::getUserId, userId).one();
+        if(identification==null){
+            Result.fail("请选择身份");
+        }
+        else if (identification.equals("student")) {
+            if(identificationStatus.getIsStudent()==2){
+                boolean success =currentIdentificationService.lambdaUpdate()
+                        .eq(CurrentIdentification::getUserId, userId)
+                        .set(CurrentIdentification::getCurrentIdentification, 1)
+                        .update();
+                if( success){
+                    return Result.ok();
+                }
+
+            }
+            else return Result.fail("此身份未验证");
+        }
+        else if (identification.equals("schoolFriend")) {
+            if(identificationStatus.getIsSchoolFriend()==2){
+                boolean success =currentIdentificationService.lambdaUpdate()
+                        .eq(CurrentIdentification::getUserId, userId)
+                        .set(CurrentIdentification::getCurrentIdentification, 2)
+                        .update();
+                if( success){
+                    return Result.ok();
+                }
+            }
+            else return Result.fail("此身份未验证");
+        }
+        else if (identification.equals("teacher")) {
+            if(identificationStatus.getIsTeacher()==2){
+                boolean success =currentIdentificationService.lambdaUpdate()
+                        .eq(CurrentIdentification::getUserId, userId)
+                        .set(CurrentIdentification::getCurrentIdentification, 3)
+                        .update();
+                if( success){
+                    return Result.ok();
+                }
+            }
+            else return Result.fail("此身份未验证");
+        }
+        else if (identification.equals("enterprise")) {
+            if(identificationStatus.getIsEnterprise()==2){
+                boolean success = currentIdentificationService.lambdaUpdate()
+                        .eq(CurrentIdentification::getUserId, userId)
+                        .set(CurrentIdentification::getCurrentIdentification, 4)
+                        .update();
+                if( success){
+                    return Result.ok();
+                }
+            }
+            else return Result.fail("此身份未验证");
+        }
+        return  Result.fail("未知错误");
+    }
+
+    @Override
+    public Result getCurrentIdentification() {
+        Long userId = UserHolder.getUser().getId();
+        CurrentIdentification currentIdentification = currentIdentificationService.lambdaQuery().eq(CurrentIdentification::getUserId, userId).one();
+        if(currentIdentification==null){
+            return Result.fail("发生错误");
+        }
+        Integer identification = currentIdentification.getCurrentIdentification();
+        if(identification==null){
+            return Result.fail("未使用任何身份登录");
+        }
+        return Result.ok(identification);
     }
 }

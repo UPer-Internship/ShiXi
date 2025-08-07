@@ -13,7 +13,9 @@ import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
+import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.IdentityAuthentication.common.service.CurrentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
@@ -63,13 +65,14 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
     @Resource
     private StudentIdentificationService studentIdentificationService;
-
     @Resource
     private TeacherIdentificationService teacherIdentificationService;
     @Resource
     private EnterpriseIdentificationService enterpriseIdentificationService;
     @Resource
     private SchoolFriendIdentificationService schoolFriendIdentificationService;
+    @Resource
+    CurrentIdentificationService currentIdentificationService;;
 
     @Override
     public Result loginByPhone(String phone, String code) {
@@ -195,6 +198,10 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         SchoolFriendIdentification schoolFriendIdentification = new SchoolFriendIdentification();
         schoolFriendIdentification.setUserId(user.getId());
         schoolFriendIdentificationService.save(schoolFriendIdentification);
+        //初始化当前身份
+        CurrentIdentification currentIdentification = new CurrentIdentification();
+        currentIdentification.setUserId(user.getId());
+        currentIdentificationService .save(currentIdentification);
         return user;
     }
 
