@@ -21,6 +21,8 @@ public class SchoolFriendIdentification implements Serializable {
     private Long userId;
     
     private String graduationCertificate;
+
+    private String identityCard;
     @TableLogic
     private Integer isDeleted;
 }

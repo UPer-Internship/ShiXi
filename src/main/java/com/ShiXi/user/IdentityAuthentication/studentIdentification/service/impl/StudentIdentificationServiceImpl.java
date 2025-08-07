@@ -83,7 +83,7 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         }
 
     @Override
-    public Result getMyIdentification(String identification, String type) {
+    public Result getMyIdentification(String type) {
         Long userId = UserHolder.getUser().getId();
         StudentIdentification studentIdentification = studentIdentificationService.lambdaQuery()
                 .eq(StudentIdentification::getUserId, userId)

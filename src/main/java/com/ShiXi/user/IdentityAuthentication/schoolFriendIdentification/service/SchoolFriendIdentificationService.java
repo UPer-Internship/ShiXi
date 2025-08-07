@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface SchoolFriendIdentificationService extends IService<SchoolFriendIdentification> {
-    Result toIdentification(String type, MultipartFile file);
+    Result uploadIdentificationData(String type, MultipartFile file);
 
-    Result getMyIdentification(String identification, String type);
+    Result getMyIdentification(String type);
 
     Result getIdentificationDataByUserId(Integer userId, String identification, String type);
 
-    Result changeIdentification(String identification);
+
 }

@@ -59,7 +59,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
            return teacherIdentificationService.toIdentification(type,file);
         }
         else if(identification.equals("schoolFriend")){
-           return schoolFriendIdentificationService.toIdentification(type,file);
+           return schoolFriendIdentificationService.uploadIdentificationData(type,file);
         }
         else if(identification.equals("enterprise")){
            return enterpriseIdentificationService.toIdentification(type,file);

@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface StudentIdentificationService extends IService<StudentIdentification> {
     Result toIdentification(String type , MultipartFile file);
 
-    Result getMyIdentification(String identification, String type);
+    Result getMyIdentification(String type);
 
     Result getIdentificationDataByUserId(Integer userId,String identification, String type);
 

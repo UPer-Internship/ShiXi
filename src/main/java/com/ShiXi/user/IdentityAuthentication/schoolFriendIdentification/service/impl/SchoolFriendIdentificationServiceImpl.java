@@ -32,7 +32,7 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
     private static final String GRADUATION_CERTIFICATE_DIR = "graduationCertificate/";
 
     @Override
-    public Result toIdentification(String type, MultipartFile file) {
+    public Result uploadIdentificationData(String type, MultipartFile file) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
         String url = "";
@@ -58,7 +58,7 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
     }
 
     @Override
-    public Result getMyIdentification(String identification, String type) {
+    public Result getMyIdentification(String type) {
         Long userId = UserHolder.getUser().getId();
         SchoolFriendIdentification schoolFriendIdentification = schoolFriendIdentificationService.lambdaQuery()
                 .eq(SchoolFriendIdentification::getUserId, userId)
@@ -91,13 +91,16 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
                 return Result.fail("图片路径为空，请检查是否上传过资料");
             }
             return Result.ok(url);
+        } else if (type.equals("identityCard")) {
+            String url = schoolFriendIdentification.getIdentityCard();
+            if (url == null || url.equals("")) {
+                return Result.fail("图片路径为空，请检查是否上传过资料");
+            }
+            return Result.ok(url);
         }
-        
+
         return Result.fail("未知错误");
     }
 
-    @Override
-    public Result changeIdentification(String identification) {
-        return null;
-    }
+
 }
