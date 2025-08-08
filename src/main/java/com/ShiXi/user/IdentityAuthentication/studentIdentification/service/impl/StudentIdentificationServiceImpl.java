@@ -4,8 +4,11 @@ import com.ShiXi.common.mapper.StudentIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
+import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +41,7 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
 
     private static final String STUDENT_ID_CARD_DIR = "studentIDCard/";
     @Override
-    public Result toIdentification(String type,MultipartFile file) {
+    public Result uploadIdentificationPictureData(String type, MultipartFile file) {
         //获取用户id
         Long userId = UserHolder.getUser().getId();
         String url = "";
@@ -83,76 +86,44 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         }
 
     @Override
-    public Result getMyIdentification(String type) {
+    public Result getMyIdentificationData() {
+        //查询用户id
         Long userId = UserHolder.getUser().getId();
-        StudentIdentification studentIdentification = studentIdentificationService.lambdaQuery()
+        //查询该用户的学生身份上传资料
+        StudentIdentification studentIdentification = lambdaQuery()
                 .eq(StudentIdentification::getUserId, userId)
                 .one();
-        if(studentIdentification==null){
+        //判空
+        if (studentIdentification == null) {
             return Result.fail("出现错误");
         }
-        if(type.equals("identityCard")){
-            String url = studentIdentification.getIdentityCard();
-            if(url==null||url.equals("")){
-                return Result.fail("图片路径为空，请检查是否上传过资料");
-            }
-            return Result.ok(url);
-        }
-        else if(type.equals("graduationCertificate")){
-            String url = studentIdentification.getGraduationCertificate();
-            if(url==null||url.equals("")){
-                return Result.fail("图片路径为空，请检查是否上传过资料");
-            }
-            return Result.ok(url);
-        }
-        else if(type.equals("studentIdCard")){
-            String url = studentIdentification.getStudentIdCard();
-            if(url==null||url.equals("")){
-                return Result.fail("图片路径为空，请检查是否上传过资料");
-            }
-            return Result.ok(url);
-        }
-        return Result.fail("未知错误");
+        //构造vo对象
+        StudentGetIdentificationDataVO studentGetIdentificationDataVO = new StudentGetIdentificationDataVO();
+        studentGetIdentificationDataVO.setIdentityCardUrl(studentIdentification.getIdentityCard())
+                .setStudentIdCardUrl(studentIdentification.getStudentIdCard())
+                .setGraduationCertificateUrl(studentIdentification.getGraduationCertificate());
+
+        return Result.ok(studentGetIdentificationDataVO);
     }
 
     @Override
-    public Result getIdentificationDataByUserId(Integer userId,String identification, String type) {
-        StudentIdentification studentIdentification = lambdaQuery().eq(StudentIdentification::getUserId, userId).one();
-        if(studentIdentification==null){
-            return Result.fail("此用户无此数据");
+    public Result getIdentificationDataByUserId(Integer userId) {
+        //查询该用户的学生身份上传资料
+        StudentIdentification studentIdentification = lambdaQuery()
+                .eq(StudentIdentification::getUserId, userId)
+                .one();
+        //判空
+        if (studentIdentification == null) {
+            return Result.fail("出现错误");
         }
-        if(type.equals("identityCard")){
-            String url = studentIdentification.getIdentityCard();
-            if(url==null||url.equals("")){
-                return Result.fail("图片路径为空，请检查是否上传过资料");
-            }
-            return Result.ok(url);
-        }
-        else if(type.equals("graduationCertificate")){
-            String url = studentIdentification.getGraduationCertificate();
-            if(url==null||url.equals("")){
-                return Result.fail("图片路径为空，请检查是否上传过资料");
-            }
-            return Result.ok(url);
-        }
-        else if(type.equals("studentIdCard")){
-            String url = studentIdentification.getStudentIdCard();
-            if(url==null||url.equals("")){
-                return Result.fail("图片路径为空，请检查是否上传过资料");
-            }
-            return Result.ok(url);
-        }
-        return Result.fail("未知错误");
-    }
+        //构造vo对象
+        StudentGetIdentificationDataVO studentGetIdentificationDataVO = new StudentGetIdentificationDataVO();
+        studentGetIdentificationDataVO.setIdentityCardUrl(studentIdentification.getIdentityCard())
+                .setStudentIdCardUrl(studentIdentification.getStudentIdCard())
+                .setGraduationCertificateUrl(studentIdentification.getGraduationCertificate());
 
-//    @Override
-//    public Result changeIdentificationData(String identification) {
-//        UserHolder.getUser().getId();
-//        identificationService.lambdaUpdate().eq(Identification::getUserId, UserHolder.getUser().getId())
-//                .set(Identification::getIdentification, identification)
-//                .update();
-//        return null;
-//    }
+        return Result.ok(studentGetIdentificationDataVO);
+    }
 }
 
 

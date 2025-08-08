@@ -1,4 +1,4 @@
-package com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity;
+package com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -12,9 +12,8 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 @TableName("teacher_identification")
-public class TeacherIdentification implements Serializable {
+public class TeacherTeamIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
-    
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     
@@ -23,6 +22,8 @@ public class TeacherIdentification implements Serializable {
     private String name;
     
     private String schoolName;
+
+    private String major;
     
     private String teacherIdCard;
     @TableLogic

@@ -35,20 +35,11 @@ public class identificationController {
         Result identification = identificationService.getIdentificationStatus();
         return Result.ok(identification);
     }
-    @PostMapping("/toIdentification")
-    @ApiOperation("发起身份验证")
-    public Result toIdentification(@RequestParam String identification,@RequestParam String type,@RequestParam MultipartFile file){
-        return identificationService.toIdentification(identification, type, file);
-    }
 
-    @GetMapping("/getMyIdentificationData")
-    @ApiOperation("查看自己的身份验证资料")
-    public Result getMyIdentificationData(@RequestParam String identification, @RequestParam String type){
-        return identificationService.getMyIdentification(identification, type);
-    }
+    //TODO 设置相关管理权限 只有管理账号能看
     @GetMapping("/getIdentificationDataByUserId")
     @ApiOperation("通过用户id查看身份验证资料")
-    public Result getIdentificationDataByUserId(@RequestParam Integer userId,@RequestParam String identification, @RequestParam String type){
-        return identificationService.getIdentificationDataByUserId(userId,identification,type);
+    public Result getIdentificationDataByUserId(@RequestParam Integer userId,@RequestParam String identification){
+        return identificationService.getIdentificationDataByUserId(userId,identification);
     }
 }

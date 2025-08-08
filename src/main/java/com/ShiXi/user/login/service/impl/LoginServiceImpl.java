@@ -23,8 +23,8 @@ import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.S
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
-import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.login.service.LoginService;
@@ -35,7 +35,6 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +65,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     @Resource
     private StudentIdentificationService studentIdentificationService;
     @Resource
-    private TeacherIdentificationService teacherIdentificationService;
+    private TeacherTeamIdentificationService teacherTeamIdentificationService;
     @Resource
     private EnterpriseIdentificationService enterpriseIdentificationService;
     @Resource
@@ -187,9 +186,9 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         studentIdentification.setUserId(user.getId());
         studentIdentificationService.save(studentIdentification);
         // 初始化教师认证资料
-        TeacherIdentification teacherIdentification = new TeacherIdentification();
+        TeacherTeamIdentification teacherIdentification = new TeacherTeamIdentification();
         teacherIdentification.setUserId(user.getId());
-        teacherIdentificationService.save(teacherIdentification);
+        teacherTeamIdentificationService.save(teacherIdentification);
         // 初始化企业认证资料
         EnterpriseIdentification enterpriseIdentification = new EnterpriseIdentification();
         enterpriseIdentification.setUserId(user.getId());

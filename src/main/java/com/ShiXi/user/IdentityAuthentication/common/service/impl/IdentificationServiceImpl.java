@@ -10,13 +10,12 @@ import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.CurrentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -27,7 +26,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
    StudentIdentificationService studentIdentificationService;
    
    @Resource
-   TeacherIdentificationService teacherIdentificationService;
+   TeacherTeamIdentificationService teacherTeamIdentificationService;
    
    @Resource
    EnterpriseIdentificationService enterpriseIdentificationService;
@@ -50,54 +49,54 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         return Result.ok(identificationVO);
     }
 
-    @Override
-    public Result toIdentification(String  identification, String type, MultipartFile file) {
-        if(identification.equals("student")){
-           return studentIdentificationService.toIdentification(type,file);
-        }
-        else if(identification.equals("teacher")){
-           return teacherIdentificationService.toIdentification(type,file);
-        }
-        else if(identification.equals("schoolFriend")){
-           return schoolFriendIdentificationService.uploadIdentificationData(type,file);
-        }
-        else if(identification.equals("enterprise")){
-           return enterpriseIdentificationService.toIdentification(type,file);
-        }
-        return Result.fail("发生错误");
-    }
+//    @Override
+//    public Result toIdentification(String  identification, String type, MultipartFile file) {
+//        if(identification.equals("student")){
+//           return studentIdentificationService.uploadIdentificationData(type,file);
+//        }
+//        else if(identification.equals("teacher")){
+//           return teacherIdentificationService.toIdentification(type,file);
+//        }
+//        else if(identification.equals("schoolFriend")){
+//           return schoolFriendIdentificationService.uploadIdentificationPictureData(type,file);
+//        }
+//        else if(identification.equals("enterprise")){
+//           return enterpriseIdentificationService.toIdentification(type,file);
+//        }
+//        return Result.fail("发生错误");
+//    }
 
-    //TODO 为了跑起来改了两个调用的传参
-    @Override
-    public Result getMyIdentification(String identification, String type) {
-        if(identification.equals("student")){
-            return studentIdentificationService.getMyIdentification(type);
-        }
-        else if(identification.equals("teacher")){
-            return teacherIdentificationService.getMyIdentification(identification,type);
-        }
-        else if(identification.equals("schoolFriend")){
-            return schoolFriendIdentificationService.getMyIdentification(type);
-        }
-        else if(identification.equals("enterprise")){
-            return enterpriseIdentificationService.getMyIdentification(identification,type);
-        }
-        return Result.fail("发生错误");
-    }
+//    //TODO 为了跑起来改了两个调用的传参
+//    @Override
+//    public Result getMyIdentification(String identification, String type) {
+//        if(identification.equals("student")){
+//            return studentIdentificationService.getMyIdentification(type);
+//        }
+//        else if(identification.equals("teacher")){
+//            return teacherIdentificationService.getMyIdentification(identification,type);
+//        }
+//        else if(identification.equals("schoolFriend")){
+//            return schoolFriendIdentificationService.getMyIdentification(type);
+//        }
+//        else if(identification.equals("enterprise")){
+//            return enterpriseIdentificationService.getMyIdentification(identification,type);
+//        }
+//        return Result.fail("发生错误");
+//    }
 
     @Override
-    public Result getIdentificationDataByUserId(Integer userId, String identification, String type) {
+    public Result getIdentificationDataByUserId(Integer userId, String identification) {
         if(identification.equals("student")){
-            return studentIdentificationService.getIdentificationDataByUserId(userId,identification,type);
+            return studentIdentificationService.getIdentificationDataByUserId(userId);
         }
         else if(identification.equals("teacher")){
-            return teacherIdentificationService.getIdentificationDataByUserId(userId,identification,type);
+            return teacherTeamIdentificationService.getIdentificationDataByUserId(userId);
         }
         else if(identification.equals("schoolFriend")){
-            return schoolFriendIdentificationService.getIdentificationDataByUserId(userId,identification,type);
+            return schoolFriendIdentificationService.getIdentificationDataByUserId(userId);
         }
         else if(identification.equals("enterprise")){
-            return enterpriseIdentificationService.getIdentificationDataByUserId(userId,identification,type);
+            return enterpriseIdentificationService.getIdentificationDataByUserId(userId);
         }
         return Result.fail("发生错误");
     }

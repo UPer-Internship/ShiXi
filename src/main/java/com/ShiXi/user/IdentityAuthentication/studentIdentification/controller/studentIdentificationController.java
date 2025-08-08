@@ -20,14 +20,19 @@ public class studentIdentificationController {
     StudentIdentificationService studentIdentificationService;
     @PostMapping("/uploadIdentificationData/fileType")
     @ApiOperation("学生发起身份验证，上传图片（身份证，学生证，毕业证）资料")
-    public Result uploadIdentificationData(@RequestParam String type, @RequestParam MultipartFile file){
-        return studentIdentificationService.toIdentification(type, file);
+    public Result uploadIdentificationPictureData(@RequestParam String type, @RequestParam MultipartFile file){
+        return studentIdentificationService.uploadIdentificationPictureData(type, file);
     }
 
+//    @PostMapping("/uploadIdentificationData/textType")
+//    @ApiOperation("学生发起身份验证，上传非图片资料（名字，学校，专业）")
+//    public Result uploadIdentificationTextData(@RequestParam String type){
+//        return studentIdentificationService.uploadIdentificationData(type);
+//    }
 
-    @GetMapping("/getMyIdentificationData/fileType")
+    @GetMapping("/getMyIdentificationData")
     @ApiOperation("查看自己的图片类身份验证资料")
-    public Result getMyIdentificationData(String type){
-        return studentIdentificationService.getMyIdentification(type);
+    public Result getMyIdentificationData(){
+        return studentIdentificationService.getMyIdentificationData();
     }
 }
