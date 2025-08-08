@@ -2,6 +2,7 @@ package com.ShiXi.Resume.ResumePersonal.controller;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
+import com.ShiXi.Resume.ResumePersonal.domin.dto.ResumePageQueryDTO;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,25 @@ public class ResumeController {
     @ApiOperation("修改我的简历")
     public Result updateMyExperience(@RequestBody UpdateResumeDTO reqDTO) {
         return onlineResumeService.updateMyExperience(reqDTO);
+    }
+
+    /**
+     * 分页查询简历公开信息
+     * @param page 页码
+     * @param pageSize 每页记录数
+     * @param expectedPosition 期望职位，用于模糊查询
+     * @return 分页查询结果
+     */
+    @GetMapping("/pageQueryPublic")
+    @ApiOperation("分页查询简历公开信息")
+    public Result pageQueryPublicResumes(@RequestParam(required = false) Integer page,
+                                       @RequestParam(required = false) Integer pageSize,
+                                       @RequestParam(required = false) String expectedPosition) {
+        // 处理空字符串为null
+        expectedPosition = (expectedPosition != null && expectedPosition.trim().isEmpty()) ? null : expectedPosition;
+        
+        ResumePageQueryDTO queryDTO = new ResumePageQueryDTO(page, pageSize, expectedPosition);
+        return onlineResumeService.pageQueryPublicResumes(queryDTO);
     }
 
 

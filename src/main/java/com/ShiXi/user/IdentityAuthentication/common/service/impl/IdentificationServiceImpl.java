@@ -67,16 +67,17 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         return Result.fail("发生错误");
     }
 
+    //TODO 为了跑起来改了两个调用的传参
     @Override
     public Result getMyIdentification(String identification, String type) {
         if(identification.equals("student")){
-            return studentIdentificationService.getMyIdentification(identification,type);
+            return studentIdentificationService.getMyIdentification(type);
         }
         else if(identification.equals("teacher")){
             return teacherIdentificationService.getMyIdentification(identification,type);
         }
         else if(identification.equals("schoolFriend")){
-            return schoolFriendIdentificationService.getMyIdentification(identification,type);
+            return schoolFriendIdentificationService.getMyIdentification(type);
         }
         else if(identification.equals("enterprise")){
             return enterpriseIdentificationService.getMyIdentification(identification,type);
