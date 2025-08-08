@@ -2,6 +2,7 @@ package com.ShiXi.Resume.ResumePersonal.service;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
+import com.ShiXi.Resume.ResumePersonal.domin.dto.ResumePageQueryDTO;
 import com.ShiXi.Resume.ResumePersonal.entity.Resume;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -36,4 +37,11 @@ public interface OnlineResumeService extends IService<Resume> {
     Result getMyResume();
 
     Result updateMyExperience(UpdateResumeDTO reqDTO);
+
+    /**
+     * 分页查询简历公开信息
+     * @param resumePageQueryDTO 查询条件
+     * @return 分页查询结果
+     */
+    Result pageQueryPublicResumes(ResumePageQueryDTO resumePageQueryDTO);
 }

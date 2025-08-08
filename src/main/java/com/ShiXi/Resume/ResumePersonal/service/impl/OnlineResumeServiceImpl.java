@@ -3,19 +3,26 @@ package com.ShiXi.Resume.ResumePersonal.service.impl;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.domin.dto.PageResult;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
+import com.ShiXi.Resume.ResumePersonal.domin.dto.ResumePageQueryDTO;
 import com.ShiXi.Resume.ResumePersonal.domin.vo.ResumeVO;
+import com.ShiXi.Resume.ResumePersonal.domin.vo.ResumePublicVO;
 import com.ShiXi.Resume.ResumePersonal.entity.Resume;
 import com.ShiXi.common.mapper.ResumeExperienceMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.common.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -287,5 +294,72 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
             }
             return Result.fail("创建记录失败");
         }
+    }
+
+    @Override
+    public Result pageQueryPublicResumes(ResumePageQueryDTO resumePageQueryDTO) {
+        // 处理分页参数默认值
+        Integer page = resumePageQueryDTO.getPage() == null ? 1 : resumePageQueryDTO.getPage();
+        Integer pageSize = resumePageQueryDTO.getPageSize() == null ? 10 : resumePageQueryDTO.getPageSize();
+
+        // 构建查询条件
+        QueryWrapper<Resume> wrapper = new QueryWrapper<>();
+        
+        // 如果有期望职位查询条件，进行模糊查询
+        if (resumePageQueryDTO.getExpectedPosition() != null && 
+            !resumePageQueryDTO.getExpectedPosition().trim().isEmpty()) {
+            wrapper.like("expected_position", resumePageQueryDTO.getExpectedPosition());
+        }
+        
+        // 按创建时间倒序排列
+        wrapper.orderByDesc("create_time");
+
+        // 执行分页查询
+        Page<Resume> resumePage = new Page<>(page, pageSize);
+        Page<Resume> resultPage = this.page(resumePage, wrapper);
+
+        // 转换为公开信息VO
+        List<ResumePublicVO> publicVOList = resultPage.getRecords().stream()
+                .map(this::convertToPublicVO)
+                .collect(Collectors.toList());
+
+        // 构建分页结果
+        PageResult pageResult = new PageResult(resultPage.getTotal(), publicVOList);
+        return Result.ok(pageResult);
+    }
+
+    /**
+     * 将Resume实体转换为ResumePublicVO
+     */
+    private ResumePublicVO convertToPublicVO(Resume resume) {
+        ResumePublicVO publicVO = new ResumePublicVO();
+        publicVO.setId(resume.getId());
+        publicVO.setName(resume.getName());
+        publicVO.setAdvantages(resume.getAdvantages());
+
+        // 反序列化期望职位
+        if (resume.getExpectedPosition() != null) {
+            publicVO.setExpectedPosition(JSONUtil.toList(resume.getExpectedPosition(), String.class));
+        }
+
+        // 反序列化教育经历 - 复用ResumeVO中的静态内部类
+        if (resume.getEducationExperiences() != null) {
+            publicVO.setEducationExperiences(JSONUtil.toList(resume.getEducationExperiences(), 
+                    ResumeVO.educationExperience.class));
+        }
+
+        // 反序列化工作实习经历 - 复用ResumeVO中的静态内部类
+        if (resume.getWorkAndInternshipExperiences() != null) {
+            publicVO.setWorkAndInternshipExperiences(JSONUtil.toList(resume.getWorkAndInternshipExperiences(), 
+                    ResumeVO.workAndInternshipExperience.class));
+        }
+
+        // 反序列化项目经历 - 复用ResumeVO中的静态内部类
+        if (resume.getProjectExperiences() != null) {
+            publicVO.setProjectExperiences(JSONUtil.toList(resume.getProjectExperiences(), 
+                    ResumeVO.projectExperience.class));
+        }
+
+        return publicVO;
     }
 }
