@@ -18,6 +18,8 @@ import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.Stude
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.domin.vo.StudentTeamGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.service.StudentTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -36,6 +38,9 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
    
     @Resource
     TeacherTeamIdentificationService teacherTeamIdentificationService;
+   
+    @Resource
+    StudentTeamIdentificationService studentTeamIdentificationService;
    
     @Resource
     EnterpriseIdentificationService enterpriseIdentificationService;
@@ -137,6 +142,18 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             }
             else return Result.fail("此身份未验证");
         }
+        else if (identification.equals("studentTeam")) {
+            if(identificationStatus.getIsStudentTeam()==2){
+                boolean success = currentIdentificationService.lambdaUpdate()
+                        .eq(CurrentIdentification::getUserId, userId)
+                        .set(CurrentIdentification::getCurrentIdentification, 5)
+                        .update();
+                if( success){
+                    return Result.ok();
+                }
+            }
+            else return Result.fail("此身份未验证");
+        }
         return  Result.fail("未知错误");
     }
 
@@ -180,6 +197,10 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
+        else if(identification.equals("studentTeam")){
+            StudentTeamGetIdentificationDataVO identificationDataByUserId = studentTeamIdentificationService.getIdentificationDataByUserId(userId);
+            return Result.ok(identificationDataByUserId);
+        }
         return Result.fail("未知错误");
     }
 
@@ -212,6 +233,9 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         else if(identification.equals("enterprise")){
             updateWrapper.set(Identification::getIsEnterprise, 3);
         }
+        else if(identification.equals("studentTeam")){
+            updateWrapper.set(Identification::getIsStudentTeam, 3);
+        }
         boolean success = update(updateWrapper);
         if(success){
             return Result.ok();
@@ -234,6 +258,9 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         }
         else if(identification.equals("enterprise")){
             updateWrapper.set(Identification::getIsEnterprise, 2);
+        }
+        else if(identification.equals("studentTeam")){
+            updateWrapper.set(Identification::getIsStudentTeam, 2);
         }
         boolean success = update(updateWrapper);
         if(success){

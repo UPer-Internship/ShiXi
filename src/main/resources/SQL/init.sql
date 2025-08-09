@@ -256,9 +256,25 @@ create table `4_uper_up_intern`.enterprise_identification
 
 create table `4_uper_up_intern`.school_friend_identification
 (
-    id                  bigint auto_increment
+    id                     bigint auto_increment
         primary key,
-    user_id             bigint                  not null comment '用户ID',
+    user_id                bigint                  not null comment '用户ID',
     graduation_certificate varchar(255) default '' null comment '毕业证书',
-    is_deleted          tinyint(1)   default 0  not null comment '逻辑删除标志，0-未删除，1-已删除'
-)
+    is_deleted             tinyint(1)   default 0  not null comment '逻辑删除标志，0-未删除，1-已删除'
+) comment '校友身份认证表';
+
+create table `student_team_identification`
+(
+    `id`                    bigint       not null auto_increment comment '主键id',
+    `user_id`               bigint       not null comment '直接关联的用户id（负责人id）',
+    `team_name`             varchar(255) not null comment '团队名称',
+    `university_name`       varchar(255)          default null comment '学校名称',
+    `school_name`           varchar(255)          default null comment '学院名称',
+    `team_leader_name`      varchar(255)          default null comment '团队负责人名称',
+    `team_leader_gender`    tinyint               default null comment '团队负责人性别 0-女 1-男',
+    `address`               varchar(255)          default null comment '入驻基地的地址',
+    `identification_images` text comment '团队身份认证图片',
+    `is_deleted`            tinyint      not null default 0 comment '逻辑删除 0-未删除 1-已删除',
+    primary key (`id`),
+    key (`user_id`)
+) comment ='学生团队身份认证表';
