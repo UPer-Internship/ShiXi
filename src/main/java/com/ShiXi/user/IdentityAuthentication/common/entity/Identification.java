@@ -21,5 +21,7 @@ public class Identification {
     private Integer isSchoolFriend;
     private Integer isTeacher;
     private Integer isEnterprise;
+    private Integer isAdmin;
+    private Integer isStudentTeam;
 
 }
