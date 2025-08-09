@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class SchoolFriendGetIdentificationDataVO {
+    private Long userId;
+    private String identification;
     private String graduationCertificateUrl;
     private String identityCardUrl;
 }

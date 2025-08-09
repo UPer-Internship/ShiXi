@@ -5,7 +5,6 @@ import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationServic
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -16,35 +15,42 @@ public class identificationController {
     @Resource
     IdentificationService identificationService;
 
+    @PostMapping("/notifyAdminToAudit")
+    @ApiOperation("用户上传的认证资料后通知审核端端口")
+    public Result notifyAdminToAudit(@RequestParam String identification){
+        return identificationService.notifyAdminToAudit(identification);
+    }
     @PostMapping("/changeIdentification")
     @ApiOperation("切换身份")
     public Result changeIdentification(@RequestParam String identification){
         return identificationService.changeIdentification(identification);
     }
-
     @GetMapping("/getCurrentIdentification")
     @ApiOperation("获取当前身份 0：游客身份 1：学生 2：校友 3：老师 4：企业 5：学生团队")
     public Result getCurrentIdentification(){
         return identificationService.getCurrentIdentification();
     }
-
-
     @GetMapping("/getIdentificationStatus")
-    @ApiOperation("获取用户的四种身份信息是否通过认证 0:未通过 1：已提交待审核 2：审核通过")
+    @ApiOperation("获取用户的四种身份信息是否通过认证 0:未提交过资料 1：已提交待审核 2：审核不通过 3：审核通过，拥有此身份")
     public Result getIdentificationStatus(){
         Result identification = identificationService.getIdentificationStatus();
         return Result.ok(identification);
     }
 
-//    @GetMapping("/getIdentificationDataByUserId")
-//    @ApiOperation("通过用户id查看身份验证资料")
-//    public Result getIdentificationDataByUserId(@RequestParam Integer userId,@RequestParam String identification){
-//        return identificationService.getIdentificationDataByUserId(userId,identification);
-//    }
     //TODO 设置相关管理权限 只有管理账号能看
-    @GetMapping("/getIdentificationDataWaitingForAuditing")
-    @ApiOperation("审核身份验证资料")
-    public Result getIdentificationDataForAdmin(){
-        return identificationService.getIdentificationDataForAdmin();
+    @GetMapping("admin/getIdentificationDataRequest")
+    @ApiOperation("管理端获取审核身份验证资料")
+    public Result getIdentificationDataRequest(){
+        return identificationService.getIdentificationDataRequest();
+    }
+    @PostMapping("admin/passIdentificationDataRequest")
+    @ApiOperation("管理端通过审核身份验证资料")
+    public Result passIdentificationDataRequest(Long userId,String  identification){
+        return identificationService.passIdentificationDataRequest(userId,identification);
+    }
+    @PostMapping("admin/refuseIdentificationDataRequest")
+    @ApiOperation("管理端通过审核身份验证资料")
+    public Result refuseIdentificationDataRequest(Long userId,String  identification){
+        return identificationService.refuseIdentificationDataRequest(userId,identification);
     }
 }

@@ -16,9 +16,11 @@ import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -153,11 +155,11 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     }
 
     @Override
-    public Result getIdentificationDataForAdmin() {
+    public Result getIdentificationDataRequest() {
         final String key = "waitForAuditingList:";
         String waitForAuditingUserId = stringRedisTemplate.opsForList().leftPop(key);
         if(waitForAuditingUserId==null){
-            Result.ok("暂无需要审核的资料");
+            return Result.ok("暂无需要审核的资料");
         }
         DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserId, DeserializeUserIdAndIdentificationInRedisListDTO.class);
         Long userId = dto.getUserId();
@@ -179,5 +181,64 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return Result.ok(identificationDataByUserId);
         }
         return Result.fail("未知错误");
+    }
+
+    @Override
+    public Result notifyAdminToAudit(String identification) {
+        Long userId = UserHolder.getUser().getId();
+        String key = "waitForAuditingList:";
+        DeserializeUserIdAndIdentificationInRedisListDTO dto = new DeserializeUserIdAndIdentificationInRedisListDTO();
+        dto.setIdentification(identification)
+                .setUserId(userId);
+        String value = JSONUtil.toJsonStr(dto);
+        stringRedisTemplate.opsForList().rightPush(key, value);
+        return Result.ok();
+
+    }
+
+    @Override
+    public Result passIdentificationDataRequest(Long userId, String identification) {
+        LambdaUpdateWrapper<Identification> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Identification::getUserId, userId);
+        if(identification.equals("student")){
+            updateWrapper.set(Identification::getIsStudent, 3);
+        }
+        else if(identification.equals("teacher")){
+            updateWrapper.set(Identification::getIsTeacher, 3);
+        }
+        else if(identification.equals("schoolFriend")){
+            updateWrapper.set(Identification::getIsSchoolFriend, 3);
+        }
+        else if(identification.equals("enterprise")){
+            updateWrapper.set(Identification::getIsEnterprise, 3);
+        }
+        boolean success = update(updateWrapper);
+        if(success){
+            return Result.ok();
+        }
+        return Result.fail("更新失败");
+    }
+
+    @Override
+    public Result refuseIdentificationDataRequest(Long userId, String identification) {
+        LambdaUpdateWrapper<Identification> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Identification::getUserId, userId);
+        if(identification.equals("student")){
+            updateWrapper.set(Identification::getIsStudent, 2);
+        }
+        else if(identification.equals("teacher")){
+            updateWrapper.set(Identification::getIsTeacher, 2);
+        }
+        else if(identification.equals("schoolFriend")){
+            updateWrapper.set(Identification::getIsSchoolFriend, 2);
+        }
+        else if(identification.equals("enterprise")){
+            updateWrapper.set(Identification::getIsEnterprise, 2);
+        }
+        boolean success = update(updateWrapper);
+        if(success){
+            return Result.ok();
+        }
+        return Result.fail("更新失败");
     }
 }

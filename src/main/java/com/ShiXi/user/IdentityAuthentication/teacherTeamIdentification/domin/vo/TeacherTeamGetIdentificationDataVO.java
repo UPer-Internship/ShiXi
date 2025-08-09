@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class TeacherTeamGetIdentificationDataVO {
+    private Long userId;
+    private String identification;
     private String Name;
     private String SchoolName;
     private String major;

@@ -135,6 +135,8 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         StudentGetIdentificationDataVO studentGetIdentificationDataVO = new StudentGetIdentificationDataVO();
         studentGetIdentificationDataVO.setIdentityCardUrl(studentIdentification.getIdentityCard())
                 .setStudentIdCardUrl(studentIdentification.getStudentIdCard())
+                .setUserId(userId)
+                .setIdentification("student")
                 .setGraduationCertificateUrl(studentIdentification.getGraduationCertificate());
 
         return studentGetIdentificationDataVO;

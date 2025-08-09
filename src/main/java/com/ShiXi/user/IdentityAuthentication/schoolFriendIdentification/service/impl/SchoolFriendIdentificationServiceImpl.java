@@ -97,6 +97,8 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
         //构造vo对象
         SchoolFriendGetIdentificationDataVO schoolFriendGetIdentificationDataVO = new SchoolFriendGetIdentificationDataVO();
         schoolFriendGetIdentificationDataVO.setIdentityCardUrl(schoolFriendIdentification.getIdentityCard())
+                .setUserId(userId)
+                .setIdentification("schoolFriend")
                 .setGraduationCertificateUrl(schoolFriendIdentification.getGraduationCertificate());
 
         return schoolFriendGetIdentificationDataVO;

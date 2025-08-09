@@ -65,6 +65,8 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
         teacherTeamGetIdentificationDataVO.setName(teacherIdentification.getName())
                 .setSchoolName(teacherIdentification.getSchoolName())
                 .setMajor(teacherIdentification.getMajor())
+                .setUserId(userId)
+                .setIdentification("teacher")
                 .setTeacherIdCardUrl(teacherIdentification.getTeacherIdCard());
         return teacherTeamGetIdentificationDataVO;
     }

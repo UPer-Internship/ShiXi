@@ -6,6 +6,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class EnterpriseGetIdentificationDataVO {
+    private Long userId;
+    private String identification;
     private String enterpriseName;
     private String enterpriseIdCard;
     private String enterpriseType;

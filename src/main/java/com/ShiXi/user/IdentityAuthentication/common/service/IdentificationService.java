@@ -3,7 +3,6 @@ package com.ShiXi.user.IdentityAuthentication.common.service;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.baomidou.mybatisplus.extension.service.IService;
-import org.springframework.web.multipart.MultipartFile;
 
 public interface IdentificationService extends IService<Identification> {
     Result getIdentificationStatus();
@@ -16,5 +15,11 @@ public interface IdentificationService extends IService<Identification> {
 
     Result getCurrentIdentification();
 
-    Result getIdentificationDataForAdmin();
+    Result getIdentificationDataRequest();
+
+    Result notifyAdminToAudit(String identification);
+
+    Result passIdentificationDataRequest(Long userId, String identification);
+
+    Result refuseIdentificationDataRequest(Long userId, String identification);
 }

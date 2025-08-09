@@ -95,6 +95,8 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         enterpriseGetIdentificationDataVO.setEnterpriseScale(enterpriseIdentification.getEnterpriseScale())
                 .setEnterpriseName(enterpriseIdentification.getEnterpriseName())
                 .setEnterpriseType(enterpriseIdentification.getEnterpriseType())
+                .setUserId(userId)
+                .setIdentification("enterprise")
                 .setEnterpriseIdCard(enterpriseIdentification.getEnterpriseIdCard());
 
         return enterpriseGetIdentificationDataVO;
