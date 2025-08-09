@@ -2,6 +2,7 @@ package com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.dto.TeacherTeamUploadIdentificationTextDataReqDTO;
+import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,7 @@ public interface TeacherTeamIdentificationService extends IService<TeacherTeamId
      * @param userId 用户id
      * @return 身份信息
      */
-    Result getIdentificationDataByUserId(Integer userId);
+    TeacherTeamGetIdentificationDataVO getIdentificationDataByUserId(Long userId);
     /**
      * 上传教师身份图片类身份验证资料
      * @param type 身份信息的种类

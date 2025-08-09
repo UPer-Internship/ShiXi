@@ -50,13 +50,13 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
     }
 
     @Override
-    public Result getIdentificationDataByUserId(Integer userId) {
+    public TeacherTeamGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
         TeacherTeamIdentification teacherIdentification = teacherTeamIdentificationService.lambdaQuery()
                 .eq(TeacherTeamIdentification::getUserId, userId)
                 .one();
         //判空
         if (teacherIdentification == null) {
-            return Result.fail("出现错误");
+            return null;
         }
         //构造vo对象
         TeacherTeamGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherTeamGetIdentificationDataVO();
@@ -64,7 +64,7 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
                 .setSchoolName(teacherIdentification.getSchoolName())
                 .setMajor(teacherIdentification.getMajor())
                 .setTeacherIdCardUrl(teacherIdentification.getTeacherIdCard());
-        return Result.ok(teacherTeamGetIdentificationDataVO);
+        return teacherTeamGetIdentificationDataVO;
     }
 
 

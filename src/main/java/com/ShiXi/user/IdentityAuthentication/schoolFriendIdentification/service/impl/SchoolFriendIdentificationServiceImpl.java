@@ -81,17 +81,21 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
     }
 
     @Override
-    public Result getIdentificationDataByUserId(Integer userId) {
-        SchoolFriendIdentification schoolFriendIdentification = schoolFriendIdentificationService.lambdaQuery()
+    public SchoolFriendGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
+        //查询该用户的学生身份上传资料
+        SchoolFriendIdentification schoolFriendIdentification = lambdaQuery()
                 .eq(SchoolFriendIdentification::getUserId, userId)
                 .one();
+        //判空
         if (schoolFriendIdentification == null) {
-            return Result.fail("出现错误");
+            return null;
         }
+        //构造vo对象
+        SchoolFriendGetIdentificationDataVO schoolFriendGetIdentificationDataVO = new SchoolFriendGetIdentificationDataVO();
+        schoolFriendGetIdentificationDataVO.setIdentityCardUrl(schoolFriendIdentification.getIdentityCard())
+                .setGraduationCertificateUrl(schoolFriendIdentification.getGraduationCertificate());
 
-
-
-        return Result.fail("未知错误");
+        return schoolFriendGetIdentificationDataVO;
     }
 
 

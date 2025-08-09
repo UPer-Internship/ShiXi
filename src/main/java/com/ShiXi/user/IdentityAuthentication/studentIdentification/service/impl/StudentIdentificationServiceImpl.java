@@ -107,14 +107,14 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
     }
 
     @Override
-    public Result getIdentificationDataByUserId(Integer userId) {
+    public StudentGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
         //查询该用户的学生身份上传资料
         StudentIdentification studentIdentification = lambdaQuery()
                 .eq(StudentIdentification::getUserId, userId)
                 .one();
         //判空
         if (studentIdentification == null) {
-            return Result.fail("出现错误");
+            return null;
         }
         //构造vo对象
         StudentGetIdentificationDataVO studentGetIdentificationDataVO = new StudentGetIdentificationDataVO();
@@ -122,7 +122,7 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
                 .setStudentIdCardUrl(studentIdentification.getStudentIdCard())
                 .setGraduationCertificateUrl(studentIdentification.getGraduationCertificate());
 
-        return Result.ok(studentGetIdentificationDataVO);
+        return studentGetIdentificationDataVO;
     }
 }
 

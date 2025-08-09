@@ -10,9 +10,11 @@ public interface IdentificationService extends IService<Identification> {
 
 //    Result getMyIdentification(String identification, String type);
 
-    Result getIdentificationDataByUserId(Integer userId, String identification);
+//    Result getIdentificationDataByUserId(Integer userId, String identification);
 
     Result changeIdentification(String identification);
 
     Result getCurrentIdentification();
+
+    Result getIdentificationDataForAdmin();
 }

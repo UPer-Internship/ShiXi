@@ -74,12 +74,23 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
     }
 
     @Override
-    public Result getIdentificationDataByUserId(Integer userId) {
-        EnterpriseIdentification enterpriseIdentification = lambdaQuery().eq(EnterpriseIdentification::getUserId, userId).one();
+    public EnterpriseGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
+        //查询该用户的学生身份上传资料
+        EnterpriseIdentification enterpriseIdentification = lambdaQuery()
+                .eq(EnterpriseIdentification::getUserId, userId)
+                .one();
+        //判空
         if (enterpriseIdentification == null) {
-            return Result.fail("此用户无此数据");
+            return null;
         }
-        return Result.fail("未知错误");
+        //构造vo对象
+        EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = new EnterpriseGetIdentificationDataVO();
+        enterpriseGetIdentificationDataVO.setEnterpriseScale(enterpriseIdentification.getEnterpriseScale())
+                .setEnterpriseName(enterpriseIdentification.getEnterpriseName())
+                .setEnterpriseType(enterpriseIdentification.getEnterpriseType())
+                .setEnterpriseIdCard(enterpriseIdentification.getEnterpriseIdCard());
+
+        return enterpriseGetIdentificationDataVO;
     }
 
     @Override
