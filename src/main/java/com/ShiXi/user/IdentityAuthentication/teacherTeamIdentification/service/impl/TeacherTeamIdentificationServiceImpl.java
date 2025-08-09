@@ -4,6 +4,8 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.TeacherIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.dto.TeacherTeamUploadIdentificationTextDataReqDTO;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
@@ -25,7 +27,7 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
     OSSUploadService ossPictureService;
 
     @Resource
-    private TeacherTeamIdentificationService teacherTeamIdentificationService;
+    private IdentificationService identificationService;
 
     private static final String TEACHER_ID_CARD_DIR = "teacherIdCard/";
     @Override
@@ -51,7 +53,7 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
 
     @Override
     public TeacherTeamGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
-        TeacherTeamIdentification teacherIdentification = teacherTeamIdentificationService.lambdaQuery()
+        TeacherTeamIdentification teacherIdentification = lambdaQuery()
                 .eq(TeacherTeamIdentification::getUserId, userId)
                 .one();
         //判空
@@ -84,7 +86,11 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
             LambdaUpdateWrapper<TeacherTeamIdentification> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(TeacherTeamIdentification::getUserId, userId);
             updateWrapper.set(TeacherTeamIdentification::getTeacherIdCard, url);
-            success = update(updateWrapper);
+            //设置对应的审核状态：待审核
+            LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+            statusUpdateWrapper.eq(Identification::getUserId, userId)
+                    .set(Identification::getIsTeacher, 1);
+            success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
         }
         if (success) {
             return Result.ok();
@@ -106,7 +112,12 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
         if (reqDTO.getMajor() != null) {
             updateWrapper.set(TeacherTeamIdentification::getMajor, reqDTO.getMajor());
         }
-        boolean success = update(updateWrapper);
+        //设置对应的审核状态：待审核
+        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+        statusUpdateWrapper.eq(Identification::getUserId, userId)
+                .set(Identification::getIsTeacher, 1);
+        boolean success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
+
         if (success) {
             return Result.ok();
         }

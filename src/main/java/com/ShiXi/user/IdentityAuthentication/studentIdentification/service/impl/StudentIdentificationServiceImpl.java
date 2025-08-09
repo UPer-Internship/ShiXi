@@ -3,6 +3,7 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.StudentIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -41,6 +43,7 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
 
     private static final String STUDENT_ID_CARD_DIR = "studentIDCard/";
     @Override
+    @Transactional
     public Result uploadIdentificationPictureData(String type, MultipartFile file) {
         //获取用户id
         Long userId = UserHolder.getUser().getId();
@@ -56,7 +59,11 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
                 LambdaUpdateWrapper<StudentIdentification> updateWrapper = new LambdaUpdateWrapper<>();
                 updateWrapper.eq(StudentIdentification::getUserId, userId);
                 updateWrapper.set(StudentIdentification::getStudentIdCard,url);
-                success = update(updateWrapper);
+                //设置对应的审核状态：待审核
+                LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+                statusUpdateWrapper.eq(Identification::getUserId, userId)
+                        .set(Identification::getIsStudent, 1);
+                success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
             }
             else if(type.equals("graduationCertificate")){
                 StudentIdentification studentIdentification = lambdaQuery().eq(StudentIdentification::getUserId, userId).one();
@@ -66,7 +73,11 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
                 LambdaUpdateWrapper<StudentIdentification> updateWrapper = new LambdaUpdateWrapper<>();
                 updateWrapper.eq(StudentIdentification::getUserId, userId);
                 updateWrapper.set(StudentIdentification::getGraduationCertificate,url);
-                success = update(updateWrapper);
+                //设置对应的审核状态：待审核
+                LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+                statusUpdateWrapper.eq(Identification::getUserId, userId)
+                        .set(Identification::getIsStudent, 1);
+                success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
             }
             else if(type.equals("studentIDCard")){
                 StudentIdentification studentIdentification = lambdaQuery().eq(StudentIdentification::getUserId, userId).one();
@@ -76,7 +87,11 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
                 LambdaUpdateWrapper<StudentIdentification> updateWrapper = new LambdaUpdateWrapper<>();
                 updateWrapper.eq(StudentIdentification::getUserId, userId);
                 updateWrapper.set(StudentIdentification::getStudentIdCard,url);
-                success = update(updateWrapper);
+                //设置对应的审核状态：待审核
+                LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+                statusUpdateWrapper.eq(Identification::getUserId, userId)
+                        .set(Identification::getIsStudent, 1);
+                success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
             }
 
         if (success) {

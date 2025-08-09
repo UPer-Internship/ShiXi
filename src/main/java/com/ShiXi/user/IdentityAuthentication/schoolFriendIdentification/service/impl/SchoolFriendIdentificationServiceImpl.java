@@ -4,6 +4,8 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.SchoolFriendIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo.SchoolFriendGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.SchoolFriendIdentification;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
@@ -14,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -26,15 +29,12 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
     OSSUploadService ossPictureService;
 
     @Resource
-    private SchoolFriendIdentificationService schoolFriendIdentificationService;
-
-    @Value("${spring.oss.bucketName}")
-    private String bucketName;
-
+    private IdentificationService identificationService;
     // 存储目录
     private static final String GRADUATION_CERTIFICATE_DIR = "graduationCertificate/";
 
     @Override
+    @Transactional
     public Result uploadIdentificationPictureData(String type, MultipartFile file) {
         // 获取用户id
         Long userId = UserHolder.getUser().getId();
@@ -51,7 +51,11 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
             LambdaUpdateWrapper<SchoolFriendIdentification> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(SchoolFriendIdentification::getUserId, userId);
             updateWrapper.set(SchoolFriendIdentification::getGraduationCertificate, url);
-            success = update(updateWrapper);
+            //设置对应的审核状态：待审核
+            LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+            statusUpdateWrapper.eq(Identification::getUserId, userId)
+                    .set(Identification::getIsSchoolFriend, 1);
+            success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
         }
 
         if (success) {

@@ -4,6 +4,8 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.EnterpriseIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.dto.EnterpriseUploadIdentificationTextDataReqDTO;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.vo.EnterpriseGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
@@ -25,8 +27,9 @@ import javax.annotation.Resource;
 public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseIdentificationMapper, EnterpriseIdentification> implements EnterpriseIdentificationService {
 
     @Resource
-    OSSUploadService ossPictureService;
-
+    private  OSSUploadService ossPictureService;
+    @Resource
+    private IdentificationService identificationService;
     // 存储目录
     private static final String ENTERPRISE_ID_CARD_DIR = "enterpriseIdCard/";
 
@@ -66,7 +69,11 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         if (reqDTO.getEnterpriseType() != null) {
             updateWrapper.set(EnterpriseIdentification::getEnterpriseType, reqDTO.getEnterpriseType());
         }
-        boolean success = update(updateWrapper);
+        //设置对应的审核状态：待审核
+        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+        statusUpdateWrapper.eq(Identification::getUserId, userId)
+                .set(Identification::getIsEnterprise, 1);
+        boolean success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
         if (success) {
             return Result.ok();
         }
@@ -109,7 +116,11 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
             LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
             updateWrapper.set(EnterpriseIdentification::getEnterpriseIdCard, url);
-            success = update(updateWrapper);
+            //设置对应的审核状态：待审核
+            LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+            statusUpdateWrapper.eq(Identification::getUserId, userId)
+                    .set(Identification::getIsEnterprise, 1);
+            success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
         }
 
         if (success) {
