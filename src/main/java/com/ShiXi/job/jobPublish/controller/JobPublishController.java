@@ -2,7 +2,7 @@ package com.ShiXi.job.jobPublish.controller;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.job.jobQuery.entity.Job;
-import com.ShiXi.job.jobPublish.service.EnterpriseService;
+import com.ShiXi.job.jobPublish.service.JobPublishService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +14,9 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/enterprise")
 @Api(tags = "发布岗位相关接口")
-public class EnterpriseController {
+public class JobPublishController {
     @Resource
-    EnterpriseService enterpriseService;
+    JobPublishService jobPublishService;
 
     /**
      * 发布岗位 需要传入一个完整的job类 除了id和userId
@@ -26,7 +26,7 @@ public class EnterpriseController {
     @ApiOperation("发布岗位")
     @PostMapping("/pubJob")
     Result pubJob(@RequestBody Job job) {
-        return enterpriseService.pubJob(job);
+        return jobPublishService.pubJob(job);
     }
 
     /**
@@ -37,7 +37,7 @@ public class EnterpriseController {
     @ApiOperation("删除岗位")
     @PostMapping("/deleteJob")
     Result pubJob(@RequestParam("id")Long id) {
-        return enterpriseService.deleteJob(id);
+        return jobPublishService.deleteJob(id);
     }
     /**
      * 根据id查询某个岗位
@@ -45,7 +45,7 @@ public class EnterpriseController {
     @ApiOperation("根据id查询某个岗位")
     @GetMapping("/queryPubById")
     Result queryPubNyId(@RequestParam("id")Long id) {
-        return enterpriseService.queryPubById(id);
+        return jobPublishService.queryPubById(id);
     }
 
     /**
@@ -55,7 +55,7 @@ public class EnterpriseController {
     @ApiOperation("查询自己已经发布全部岗位")
     @GetMapping("/queryMyPubList")
     Result queryMyPubList() {
-        return enterpriseService.queryMyPubList();
+        return jobPublishService.queryMyPubList();
     }
 
     /**
@@ -67,7 +67,7 @@ public class EnterpriseController {
     @ApiOperation("更新某个岗位")
     @PostMapping("/updateJob")
     Result updateJob(@RequestBody Job job,@RequestParam("id")Long id) {
-        return enterpriseService.updateJob(job,id);
+        return jobPublishService.updateJob(job,id);
     }
 
     /**
@@ -76,7 +76,7 @@ public class EnterpriseController {
     @ApiOperation("改变岗位状态")
     @PostMapping("/changeJobStatus")
     public Result changeJobStatus(@RequestParam("jobId") Long jobId, @RequestParam("status") Integer status) {
-        return enterpriseService.changeJobStatus(jobId, status);
+        return jobPublishService.changeJobStatus(jobId, status);
     }
 
     /**
@@ -86,7 +86,7 @@ public class EnterpriseController {
     @ApiOperation("查询收到的所有简历")
     @GetMapping("/queryResumeList")
     Result queryResumeList() {
-        return enterpriseService.queryResumeList();
+        return jobPublishService.queryResumeList();
     }
 
     /**
@@ -97,6 +97,6 @@ public class EnterpriseController {
     @ApiOperation("根据id查询某个简历")
     @GetMapping("/queryResumeById")
     Result queryResumeById(@RequestParam("id")Long id) {
-        return enterpriseService.queryResumeById(id);
+        return jobPublishService.queryResumeById(id);
     }
 }

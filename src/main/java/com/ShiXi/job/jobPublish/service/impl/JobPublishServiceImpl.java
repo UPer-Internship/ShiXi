@@ -8,7 +8,7 @@ import com.ShiXi.job.jobQuery.entity.Job;
 import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.JobMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
-import com.ShiXi.job.jobPublish.service.EnterpriseService;
+import com.ShiXi.job.jobPublish.service.JobPublishService;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.domin.vo.InboxVO;
@@ -28,7 +28,7 @@ import java.util.Set;
 
 @Slf4j
 @Service
-public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implements EnterpriseService {
+public class JobPublishServiceImpl extends ServiceImpl<JobMapper, Job> implements JobPublishService {
     @Resource
     StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -128,9 +128,7 @@ public class EnterpriseServiceImpl extends ServiceImpl<JobMapper, Job> implement
 
     @Override
     public Result queryResumeById(Long id) {//传入投递者的简历id
-
         return onlineResumeService.getResumeByResumeId(id);
-
     }
 
     @Override

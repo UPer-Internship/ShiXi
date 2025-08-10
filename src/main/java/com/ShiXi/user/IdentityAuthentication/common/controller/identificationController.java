@@ -26,7 +26,7 @@ public class identificationController {
         return identificationService.changeIdentification(identification);
     }
     @GetMapping("/getCurrentIdentification")
-    @ApiOperation("获取当前身份 0：游客身份 1：学生 2：校友 3：老师 4：企业 5：学生团队")
+    @ApiOperation("获取当前身份 0：游客身份 1：学生 2：校友 3：老师 4：企业 5：学生团队 6：管理员")
     public Result getCurrentIdentification(){
         return identificationService.getCurrentIdentification();
     }
@@ -49,7 +49,7 @@ public class identificationController {
         return identificationService.passIdentificationDataRequest(userId,identification);
     }
     @PostMapping("admin/refuseIdentificationDataRequest")
-    @ApiOperation("管理端通过审核身份验证资料")
+    @ApiOperation("管理端不通过审核身份验证资料")
     public Result refuseIdentificationDataRequest(Long userId,String  identification){
         return identificationService.refuseIdentificationDataRequest(userId,identification);
     }

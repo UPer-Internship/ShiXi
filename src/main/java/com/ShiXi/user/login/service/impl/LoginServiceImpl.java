@@ -72,7 +72,6 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     private SchoolFriendIdentificationService schoolFriendIdentificationService;
     @Resource
     CurrentIdentificationService currentIdentificationService;;
-
     @Override
     public Result loginByPhone(String phone, String code) {
         if (RegexUtils.isPhoneInvalid(phone)) {
@@ -100,6 +99,9 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         String token = UUID.randomUUID().toString(true);
         // 7.2.将User对象转为HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+        //获取当前用户的身份
+        Result currentIdentification = identificationService.getCurrentIdentification();
+        userDTO.setIdentification(currentIdentification.getData().toString());
         String userDTOJson = JSONUtil.toJsonStr(userDTO);
         // 7.3.存储
         String tokenKey = LOGIN_USER_KEY + token;

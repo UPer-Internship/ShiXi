@@ -67,24 +67,6 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         return Result.ok(identificationVO);
     }
 
-
-//    @Override
-//    public Result getIdentificationDataByUserId(Integer userId, String identification) {
-//        if(identification.equals("student")){
-//            return studentIdentificationService.getIdentificationDataByUserId(userId);
-//        }
-//        else if(identification.equals("teacher")){
-//            return teacherTeamIdentificationService.getIdentificationDataByUserId(userId);
-//        }
-//        else if(identification.equals("schoolFriend")){
-//            return schoolFriendIdentificationService.getIdentificationDataByUserId(userId);
-//        }
-//        else if(identification.equals("enterprise")){
-//            return enterpriseIdentificationService.getIdentificationDataByUserId(userId);
-//        }
-//        return Result.fail("发生错误");
-//    }
-
     @Override
     public Result changeIdentification(String identification) {
         Long userId = UserHolder.getUser().getId();
@@ -94,7 +76,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             Result.fail("请选择身份");
         }
         else if (identification.equals("student")) {
-            if(identificationStatus.getIsStudent()==2){
+            if(identificationStatus.getIsStudent()==3){
                 boolean success =currentIdentificationService.lambdaUpdate()
                         .eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 1)
@@ -107,7 +89,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("schoolFriend")) {
-            if(identificationStatus.getIsSchoolFriend()==2){
+            if(identificationStatus.getIsSchoolFriend()==3){
                 boolean success =currentIdentificationService.lambdaUpdate()
                         .eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 2)
@@ -119,7 +101,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("teacher")) {
-            if(identificationStatus.getIsTeacher()==2){
+            if(identificationStatus.getIsTeacher()==3){
                 boolean success =currentIdentificationService.lambdaUpdate()
                         .eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 3)
@@ -131,7 +113,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("enterprise")) {
-            if(identificationStatus.getIsEnterprise()==2){
+            if(identificationStatus.getIsEnterprise()==3){
                 boolean success = currentIdentificationService.lambdaUpdate()
                         .eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 4)
@@ -143,10 +125,22 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("studentTeam")) {
-            if(identificationStatus.getIsStudentTeam()==2){
+            if(identificationStatus.getIsStudentTeam()==3){
                 boolean success = currentIdentificationService.lambdaUpdate()
                         .eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 5)
+                        .update();
+                if( success){
+                    return Result.ok();
+                }
+            }
+            else return Result.fail("此身份未验证");
+        }
+        else if (identification.equals("admin")) {
+            if(identificationStatus.getIsAdmin()==3){
+                boolean success = currentIdentificationService.lambdaUpdate()
+                        .eq(CurrentIdentification::getUserId, userId)
+                        .set(CurrentIdentification::getCurrentIdentification, 6)
                         .update();
                 if( success){
                     return Result.ok();
