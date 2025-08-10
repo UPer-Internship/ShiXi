@@ -15,6 +15,8 @@ public class MvcConfig implements WebMvcConfigurer {
     private StringRedisTemplate stringRedisTemplate;
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        //TODO 权限拦截器 权限身份已经保留在Userholder当中 获取用户当前使用的身份
+
         //登录拦截器 输入restful风格拦截
         registry.addInterceptor(new LoginInterceptor())
                 .excludePathPatterns(
