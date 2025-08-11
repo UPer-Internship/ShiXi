@@ -14,6 +14,8 @@ import com.ShiXi.job.jobQuery.service.JobService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.utils.RedisConstants;
 import com.ShiXi.common.domin.vo.InboxVO;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.service.StudentInfoService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     OnlineResumeServiceImpl onlineResumeService;
     @Resource
     private ApplicationMapper applicationMapper;
+    @Resource
+    private StudentInfoService studentInfoService;
 
     /**
      * 分页模糊匹配
@@ -94,7 +98,12 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         // 只对当前页做专业匹配度排序（不影响分页）
         String tempMajor = null;
         try {
-            tempMajor = UserHolder.getUser().getMajor();
+            Long userId = UserHolder.getUser().getId();
+            // 根据userId查询StudentInfo获取major
+            StudentInfo studentInfo = studentInfoService.query().eq("user_id", userId).one();
+            if (studentInfo != null) {
+                tempMajor = studentInfo.getMajor();
+            }
         } catch (Exception e) {
             tempMajor = null;
         }

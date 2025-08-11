@@ -11,5 +11,4 @@ public class UserDTO {
     private String phone;
     //当前身份
     private String identification;
-    private String major;
 }
