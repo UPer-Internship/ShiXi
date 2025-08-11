@@ -90,6 +90,29 @@ public class JobPublishController {
     }
 
     /**
+     * 查询新投递的简历（从Redis消费）
+     * @return 新投递的简历列表
+     */
+    @ApiOperation("查询新投递的简历")
+    @GetMapping("/queryNewResumeList")
+    Result queryNewResumeList() {
+        return jobPublishService.queryNewResumeList();
+    }
+
+    /**
+     * 查询历史全量简历（分页查询）
+     * @param page 页码，默认为1
+     * @param pageSize 每页大小，默认为10
+     * @return 分页查询结果
+     */
+    @ApiOperation("查询历史全量简历")
+    @GetMapping("/queryHistoryResumeList")
+    Result queryHistoryResumeList(@RequestParam(value = "page", defaultValue = "1") Integer page,
+                                 @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return jobPublishService.queryHistoryResumeList(page, pageSize);
+    }
+
+    /**
      * 根据id查询某个简历
      * @param id 要查询的简历的id
      * @return 该简历

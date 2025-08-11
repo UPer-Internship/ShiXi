@@ -7,9 +7,12 @@ import com.ShiXi.common.domin.dto.PageResult;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.job.jobQuery.entity.Job;
 import com.ShiXi.common.mapper.JobMapper;
+import com.ShiXi.common.mapper.ApplicationMapper;
+import com.ShiXi.application.entity.Application;
 import com.ShiXi.Resume.ResumePersonal.service.impl.OnlineResumeServiceImpl;
 import com.ShiXi.job.jobQuery.service.JobService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.common.utils.RedisConstants;
 import com.ShiXi.common.domin.vo.InboxVO;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import javax.annotation.Resource;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +34,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     StringRedisTemplate stringRedisTemplate;
     @Resource
     OnlineResumeServiceImpl onlineResumeService;
+    @Resource
+    private ApplicationMapper applicationMapper;
 
     /**
      * 分页模糊匹配
@@ -135,19 +141,44 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         //找出学生的id
         Long userId = UserHolder.getUser().getId();
 
-        //投递到发布者的收件箱中
-        String key = "inbox:" + HRId;//hr的收件箱
-        InboxVO inboxVO = new InboxVO();
-        inboxVO.setJobId(id);
-        inboxVO.setSubmitterId(userId);
-//        inboxVO.setIcon("");
-//        inboxVO.setGender("");
-//        inboxVO.setJobName("");
-//        inboxVO.s
-        String Json = JSONUtil.toJsonStr(inboxVO);
-        stringRedisTemplate.opsForZSet().add(key, Json, System.currentTimeMillis());
-        //TODO 异步回写mysql
-        return Result.ok();
+        try {
+            // 检查是否已经投递过
+            QueryWrapper<Application> checkWrapper = new QueryWrapper<>();
+            checkWrapper.eq("student_id", userId)
+                       .eq("job_id", id)
+                       .eq("is_deleted", 0);
+            Application existingApplication = applicationMapper.selectOne(checkWrapper);
+            if (existingApplication != null) {
+                return Result.fail("您已经投递过该岗位");
+            }
+
+            //投递到发布者的收件箱中
+            String key = RedisConstants.HR_INBOX_KEY + HRId;//hr的收件箱
+            InboxVO inboxVO = new InboxVO();
+            inboxVO.setJobId(id);
+            inboxVO.setSubmitterId(userId);
+            String Json = JSONUtil.toJsonStr(inboxVO);
+            stringRedisTemplate.opsForZSet().add(key, Json, System.currentTimeMillis());
+            
+            // 同步回写MySQL
+            Application application = new Application();
+            application.setStudentId(userId);
+            application.setEnterpriseId(HRId);
+            application.setJobId(id);
+            application.setStatus("pending");
+            application.setIsRead(0);
+            application.setIsDeleted(0);
+            application.setApplyTime(LocalDateTime.now());
+            application.setUpdateTime(LocalDateTime.now());
+            
+            applicationMapper.insert(application);
+            log.info("简历投递成功，学生ID: {}, 岗位ID: {}, 企业ID: {}", userId, id, HRId);
+            
+            return Result.ok("投递成功");
+        } catch (Exception e) {
+            log.error("投递简历失败，学生ID: {}, 岗位ID: {}", userId, id, e);
+            return Result.fail("投递失败，请稍后重试");
+        }
     }
 
     /**

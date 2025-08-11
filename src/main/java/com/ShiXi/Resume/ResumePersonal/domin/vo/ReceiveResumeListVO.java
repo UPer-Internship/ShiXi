@@ -3,6 +3,8 @@ package com.ShiXi.Resume.ResumePersonal.domin.vo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.time.LocalDateTime;
+
 /**
  * 用于表示简历投递的VO类
  */
@@ -19,4 +21,6 @@ public class ReceiveResumeListVO {
     private String major;//专业
     private String graduationDate;//毕业时间
     private String educationLevel;//学历水平
+    private LocalDateTime applyTime;//投递时间
+    private String status;//投递状态 (pending, accepted, rejected)
 }
