@@ -10,5 +10,7 @@ public class UserDTO {
     private String icon;
     private String phone;
     //当前身份
-    private String identification;
+    private Integer identification;
+    private String major;
+    private String token;
 }

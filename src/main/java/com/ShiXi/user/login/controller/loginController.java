@@ -55,4 +55,11 @@ public class loginController {
     public Result login(@RequestParam String code, @RequestParam(required = false) String phone) {
         return loginService.loginByWechat(code, phone);
     }
+
+
+    @PostMapping("/logout")
+    @ApiOperation("登出")
+    public Result logout() {
+        return loginService.logout();
+    }
 }

@@ -11,6 +11,7 @@ import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.common.service.OptionsService;
 import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;
+import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
 import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
@@ -100,15 +101,13 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         // 7.2.将User对象转为HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         //获取当前用户的身份
-        Result currentIdentification = identificationService.getCurrentIdentification();
-        userDTO.setIdentification(currentIdentification.getData().toString());
-        String userDTOJson = JSONUtil.toJsonStr(userDTO);
+        userDTO.setIdentification(0);
         // 7.3.存储
         String tokenKey = LOGIN_USER_KEY + token;
+        String userDTOJson = JSONUtil.toJsonStr(userDTO);
         stringRedisTemplate.opsForValue().set(tokenKey, userDTOJson);
         // 7.4.设置token有效期
         stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
-
         // 8.返回token
         return Result.ok(token);
     }
@@ -256,6 +255,11 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
         // 返回token
         return Result.ok(token);
+    }
+
+    @Override
+    public Result logout() {
+        return null;
     }
 
     /**

@@ -39,13 +39,6 @@ public class User implements Serializable {
 
     private LocalDateTime updateTime;// 更新时间
 
-
-//    private Integer schoolFriendIdentification;// 是否通过校友验证，0-否，1-是
-//
-//    private Integer teacherIdentification;// 是否通过教室验证，0-否，1-是
-//
-//    private Integer enterpriseIdentification;// 是否通过企业验证，0-否，1-是
-
     @TableLogic
     private Integer isDeleted;// 逻辑删除标志，0-未删除，1-已删除
 

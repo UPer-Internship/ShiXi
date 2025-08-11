@@ -15,7 +15,6 @@ public class CurrentIdentification {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;// 自增id
-
     private Long userId;
     private Integer currentIdentification;
 }

@@ -22,6 +22,7 @@ import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.domin.vo.
 import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.service.StudentTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
+import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
+import static com.ShiXi.common.utils.RedisConstants.LOGIN_USER_KEY;
 
 @Slf4j
 @Service
@@ -67,84 +70,84 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         return Result.ok(identificationVO);
     }
 
+    //TODO 异步逻辑尚为完成
+    //TODO 复用抽象尚未完成
     @Override
     public Result changeIdentification(String identification) {
         Long userId = UserHolder.getUser().getId();
-        CurrentIdentification currentIdentification = currentIdentificationService.lambdaQuery().eq(CurrentIdentification::getUserId, userId).one();
+        String token = LOGIN_USER_KEY + UserHolder.getUser().getToken();
+        String userDTOJson = stringRedisTemplate.opsForValue().get(token);
+        if(userDTOJson==null){
+            return Result.fail("请先登录");
+        }
+        UserDTO userDTO = JSONUtil.toBean(userDTOJson, UserDTO.class);
         Identification identificationStatus = lambdaQuery().eq(Identification::getUserId, userId).one();
         if(identification==null){
             Result.fail("请选择身份");
         }
         else if (identification.equals("student")) {
             if(identificationStatus.getIsStudent()==3){
-                boolean success =currentIdentificationService.lambdaUpdate()
-                        .eq(CurrentIdentification::getUserId, userId)
+                userDTO.setIdentification(1);
+                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 1)
                         .update();
-                if( success){
-                    return Result.ok();
-                }
-
+                return Result.ok();
             }
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("schoolFriend")) {
             if(identificationStatus.getIsSchoolFriend()==3){
-                boolean success =currentIdentificationService.lambdaUpdate()
-                        .eq(CurrentIdentification::getUserId, userId)
+                userDTO.setIdentification(2);
+                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 2)
                         .update();
-                if( success){
-                    return Result.ok();
-                }
+                return Result.ok();
             }
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("teacher")) {
             if(identificationStatus.getIsTeacher()==3){
-                boolean success =currentIdentificationService.lambdaUpdate()
-                        .eq(CurrentIdentification::getUserId, userId)
+                userDTO.setIdentification(3);
+                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 3)
                         .update();
-                if( success){
-                    return Result.ok();
-                }
+                return Result.ok();
             }
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("enterprise")) {
             if(identificationStatus.getIsEnterprise()==3){
-                boolean success = currentIdentificationService.lambdaUpdate()
-                        .eq(CurrentIdentification::getUserId, userId)
+                userDTO.setIdentification(4);
+                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 4)
                         .update();
-                if( success){
                     return Result.ok();
-                }
             }
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("studentTeam")) {
             if(identificationStatus.getIsStudentTeam()==3){
-                boolean success = currentIdentificationService.lambdaUpdate()
-                        .eq(CurrentIdentification::getUserId, userId)
+                userDTO.setIdentification(5);
+                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 5)
                         .update();
-                if( success){
                     return Result.ok();
-                }
             }
             else return Result.fail("此身份未验证");
         }
         else if (identification.equals("admin")) {
             if(identificationStatus.getIsAdmin()==3){
-                boolean success = currentIdentificationService.lambdaUpdate()
-                        .eq(CurrentIdentification::getUserId, userId)
+                userDTO.setIdentification(6);
+                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
                         .set(CurrentIdentification::getCurrentIdentification, 6)
                         .update();
-                if( success){
-                    return Result.ok();
-                }
+                return Result.ok();
             }
             else return Result.fail("此身份未验证");
         }
@@ -152,17 +155,15 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     }
 
     @Override
-    public Result getCurrentIdentification() {
-        Long userId = UserHolder.getUser().getId();
-        CurrentIdentification currentIdentification = currentIdentificationService.lambdaQuery().eq(CurrentIdentification::getUserId, userId).one();
-        if(currentIdentification==null){
-            return Result.fail("发生错误");
+    public Integer getCurrentIdentification() {
+        Integer currentIdentificationCache = UserHolder.getUser().getIdentification();
+        if(currentIdentificationCache==null){
+            CurrentIdentification currentIdentification = currentIdentificationService.lambdaQuery()
+                    .eq(CurrentIdentification::getUserId, UserHolder.getUser().getId())
+                    .one();
+            return currentIdentification.getCurrentIdentification();
         }
-        Integer identification = currentIdentification.getCurrentIdentification();
-        if(identification==null){
-            return Result.fail("未使用任何身份登录");
-        }
-        return Result.ok(identification);
+        return currentIdentificationCache;
     }
 
     @Override

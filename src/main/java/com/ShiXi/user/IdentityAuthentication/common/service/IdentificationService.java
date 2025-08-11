@@ -13,7 +13,7 @@ public interface IdentificationService extends IService<Identification> {
 
     Result changeIdentification(String identification);
 
-    Result getCurrentIdentification();
+    Integer getCurrentIdentification();
 
     Result getIdentificationDataRequest();
 

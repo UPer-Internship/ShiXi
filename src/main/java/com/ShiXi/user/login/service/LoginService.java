@@ -10,4 +10,6 @@ public interface LoginService extends IService<User> {
     Result loginByPhone(String phone, String code);
 
     Result loginByWechat(String code, String phone);
+
+    Result logout();
 }

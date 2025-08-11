@@ -36,6 +36,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor {
         }
         // 5.将查询到的hash数据转为UserDTO
         UserDTO userDTO= JSONUtil.toBean(jsonStr,UserDTO.class);
+        userDTO.setToken(token);
         // 6.存在，保存用户信息到 ThreadLocal
         UserHolder.saveUser(userDTO);
         // 7.刷新token有效期

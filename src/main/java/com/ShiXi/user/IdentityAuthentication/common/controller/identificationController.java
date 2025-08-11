@@ -28,7 +28,7 @@ public class identificationController {
     @GetMapping("/getCurrentIdentification")
     @ApiOperation("获取当前身份 0：游客身份 1：学生 2：校友 3：老师 4：企业 5：学生团队 6：管理员")
     public Result getCurrentIdentification(){
-        return identificationService.getCurrentIdentification();
+        return Result.ok(identificationService.getCurrentIdentification());
     }
     @GetMapping("/getIdentificationStatus")
     @ApiOperation("获取用户的四种身份信息是否通过认证 0:未提交过资料 1：已提交待审核 2：审核不通过 3：审核通过，拥有此身份")
