@@ -2,9 +2,10 @@ package com.ShiXi.user.info.studentInfo.service;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.info.studentInfo.domin.dto.StudentChangeInfoDTO;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
+import com.baomidou.mybatisplus.extension.service.IService;
 
-
-public interface StudentInfoService {
+public interface StudentInfoService extends IService<StudentInfo> {
     /**
      * 保存学生基本信息
      */
