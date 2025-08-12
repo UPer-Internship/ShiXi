@@ -1,6 +1,7 @@
 package com.ShiXi.job.jobQuery.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import com.ShiXi.application.service.ApplicationService;
 import com.ShiXi.job.jobQuery.domin.dto.JobFuzzyQueryDTO;
 import com.ShiXi.job.jobQuery.domin.dto.JobPageQueryDTO;
 import com.ShiXi.common.domin.dto.PageResult;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import javax.annotation.Resource;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -37,7 +37,7 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     @Resource
     OnlineResumeServiceImpl onlineResumeService;
     @Resource
-    private ApplicationMapper applicationMapper;
+    private ApplicationService applicationService;
     @Resource
     private StudentInfoService studentInfoService;
 
@@ -154,9 +154,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
             // 检查是否已经投递过
             QueryWrapper<Application> checkWrapper = new QueryWrapper<>();
             checkWrapper.eq("student_id", userId)
-                       .eq("job_id", id)
-                       .eq("is_deleted", 0);
-            Application existingApplication = applicationMapper.selectOne(checkWrapper);
+                       .eq("job_id", id);
+            Application existingApplication = applicationService.getOne(checkWrapper);
             if (existingApplication != null) {
                 return Result.fail("您已经投递过该岗位");
             }
@@ -176,11 +175,8 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
             application.setJobId(id);
             application.setStatus("pending");
             application.setIsRead(0);
-            application.setIsDeleted(0);
-            application.setApplyTime(LocalDateTime.now());
-            application.setUpdateTime(LocalDateTime.now());
             
-            applicationMapper.insert(application);
+            applicationService.save(application);
             log.info("简历投递成功，学生ID: {}, 岗位ID: {}, 企业ID: {}", userId, id, HRId);
             
             return Result.ok("投递成功");
