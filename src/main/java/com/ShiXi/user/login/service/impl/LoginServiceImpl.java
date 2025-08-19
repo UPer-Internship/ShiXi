@@ -11,7 +11,6 @@ import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.common.service.OptionsService;
 import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;
-import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
 import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
@@ -24,8 +23,8 @@ import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.S
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.login.service.LoginService;
@@ -66,7 +65,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     @Resource
     private StudentIdentificationService studentIdentificationService;
     @Resource
-    private TeacherTeamIdentificationService teacherTeamIdentificationService;
+    private TeacherIdentificationService teacherIdentificationService;
     @Resource
     private EnterpriseIdentificationService enterpriseIdentificationService;
     @Resource
@@ -177,6 +176,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         User user = new User();
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
+        user.setUuid(UUID.randomUUID().toString(true)); // 生成UUID
         save(user);
         // 初始化身份认证
         Identification identification = new Identification();
@@ -187,9 +187,9 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         studentIdentification.setUserId(user.getId());
         studentIdentificationService.save(studentIdentification);
         // 初始化教师认证资料
-        TeacherTeamIdentification teacherIdentification = new TeacherTeamIdentification();
+        TeacherIdentification teacherIdentification = new TeacherIdentification();
         teacherIdentification.setUserId(user.getId());
-        teacherTeamIdentificationService.save(teacherIdentification);
+        teacherIdentificationService.save(teacherIdentification);
         // 初始化企业认证资料
         EnterpriseIdentification enterpriseIdentification = new EnterpriseIdentification();
         enterpriseIdentification.setUserId(user.getId());

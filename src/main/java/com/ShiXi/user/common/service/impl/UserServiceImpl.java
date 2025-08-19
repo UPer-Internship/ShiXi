@@ -180,6 +180,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         User user = new User();
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
+        user.setUuid(UUID.randomUUID().toString(true)); // 生成UUID
         // 2.保存用户
         save(user);
         return user;
@@ -265,6 +266,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.ok(user);
     }
 
+
+
+    @Override
+    public Result getUserInfoByUuid(String uuid) {
+        // 根据uuid查询用户
+        User user = query().eq("uuid", uuid).one();
+        if(user == null){
+            return Result.fail("用户不存在");
+        }
+        return Result.ok(user);
+    }
 
 
     @Override

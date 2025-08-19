@@ -1,4 +1,4 @@
-package com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.impl;
+package com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.impl;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.TeacherIdentificationMapper;
@@ -6,14 +6,13 @@ import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.dto.TeacherTeamUploadIdentificationTextDataReqDTO;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.dto.TeacherUploadIdentificationTextDataReqDTO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,7 +20,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @Service
-public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIdentificationMapper, TeacherTeamIdentification> implements TeacherTeamIdentificationService {
+public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentificationMapper, TeacherIdentification> implements TeacherIdentificationService {
 
     @Resource
     OSSUploadService ossPictureService;
@@ -35,15 +34,15 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
         //查询用户id
         Long userId = UserHolder.getUser().getId();
         //查询该用户的教师团队上传资料
-        TeacherTeamIdentification teacherIdentification = lambdaQuery()
-                .eq(TeacherTeamIdentification::getUserId, userId)
+        TeacherIdentification teacherIdentification = lambdaQuery()
+                .eq(TeacherIdentification::getUserId, userId)
                 .one();
         //判空
         if (teacherIdentification == null) {
             return Result.fail("出现错误");
         }
         //构造vo对象
-        TeacherTeamGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherTeamGetIdentificationDataVO();
+        TeacherGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherGetIdentificationDataVO();
         teacherTeamGetIdentificationDataVO.setName(teacherIdentification.getName())
                 .setSchoolName(teacherIdentification.getSchoolName())
                 .setMajor(teacherIdentification.getMajor())
@@ -52,16 +51,16 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
     }
 
     @Override
-    public TeacherTeamGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
-        TeacherTeamIdentification teacherIdentification = lambdaQuery()
-                .eq(TeacherTeamIdentification::getUserId, userId)
+    public TeacherGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
+        TeacherIdentification teacherIdentification = lambdaQuery()
+                .eq(TeacherIdentification::getUserId, userId)
                 .one();
         //判空
         if (teacherIdentification == null) {
             return null;
         }
         //构造vo对象
-        TeacherTeamGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherTeamGetIdentificationDataVO();
+        TeacherGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherGetIdentificationDataVO();
         teacherTeamGetIdentificationDataVO.setName(teacherIdentification.getName())
                 .setSchoolName(teacherIdentification.getSchoolName())
                 .setMajor(teacherIdentification.getMajor())
@@ -80,14 +79,14 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
         boolean success = false;
         if (type.equals("teacherIdCard")) {
             // 删除旧的认证
-            TeacherTeamIdentification teacherIdentification = lambdaQuery().eq(TeacherTeamIdentification::getUserId, userId).one();
+            TeacherIdentification teacherIdentification = lambdaQuery().eq(TeacherIdentification::getUserId, userId).one();
             url = teacherIdentification.getTeacherIdCard();
             ossPictureService.deletePicture(url);
             // 上传新的认证
             url = ossPictureService.uploadPicture(file, TEACHER_ID_CARD_DIR);
-            LambdaUpdateWrapper<TeacherTeamIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(TeacherTeamIdentification::getUserId, userId);
-            updateWrapper.set(TeacherTeamIdentification::getTeacherIdCard, url);
+            LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(TeacherIdentification::getUserId, userId);
+            updateWrapper.set(TeacherIdentification::getTeacherIdCard, url);
             //设置对应的审核状态：待审核
             LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
             statusUpdateWrapper.eq(Identification::getUserId, userId)
@@ -101,18 +100,18 @@ public class TeacherTeamIdentificationServiceImpl extends ServiceImpl<TeacherIde
     }
 
     @Override
-    public Result uploadIdentificationTextData(TeacherTeamUploadIdentificationTextDataReqDTO reqDTO) {
+    public Result uploadIdentificationTextData(TeacherUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
-        LambdaUpdateWrapper<TeacherTeamIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(TeacherTeamIdentification::getUserId, userId);
+        LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(TeacherIdentification::getUserId, userId);
         if (reqDTO.getName() != null) {
-            updateWrapper.set(TeacherTeamIdentification::getName, reqDTO.getName());
+            updateWrapper.set(TeacherIdentification::getName, reqDTO.getName());
         }
         if (reqDTO.getSchoolName() != null) {
-            updateWrapper.set(TeacherTeamIdentification::getSchoolName, reqDTO.getSchoolName());
+            updateWrapper.set(TeacherIdentification::getSchoolName, reqDTO.getSchoolName());
         }
         if (reqDTO.getMajor() != null) {
-            updateWrapper.set(TeacherTeamIdentification::getMajor, reqDTO.getMajor());
+            updateWrapper.set(TeacherIdentification::getMajor, reqDTO.getMajor());
         }
         //设置对应的审核状态：待审核
         LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();

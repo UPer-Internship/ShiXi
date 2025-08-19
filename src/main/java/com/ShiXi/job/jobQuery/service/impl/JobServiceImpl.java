@@ -40,7 +40,6 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     private ApplicationService applicationService;
     @Resource
     private StudentInfoService studentInfoService;
-
     /**
      * 分页模糊匹配
      * status字段：0-可申请，1-已截止

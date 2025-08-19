@@ -1,13 +1,13 @@
-package com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service;
+package com.ShiXi.user.IdentityAuthentication.teacherIdentification.service;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.dto.TeacherTeamUploadIdentificationTextDataReqDTO;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.dto.TeacherUploadIdentificationTextDataReqDTO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface TeacherTeamIdentificationService extends IService<TeacherTeamIdentification> {
+public interface TeacherIdentificationService extends IService<TeacherIdentification> {
     /**
      * 获取我作为教师身份的验证资料
      * @return 上传成功与否
@@ -18,7 +18,7 @@ public interface TeacherTeamIdentificationService extends IService<TeacherTeamId
      * @param userId 用户id
      * @return 身份信息
      */
-    TeacherTeamGetIdentificationDataVO getIdentificationDataByUserId(Long userId);
+    TeacherGetIdentificationDataVO getIdentificationDataByUserId(Long userId);
     /**
      * 上传教师身份图片类身份验证资料
      * @param type 身份信息的种类
@@ -31,5 +31,5 @@ public interface TeacherTeamIdentificationService extends IService<TeacherTeamId
      * @param reqDTO 身份信息的种类
      * @return 上传成功与否
      */
-    Result uploadIdentificationTextData(TeacherTeamUploadIdentificationTextDataReqDTO reqDTO);
+    Result uploadIdentificationTextData(TeacherUploadIdentificationTextDataReqDTO reqDTO);
 }
