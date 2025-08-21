@@ -166,6 +166,7 @@ create table `4_uper_up_intern`.user
 (
     id          bigint auto_increment comment '用户ID'
         primary key,
+    uuid        varchar(255)                           not null comment '用户唯一标识符',
     phone       varchar(20)                            not null comment '电话号码',
     openid      varchar(255)                           null comment '微信开放id',
     password    varchar(255)                           null comment '密码',
@@ -178,7 +179,9 @@ create table `4_uper_up_intern`.user
 ',
     birth_date  varchar(10)                            null comment '生日',
     wechat      varchar(255)                           null comment '微信',
-    is_deleted  tinyint(1)   default 0                 not null comment '逻辑删除标志，0-未删除，1-已删除'
+    is_deleted  tinyint(1)   default 0                 not null comment '逻辑删除标志，0-未删除，1-已删除',
+    key (uuid),
+    key (phone)
 )
     comment '用户表' charset = utf8mb4;
 
