@@ -15,9 +15,8 @@ import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.vo.E
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo.SchoolFriendGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.domin.vo.TeacherTeamGetIdentificationDataVO;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.entity.TeacherTeamIdentification;
-import com.ShiXi.user.IdentityAuthentication.teacherTeamIdentification.service.TeacherTeamIdentificationService;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.domin.vo.StudentTeamGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.service.StudentTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
@@ -40,7 +39,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     StudentIdentificationService studentIdentificationService;
    
     @Resource
-    TeacherTeamIdentificationService teacherTeamIdentificationService;
+    TeacherIdentificationService teacherIdentificationService;
    
     @Resource
     StudentTeamIdentificationService studentTeamIdentificationService;
@@ -181,7 +180,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals("teacher")){
-            TeacherTeamGetIdentificationDataVO identificationDataByUserId = teacherTeamIdentificationService.getIdentificationDataByUserId(userId);
+            TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals("schoolFriend")){

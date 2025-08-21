@@ -166,6 +166,7 @@ create table `4_uper_up_intern`.user
 (
     id          bigint auto_increment comment '用户ID'
         primary key,
+    uuid        varchar(255)                           not null comment '用户唯一标识符',
     phone       varchar(20)                            not null comment '电话号码',
     openid      varchar(255)                           null comment '微信开放id',
     password    varchar(255)                           null comment '密码',
@@ -178,7 +179,9 @@ create table `4_uper_up_intern`.user
 ',
     birth_date  varchar(10)                            null comment '生日',
     wechat      varchar(255)                           null comment '微信',
-    is_deleted  tinyint(1)   default 0                 not null comment '逻辑删除标志，0-未删除，1-已删除'
+    is_deleted  tinyint(1)   default 0                 not null comment '逻辑删除标志，0-未删除，1-已删除',
+    key (uuid),
+    key (phone)
 )
     comment '用户表' charset = utf8mb4;
 
@@ -278,3 +281,34 @@ create table `student_team_identification`
     primary key (`id`),
     key (`user_id`)
 ) comment ='学生团队身份认证表';
+
+CREATE TABLE `team`(
+    `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    `uuid` VARCHAR(255) NOT NULL COMMENT '团队的唯一标识',
+    `name` VARCHAR(255) NOT NULL COMMENT '团队名称',
+    `description` TEXT COMMENT '团队描述',
+    `leader_id` BIGINT NOT NULL COMMENT '团队创建者ID，外键到用户表',
+    `school` VARCHAR(255) NOT NULL COMMENT '团队所属院校',
+    `industry` VARCHAR(255) NOT NULL COMMENT '团队所属行业',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    KEY (`leader_id`),
+    KEY (`uuid`)
+)COMMENT '团队信息表';
+
+CREATE TABLE `team_member`
+(
+    `id`        BIGINT                                   NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    `team_id`   BIGINT                                   NOT NULL COMMENT '团队ID，外键到团队表',
+    `user_id`   BIGINT                                   NOT NULL COMMENT '用户ID，外键到用户表',
+    `role`      ENUM ('leader', 'member')                COMMENT '成员角色，leader表示团队负责人，member表示普通成员',
+    `responsibility` TEXT COMMENT '成员职责描述',
+    `apply_reason` TEXT COMMENT '申请说明',
+    `join_time` DATETIME                                 NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
+    `quit_time` DATETIME COMMENT '退出时间',
+    `status`    ENUM ('pending', 'approved', 'rejected') NOT NULL COMMENT '申请状态，pending表示待审核，approved表示审核通过，rejected表示审核拒绝',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    KEY (`team_id`),
+    KEY (`user_id`)
+)COMMENT '团队成员关系表';

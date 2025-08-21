@@ -28,6 +28,11 @@ public class UserController {
         return userService.getUserInfoById(id);
     }
 
+    @GetMapping("/getUserInfoByUuid")
+    public Result getUserInfoByUuid(@RequestParam String uuid){
+        return userService.getUserInfoByUuid(uuid);
+    }
+
 //    @GetMapping("/isLogin")
 //    public Result isLogin(@RequestParam String token){
 //

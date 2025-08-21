@@ -23,4 +23,6 @@ public interface UserService extends IService<User> {
     User getMyUserInfo();
 
 //    Result getIdentification();
+    
+    Result getUserInfoByUuid(String uuid);
 }
