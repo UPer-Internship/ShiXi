@@ -176,7 +176,6 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         User user = new User();
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
-        user.setUuid(UUID.randomUUID().toString(true)); // 生成UUID
         save(user);
         // 初始化身份认证
         Identification identification = new Identification();
