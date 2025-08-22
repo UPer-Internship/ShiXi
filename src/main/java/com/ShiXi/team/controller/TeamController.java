@@ -39,9 +39,9 @@ public class TeamController {
         return teamService.approveJoinTeam(approveJoinDTO);
     }
 
-    @GetMapping("/info/{teamUuid}")
+    @GetMapping("/info")
     @ApiOperation("根据UUID获取团队信息")
-    public Result getTeamByUuid(@PathVariable String teamUuid) {
+    public Result getTeamByUuid(@RequestParam String teamUuid) {
         return teamService.getTeamByUuid(teamUuid);
     }
 
@@ -57,33 +57,33 @@ public class TeamController {
         return teamService.getMyJoinedTeams();
     }
 
-    @GetMapping("/applications/{teamId}")
+    @GetMapping("/applications")
     @ApiOperation("获取团队的待审核申请列表")
-    public Result getPendingApplications(@PathVariable Long teamId) {
+    public Result getPendingApplications(@RequestParam Long teamId) {
         return teamService.getPendingApplications(teamId);
     }
 
-    @PostMapping("/quit/{teamId}")
+    @PostMapping("/quit")
     @ApiOperation("退出团队")
-    public Result quitTeam(@PathVariable Long teamId) {
+    public Result quitTeam(@RequestParam Long teamId) {
         return teamService.quitTeam(teamId);
     }
 
-    @DeleteMapping("/dissolve/{teamId}")
+    @DeleteMapping("/dissolve")
     @ApiOperation("解散团队")
-    public Result dissolveTeam(@PathVariable Long teamId) {
+    public Result dissolveTeam(@RequestParam Long teamId) {
         return teamService.dissolveTeam(teamId);
     }
 
-    @PutMapping("/update/{teamId}")
+    @PutMapping("/update")
     @ApiOperation("修改团队信息")
-    public Result updateTeamInfo(@PathVariable Long teamId, @RequestBody CreateTeamDTO createTeamDTO) {
+    public Result updateTeamInfo(@RequestParam Long teamId, @RequestBody CreateTeamDTO createTeamDTO) {
         return teamService.updateTeamInfo(teamId, createTeamDTO);
     }
 
-    @DeleteMapping("/remove/{teamId}/{userId}")
+    @DeleteMapping("/remove")
     @ApiOperation("移除团队成员")
-    public Result removeMember(@PathVariable Long teamId, @PathVariable Long userId) {
+    public Result removeMember(@RequestParam Long teamId, @RequestParam Long userId) {
         return teamService.removeMember(teamId, userId);
     }
 }
