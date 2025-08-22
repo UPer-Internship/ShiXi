@@ -15,8 +15,6 @@ import com.ShiXi.team.service.TeamMemberService;
 import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.common.entity.User;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -129,20 +127,20 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 根据UUID查找团队
-            QueryWrapper<Team> teamWrapper = new QueryWrapper<>();
-            teamWrapper.eq("uuid", joinTeamDTO.getTeamUuid());
-            Team team = getOne(teamWrapper);
+            Team team = lambdaQuery()
+                    .eq(Team::getUuid, joinTeamDTO.getTeamUuid())
+                    .one();
 
             if (team == null) {
                 return Result.fail("团队不存在");
             }
 
             // 检查是否已经是团队成员或已申请
-            QueryWrapper<TeamMember> memberWrapper = new QueryWrapper<>();
-            memberWrapper.eq("team_id", team.getId())
-                    .eq("user_id", userId)
-                    .in("status", "pending", "approved");
-            TeamMember existingMember = teamMemberService.getOne(memberWrapper);
+            TeamMember existingMember = teamMemberService.lambdaQuery()
+                    .eq(TeamMember::getTeamId, team.getId())
+                    .eq(TeamMember::getUserId, userId)
+                    .in(TeamMember::getStatus, "pending", "approved")
+                    .one();
 
             if (existingMember != null) {
                 if ("approved".equals(existingMember.getStatus())) {
@@ -217,15 +215,15 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 更新申请状态
-            UpdateWrapper<TeamMember> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("id", approveJoinDTO.getTeamMemberId())
-                    .set("status", approveJoinDTO.getStatus());
+            boolean updateResult = teamMemberService.lambdaUpdate()
+                    .eq(TeamMember::getId, approveJoinDTO.getTeamMemberId())
+                    .set(TeamMember::getStatus, approveJoinDTO.getStatus())
+                    .set("approved".equals(approveJoinDTO.getStatus()), TeamMember::getJoinTime, LocalDateTime.now())
+                    .update();
 
-            if ("approved".equals(approveJoinDTO.getStatus())) {
-                updateWrapper.set("join_time", LocalDateTime.now());
+            if (!updateResult) {
+                return Result.fail("更新申请状态失败");
             }
-
-            teamMemberService.update(updateWrapper);
 
             String resultMsg = "approved".equals(approveJoinDTO.getStatus()) ? "申请已通过" : "申请已拒绝";
             return Result.ok(resultMsg);
@@ -244,9 +242,9 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 根据UUID查找团队
-            QueryWrapper<Team> teamWrapper = new QueryWrapper<>();
-            teamWrapper.eq("uuid", teamUuid);
-            Team team = getOne(teamWrapper);
+            Team team = lambdaQuery()
+                    .eq(Team::getUuid, teamUuid)
+                    .one();
 
             if (team == null) {
                 return Result.fail("团队不存在");
@@ -268,10 +266,10 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             Long userId = UserHolder.getUser().getId();
 
             // 查询我创建的团队
-            QueryWrapper<Team> wrapper = new QueryWrapper<>();
-            wrapper.eq("leader_id", userId)
-                    .orderByDesc("create_time");
-            List<Team> teams = list(wrapper);
+            List<Team> teams = lambdaQuery()
+                    .eq(Team::getLeaderId, userId)
+                    .orderByDesc(Team::getCreateTime)
+                    .list();
 
             // 构建团队VO列表
             List<TeamVO> teamVOList = teams.stream()
@@ -292,11 +290,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             Long userId = UserHolder.getUser().getId();
 
             // 查询我加入的团队（状态为approved）
-            QueryWrapper<TeamMember> memberWrapper = new QueryWrapper<>();
-            memberWrapper.eq("user_id", userId)
-                    .eq("status", "approved")
-                    .orderByDesc("join_time");
-            List<TeamMember> teamMembers = teamMemberService.list(memberWrapper);
+            List<TeamMember> teamMembers = teamMemberService.lambdaQuery()
+                    .eq(TeamMember::getUserId, userId)
+                    .eq(TeamMember::getStatus, "approved")
+                    .orderByDesc(TeamMember::getJoinTime)
+                    .list();
 
             // 获取团队信息
             List<TeamVO> teamVOList = teamMembers.stream()
@@ -331,11 +329,11 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 查询待审核申请
-            QueryWrapper<TeamMember> wrapper = new QueryWrapper<>();
-            wrapper.eq("team_id", teamId)
-                    .eq("status", "pending")
-                    .orderByAsc("id");
-            List<TeamMember> pendingMembers = teamMemberService.list(wrapper);
+            List<TeamMember> pendingMembers = teamMemberService.lambdaQuery()
+                    .eq(TeamMember::getTeamId, teamId)
+                    .eq(TeamMember::getStatus, "pending")
+                    .orderByAsc(TeamMember::getId)
+                    .list();
 
             // 构建申请VO列表
             List<TeamMemberVO> memberVOList = pendingMembers.stream()
@@ -367,21 +365,21 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 查找成员记录
-            QueryWrapper<TeamMember> wrapper = new QueryWrapper<>();
-            wrapper.eq("team_id", teamId)
-                    .eq("user_id", userId)
-                    .eq("status", "approved");
-            TeamMember teamMember = teamMemberService.getOne(wrapper);
+            TeamMember teamMember = teamMemberService.lambdaQuery()
+                    .eq(TeamMember::getTeamId, teamId)
+                    .eq(TeamMember::getUserId, userId)
+                    .eq(TeamMember::getStatus, "approved")
+                    .one();
 
             if (teamMember == null) {
                 return Result.fail("您不是该团队成员");
             }
 
             // 更新退出时间并逻辑删除
-            UpdateWrapper<TeamMember> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("id", teamMember.getId())
-                    .set("quit_time", LocalDateTime.now());
-            teamMemberService.update(updateWrapper);
+            teamMemberService.lambdaUpdate()
+                    .eq(TeamMember::getId, teamMember.getId())
+                    .set(TeamMember::getQuitTime, LocalDateTime.now())
+                    .update();
             
             // 使用MyBatis-Plus的逻辑删除
             teamMemberService.removeById(teamMember.getId());
@@ -413,19 +411,16 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             // 逻辑删除团队
             removeById(teamId);
 
-            // 逻辑删除所有团队成员记录
-            QueryWrapper<TeamMember> memberWrapper = new QueryWrapper<>();
-            memberWrapper.eq("team_id", teamId);
-            List<TeamMember> members = teamMemberService.list(memberWrapper);
-            
             // 更新退出时间
-            UpdateWrapper<TeamMember> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("team_id", teamId)
-                    .set("quit_time", LocalDateTime.now());
-            teamMemberService.update(updateWrapper);
+            teamMemberService.lambdaUpdate()
+                    .eq(TeamMember::getTeamId, teamId)
+                    .set(TeamMember::getQuitTime, LocalDateTime.now())
+                    .update();
             
             // 逻辑删除所有成员
-            teamMemberService.remove(memberWrapper);
+            teamMemberService.lambdaUpdate()
+                    .eq(TeamMember::getTeamId, teamId)
+                    .remove();
 
             return Result.ok("团队解散成功");
         } catch (Exception e) {
@@ -451,14 +446,18 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 更新团队信息
-            UpdateWrapper<Team> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("id", teamId)
-                    .set("name", createTeamDTO.getName())
-                    .set("description", createTeamDTO.getDescription())
-                    .set("school", createTeamDTO.getSchool())
-                    .set("industry", createTeamDTO.getIndustry())
-                    .set("update_time", LocalDateTime.now());
-            update(updateWrapper);
+            boolean updateResult = lambdaUpdate()
+                    .eq(Team::getId, teamId)
+                    .set(Team::getName, createTeamDTO.getName())
+                    .set(Team::getDescription, createTeamDTO.getDescription())
+                    .set(Team::getSchool, createTeamDTO.getSchool())
+                    .set(Team::getIndustry, createTeamDTO.getIndustry())
+                    .set(Team::getUpdateTime, LocalDateTime.now())
+                    .update();
+
+            if (!updateResult) {
+                return Result.fail("更新团队信息失败");
+            }
 
             return Result.ok("团队信息更新成功");
         } catch (Exception e) {
@@ -489,21 +488,21 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             }
 
             // 查找成员记录
-            QueryWrapper<TeamMember> wrapper = new QueryWrapper<>();
-            wrapper.eq("team_id", teamId)
-                    .eq("user_id", userId)
-                    .eq("status", "approved");
-            TeamMember teamMember = teamMemberService.getOne(wrapper);
+            TeamMember teamMember = teamMemberService.lambdaQuery()
+                    .eq(TeamMember::getTeamId, teamId)
+                    .eq(TeamMember::getUserId, userId)
+                    .eq(TeamMember::getStatus, "approved")
+                    .one();
 
             if (teamMember == null) {
                 return Result.fail("该用户不是团队成员");
             }
 
             // 更新退出时间并逻辑删除成员记录
-            UpdateWrapper<TeamMember> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.eq("id", teamMember.getId())
-                    .set("quit_time", LocalDateTime.now());
-            teamMemberService.update(updateWrapper);
+            teamMemberService.lambdaUpdate()
+                    .eq(TeamMember::getId, teamMember.getId())
+                    .set(TeamMember::getQuitTime, LocalDateTime.now())
+                    .update();
             
             // 使用MyBatis-Plus的逻辑删除
             teamMemberService.removeById(teamMember.getId());
@@ -529,14 +528,17 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
 
         // 获取团队成员数量
-        QueryWrapper<TeamMember> memberWrapper = new QueryWrapper<>();
-        memberWrapper.eq("team_id", team.getId())
-                .eq("status", "approved");
-        Integer memberCount = teamMemberService.count(memberWrapper);
+        Integer memberCount = teamMemberService.lambdaQuery()
+                .eq(TeamMember::getTeamId, team.getId())
+                .eq(TeamMember::getStatus, "approved")
+                .count();
         teamVO.setMemberCount(memberCount);
 
         // 获取团队成员列表
-        List<TeamMember> members = teamMemberService.list(memberWrapper);
+        List<TeamMember> members = teamMemberService.lambdaQuery()
+                .eq(TeamMember::getTeamId, team.getId())
+                .eq(TeamMember::getStatus, "approved")
+                .list();
         List<TeamMemberVO> memberVOList = members.stream()
                 .map(this::buildTeamMemberVO)
                 .collect(Collectors.toList());
