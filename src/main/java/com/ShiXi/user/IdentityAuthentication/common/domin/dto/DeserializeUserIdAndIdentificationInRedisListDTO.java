@@ -7,5 +7,5 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class DeserializeUserIdAndIdentificationInRedisListDTO {
     private Long userId;
-    private String identification;
+    private Integer identification;
 }

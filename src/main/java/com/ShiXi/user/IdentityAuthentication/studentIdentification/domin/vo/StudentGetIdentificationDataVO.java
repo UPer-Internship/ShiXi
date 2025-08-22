@@ -7,12 +7,14 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class StudentGetIdentificationDataVO {
     private Long userId;
-
-    private String identification;
-
-    private String identityCardUrl;
-
-    private String graduationCertificateUrl;
-
-    private String studentIdCardUrl;
+    private Integer identification;
+    private String pictureMaterialUrl;
+    private String name;
+    private String gender;
+    private String birthDate;
+    private String educationLevel;
+    private String university;
+    private String major;
+    private String enrollmentDate;
+    private String graduationDate;
 }

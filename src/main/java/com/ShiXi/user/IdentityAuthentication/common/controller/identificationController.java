@@ -15,11 +15,11 @@ public class identificationController {
     @Resource
     IdentificationService identificationService;
 
-    @PostMapping("/notifyAdminToAudit")
-    @ApiOperation("用户上传的认证资料后通知审核端端口")
-    public Result notifyAdminToAudit(@RequestParam String identification){
-        return identificationService.notifyAdminToAudit(identification);
-    }
+//    @PostMapping("/notifyAdminToAudit")
+//    @ApiOperation("用户上传的认证资料后通知审核端端口")
+//    public Result notifyAdminToAudit(@RequestParam String identification){
+//        return identificationService.notifyAdminToAudit(identification);
+//    }
     @PostMapping("/changeIdentification")
     @ApiOperation("切换身份")
     public Result changeIdentification(@RequestParam String identification){

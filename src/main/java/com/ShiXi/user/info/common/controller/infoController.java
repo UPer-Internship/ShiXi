@@ -1,6 +1,7 @@
 package com.ShiXi.user.info.common.controller;
 
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.user.info.common.domin.dto.changeInfoDTO;
 import com.ShiXi.user.info.studentInfo.domin.dto.StudentChangeInfoDTO;
@@ -29,20 +30,20 @@ public class infoController {
     @ApiOperation("修改用户信息")
     public Result changeInfo(@RequestBody changeInfoDTO reqDTO) {
         //获取当前用户的身份
-        String identification = reqDTO.getIdentification();
-        if(identification.equals("student")){
+        Integer identification = UserHolder.getUser().getIdentification();
+        if(identification.equals(1)){
             StudentChangeInfoDTO studentChangeInfoDTO=new StudentChangeInfoDTO();
             BeanUtils.copyProperties(reqDTO, studentChangeInfoDTO);
             studentInfoService.changeStudentInfo(studentChangeInfoDTO);
             return Result.ok();
         }
-        else if(identification.equals("schoolFriend")){
+        else if(identification.equals(2)){
             return Result.ok();
         }
-        else if(identification.equals("teacher")){
+        else if(identification.equals(3)){
             return Result.ok();
         }
-        else if(identification.equals("enterprise")){
+        else if(identification.equals(4)){
             return Result.ok();
         }
         return Result.fail("未知错误");

@@ -18,10 +18,10 @@ public class UserController {
     private UserService userService;
 
 
-    @PostMapping("/changeInfo")
-    public Result changeUserInfo(@RequestBody UserDTO userDTO){
-        return userService.changeUserInfo(userDTO);
-    }
+//    @PostMapping("/changeInfo")
+//    public Result changeUserInfo(@RequestBody UserDTO userDTO){
+//        return userService.changeUserInfo(userDTO);
+//    }
 
     @GetMapping("/getUserInfoById")
     public Result getUserInfoById(@RequestParam Long id){

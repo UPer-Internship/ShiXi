@@ -15,14 +15,17 @@ public class StudentIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-
     private Long userId;
+    private String pictureMaterialUrl;
+    private String name;
+    private String gender;
+    private String birthDate;
+    private String educationLevel;
+    private String university;
+    private String major;
+    private String enrollmentDate;
+    private String graduationDate;
 
-    private String identityCard;
-
-    private String graduationCertificate;
-
-    private String studentIdCard;
 
 
 }

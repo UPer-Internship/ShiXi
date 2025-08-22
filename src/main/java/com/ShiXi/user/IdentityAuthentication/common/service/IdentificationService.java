@@ -17,7 +17,7 @@ public interface IdentificationService extends IService<Identification> {
 
     Result getIdentificationDataRequest();
 
-    Result notifyAdminToAudit(String identification);
+    void notifyAdminToAudit(Integer identification);
 
     Result passIdentificationDataRequest(Long userId, String identification);
 

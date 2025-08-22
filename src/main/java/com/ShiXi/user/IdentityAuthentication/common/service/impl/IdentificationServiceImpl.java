@@ -174,32 +174,28 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         }
         DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserId, DeserializeUserIdAndIdentificationInRedisListDTO.class);
         Long userId = dto.getUserId();
-        String identification = dto.getIdentification();
-        if(identification.equals("student")){
+        Integer identification = dto.getIdentification();
+        if(identification.equals(1)){
             StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
-        else if(identification.equals("teacher")){
+        else if(identification.equals(2)){
             TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
-        else if(identification.equals("schoolFriend")){
+        else if(identification.equals(3)){
             SchoolFriendGetIdentificationDataVO identificationDataByUserId = schoolFriendIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
-        else if(identification.equals("enterprise")){
+        else if(identification.equals(4)){
             EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(userId);
-            return Result.ok(identificationDataByUserId);
-        }
-        else if(identification.equals("studentTeam")){
-            StudentTeamGetIdentificationDataVO identificationDataByUserId = studentTeamIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
         return Result.fail("未知错误");
     }
 
     @Override
-    public Result notifyAdminToAudit(String identification) {
+    public void notifyAdminToAudit(Integer identification) {
         Long userId = UserHolder.getUser().getId();
         String key = "waitForAuditingList:";
         DeserializeUserIdAndIdentificationInRedisListDTO dto = new DeserializeUserIdAndIdentificationInRedisListDTO();
@@ -207,7 +203,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
                 .setUserId(userId);
         String value = JSONUtil.toJsonStr(dto);
         stringRedisTemplate.opsForList().rightPush(key, value);
-        return Result.ok();
+
 
     }
 
