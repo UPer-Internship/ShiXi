@@ -22,7 +22,7 @@ public class identificationController {
 //    }
     @PostMapping("/changeIdentification")
     @ApiOperation("切换身份")
-    public Result changeIdentification(@RequestParam String identification){
+    public Result changeIdentification(@RequestParam Integer identification){
         return identificationService.changeIdentification(identification);
     }
     @GetMapping("/getCurrentIdentification")

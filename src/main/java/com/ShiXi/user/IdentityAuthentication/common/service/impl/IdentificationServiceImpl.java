@@ -72,7 +72,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     //TODO 异步逻辑尚为完成
     //TODO 复用抽象尚未完成
     @Override
-    public Result changeIdentification(String identification) {
+    public Result changeIdentification(Integer identification) {
         Long userId = UserHolder.getUser().getId();
         String token = LOGIN_USER_KEY + UserHolder.getUser().getToken();
         String userDTOJson = stringRedisTemplate.opsForValue().get(token);
@@ -84,7 +84,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         if(identification==null){
             Result.fail("请选择身份");
         }
-        else if (identification.equals("student")) {
+        else if (identification.equals(1)) {
             if(identificationStatus.getIsStudent()==3){
                 userDTO.setIdentification(1);
                 stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
@@ -95,7 +95,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             }
             else return Result.fail("此身份未验证");
         }
-        else if (identification.equals("schoolFriend")) {
+        else if (identification.equals(2)) {
             if(identificationStatus.getIsSchoolFriend()==3){
                 userDTO.setIdentification(2);
                 stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
@@ -106,7 +106,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             }
             else return Result.fail("此身份未验证");
         }
-        else if (identification.equals("teacher")) {
+        else if (identification.equals(3)) {
             if(identificationStatus.getIsTeacher()==3){
                 userDTO.setIdentification(3);
                 stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
@@ -117,7 +117,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             }
             else return Result.fail("此身份未验证");
         }
-        else if (identification.equals("enterprise")) {
+        else if (identification.equals(4)) {
             if(identificationStatus.getIsEnterprise()==3){
                 userDTO.setIdentification(4);
                 stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
@@ -128,18 +128,18 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             }
             else return Result.fail("此身份未验证");
         }
-        else if (identification.equals("studentTeam")) {
-            if(identificationStatus.getIsStudentTeam()==3){
-                userDTO.setIdentification(5);
-                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
-                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
-                        .set(CurrentIdentification::getCurrentIdentification, 5)
-                        .update();
-                    return Result.ok();
-            }
-            else return Result.fail("此身份未验证");
-        }
-        else if (identification.equals("admin")) {
+//        else if (identification.equals("studentTeam")) {
+//            if(identificationStatus.getIsStudentTeam()==3){
+//                userDTO.setIdentification(5);
+//                stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
+//                currentIdentificationService.lambdaUpdate().eq(CurrentIdentification::getUserId, userId)
+//                        .set(CurrentIdentification::getCurrentIdentification, 5)
+//                        .update();
+//                    return Result.ok();
+//            }
+//            else return Result.fail("此身份未验证");
+//        }
+        else if (identification.equals(6)) {
             if(identificationStatus.getIsAdmin()==3){
                 userDTO.setIdentification(6);
                 stringRedisTemplate.opsForValue().set(token, JSONUtil.toJsonStr(userDTO));
