@@ -176,6 +176,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         User user = new User();
         user.setPhone(phone);
         user.setNickName(RandomUtil.randomString(10));
+        user.setUuid(UUID.randomUUID().toString(true));// 生成uuid并赋值
         save(user);
         // 初始化身份认证
         Identification identification = new Identification();
@@ -200,7 +201,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         //初始化当前身份
         CurrentIdentification currentIdentification = new CurrentIdentification();
         currentIdentification.setUserId(user.getId());
-        currentIdentificationService .save(currentIdentification);
+        currentIdentificationService.save(currentIdentification);
         return user;
     }
 
