@@ -11,6 +11,7 @@ import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.common.service.OptionsService;
 import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;
+import com.ShiXi.common.utils.UuidGenerator;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
 import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
@@ -72,6 +73,8 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     private SchoolFriendIdentificationService schoolFriendIdentificationService;
     @Resource
     CurrentIdentificationService currentIdentificationService;;
+    @Resource
+    UuidGenerator uuidGenerator;
     @Override
     public Result loginByPhone(String phone, String code) {
         if (RegexUtils.isPhoneInvalid(phone)) {
@@ -175,8 +178,9 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         // 1.创建用户
         User user = new User();
         user.setPhone(phone);
+        String uuid = uuidGenerator.generateUuid(8, "BASE_62");
         user.setNickName(RandomUtil.randomString(10));
-        user.setUuid(UUID.randomUUID().toString(true));// 生成uuid并赋值
+        user.setUuid(uuid);
         save(user);
         // 初始化身份认证
         Identification identification = new Identification();

@@ -15,8 +15,6 @@ public class changeInfoDTO {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;// 用户id
-    private String identification;
-
     private String nickName;
     private String icon = "";
     private String gender;
