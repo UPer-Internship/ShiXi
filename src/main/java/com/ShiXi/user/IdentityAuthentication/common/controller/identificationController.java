@@ -38,17 +38,17 @@ public class identificationController {
     }
 
     //TODO 设置相关管理权限 只有管理账号能看
-    @GetMapping("admin/getIdentificationDataRequest")
+    @GetMapping("/admin/getIdentificationDataRequest")
     @ApiOperation("管理端获取审核身份验证资料")
     public Result getIdentificationDataRequest(){
         return identificationService.getIdentificationDataRequest();
     }
-    @PostMapping("admin/passIdentificationDataRequest")
+    @PostMapping("/admin/passIdentificationDataRequest")
     @ApiOperation("管理端通过审核身份验证资料")
     public Result passIdentificationDataRequest(Long userId,String  identification){
         return identificationService.passIdentificationDataRequest(userId,identification);
     }
-    @PostMapping("admin/refuseIdentificationDataRequest")
+    @PostMapping("/admin/refuseIdentificationDataRequest")
     @ApiOperation("管理端不通过审核身份验证资料")
     public Result refuseIdentificationDataRequest(Long userId,String  identification){
         return identificationService.refuseIdentificationDataRequest(userId,identification);
