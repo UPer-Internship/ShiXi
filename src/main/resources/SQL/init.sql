@@ -312,3 +312,40 @@ CREATE TABLE `team_member`
     KEY (`team_id`),
     KEY (`user_id`)
 )COMMENT '团队成员关系表';
+CREATE TABLE sys_role_permission (
+                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     role_id BIGINT NOT NULL COMMENT '角色ID',
+                                     perm_id BIGINT NOT NULL COMMENT '权限ID',
+                                     UNIQUE KEY uk_role_perm (role_id, perm_id), -- 避免重复关联
+                                     FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE,
+                                     FOREIGN KEY (perm_id) REFERENCES sys_permission(id) ON DELETE CASCADE
+) COMMENT '角色-权限关联表';
+
+CREATE TABLE sys_user_role (
+                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                               user_id BIGINT NOT NULL COMMENT '用户ID',
+                               role_id BIGINT NOT NULL COMMENT '角色ID',
+                               UNIQUE KEY uk_user_role (user_id, role_id), -- 避免重复关联
+                               FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE,
+                               FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE
+) COMMENT '用户-角色关联表';
+
+CREATE TABLE sys_permission (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                perm_name VARCHAR(100) NOT NULL COMMENT '权限名称',
+                                perm_code VARCHAR(100) NOT NULL UNIQUE COMMENT '权限编码(如user:list)',
+                                perm_type TINYINT COMMENT '权限类型(1=菜单,2=按钮,3=接口)',
+                                url VARCHAR(255) COMMENT '接口路径',
+                                method VARCHAR(10) COMMENT '请求方法(GET/POST等)',
+                                parent_id BIGINT COMMENT '父权限ID',
+                                sort INT DEFAULT 0 COMMENT '排序号',
+                                FOREIGN KEY (parent_id) REFERENCES sys_permission(id) ON DELETE SET NULL
+) COMMENT '权限表';
+
+CREATE TABLE sys_role (
+                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          role_name VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
+                          role_code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码(如ROLE_ADMIN)',
+                          description VARCHAR(200) COMMENT '角色描述',
+                          create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+) COMMENT '角色表';
