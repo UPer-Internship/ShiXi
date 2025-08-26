@@ -391,125 +391,53 @@ CREATE TABLE `team`
 DROP TABLE IF EXISTS `team_member`;
 CREATE TABLE `team_member`
 (
-    `id`             bigint                                                                                  NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    `team_id`        bigint                                                                                  NOT NULL COMMENT '团队ID，外键到团队表',
-    `user_id`        bigint                                                                                  NOT NULL COMMENT '用户ID，外键到用户表',
-    `role`           enum ('leader','member') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci               NULL     DEFAULT NULL COMMENT '成员角色，leader表示团队负责人，member表示普通成员',
-    `responsibility` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci                                   NULL COMMENT '成员职责描述',
-    `apply_reason`   text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci                                   NULL COMMENT '申请说明',
-    `join_time`      datetime                                                                                NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
-    `quit_time`      datetime                                                                                NULL     DEFAULT NULL COMMENT '退出时间',
-    `status`         enum ('pending','approved','rejected') CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL COMMENT '申请状态，pending表示待审核，approved表示审核通过，rejected表示审核拒绝',
-    `is_deleted`     tinyint                                                                                 NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
-    PRIMARY KEY (`id`) USING BTREE,
-    INDEX `team_id` (`team_id` ASC) USING BTREE,
-    INDEX `user_id` (`user_id` ASC) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb3
-  COLLATE = utf8mb3_general_ci COMMENT = '团队成员关系表';
+    `id`        BIGINT                                   NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    `team_id`   BIGINT                                   NOT NULL COMMENT '团队ID，外键到团队表',
+    `user_id`   BIGINT                                   NOT NULL COMMENT '用户ID，外键到用户表',
+    `role`      ENUM ('leader', 'member')                COMMENT '成员角色，leader表示团队负责人，member表示普通成员',
+    `responsibility` TEXT COMMENT '成员职责描述',
+    `apply_reason` TEXT COMMENT '申请说明',
+    `join_time` DATETIME                                 NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
+    `quit_time` DATETIME COMMENT '退出时间',
+    `status`    ENUM ('pending', 'approved', 'rejected') NOT NULL COMMENT '申请状态，pending表示待审核，approved表示审核通过，rejected表示审核拒绝',
+    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    KEY (`team_id`),
+    KEY (`user_id`)
+)COMMENT '团队成员关系表';
+CREATE TABLE sys_role_permission (
+                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                     role_id BIGINT NOT NULL COMMENT '角色ID',
+                                     perm_id BIGINT NOT NULL COMMENT '权限ID',
+                                     UNIQUE KEY uk_role_perm (role_id, perm_id), -- 避免重复关联
+                                     FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE,
+                                     FOREIGN KEY (perm_id) REFERENCES sys_permission(id) ON DELETE CASCADE
+) COMMENT '角色-权限关联表';
 
+CREATE TABLE sys_user_role (
+                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                               user_id BIGINT NOT NULL COMMENT '用户ID',
+                               role_id BIGINT NOT NULL COMMENT '角色ID',
+                               UNIQUE KEY uk_user_role (user_id, role_id), -- 避免重复关联
+                               FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE,
+                               FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE
+) COMMENT '用户-角色关联表';
 
--- ----------------------------
--- Table structure for university
--- ----------------------------
-DROP TABLE IF EXISTS `university`;
-CREATE TABLE `university`
-(
-    `id`              int                                                           NOT NULL AUTO_INCREMENT,
-    `university_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL,
-    `designation`     varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL COMMENT '985 211 双一流 一本 二本 。。。。\r\n',
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb3
-  COLLATE = utf8mb3_general_ci;
+CREATE TABLE sys_permission (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                perm_name VARCHAR(100) NOT NULL COMMENT '权限名称',
+                                perm_code VARCHAR(100) NOT NULL UNIQUE COMMENT '权限编码(如user:list)',
+                                perm_type TINYINT COMMENT '权限类型(1=菜单,2=按钮,3=接口)',
+                                url VARCHAR(255) COMMENT '接口路径',
+                                method VARCHAR(10) COMMENT '请求方法(GET/POST等)',
+                                parent_id BIGINT COMMENT '父权限ID',
+                                sort INT DEFAULT 0 COMMENT '排序号',
+                                FOREIGN KEY (parent_id) REFERENCES sys_permission(id) ON DELETE SET NULL
+) COMMENT '权限表';
 
-
--- ----------------------------
--- Table structure for user
--- ----------------------------
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE `user`
-(
-    `id`          bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '用户ID',
-    `uuid`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '用户唯一标识符',
-    `phone`       varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NOT NULL COMMENT '电话号码',
-    `openid`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '微信开放id',
-    `password`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '密码',
-    `nick_name`   varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '昵称',
-    `icon`        varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT '' COMMENT '头像',
-    `create_time` datetime                                                      NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime                                                      NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `gender`      varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL     DEFAULT NULL COMMENT '性别',
-    `name`        varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL     DEFAULT NULL COMMENT '真实姓名\r\n',
-    `birth_date`  varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL     DEFAULT NULL COMMENT '生日',
-    `wechat`      varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '微信',
-    `is_deleted`  tinyint(1)                                                    NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
-    PRIMARY KEY (`id`) USING BTREE,
-    INDEX `uuid` (`uuid` ASC) USING BTREE,
-    INDEX `phone` (`phone` ASC) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户表';
-
--- ----------------------------
--- Table structure for user_enterprise_info
--- ----------------------------
-DROP TABLE IF EXISTS `user_enterprise_info`;
-CREATE TABLE `user_enterprise_info`
-(
-    `id` bigint NOT NULL,
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb3
-  COLLATE = utf8mb3_general_ci;
-
--- ----------------------------
--- Table structure for user_school_friend_info
--- ----------------------------
-DROP TABLE IF EXISTS `user_school_friend_info`;
-CREATE TABLE `user_school_friend_info`
-(
-    `id`      bigint                                                        NOT NULL,
-    `user_id` bigint                                                        NOT NULL,
-    `name`    varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL DEFAULT NULL,
-    PRIMARY KEY (`id` DESC) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb3
-  COLLATE = utf8mb3_general_ci;
-
--- ----------------------------
--- Table structure for user_student_info
--- ----------------------------
-DROP TABLE IF EXISTS `user_student_info`;
-CREATE TABLE `user_student_info`
-(
-    `id`                bigint                                                        NOT NULL AUTO_INCREMENT COMMENT 'ID',
-    `user_id`           bigint                                                        NOT NULL COMMENT '用户ID, 外键',
-    `school_name`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '学校名称',
-    `major`             varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '专业名称',
-    `graduation_date`   varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL     DEFAULT NULL COMMENT '毕业时间，格式：YYYY-MM-DD',
-    `education_level`   varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci  NULL     DEFAULT NULL COMMENT '学历（本科、大专等）',
-    `advantages`        text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci         NULL COMMENT '个人优势',
-    `expected_position` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL     DEFAULT NULL COMMENT '期望职位，例如：互联网-产品实习生',
-    `create_time`       datetime                                                      NULL     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`       datetime                                                      NULL     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `is_deleted`        tinyint(1)                                                    NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
-    PRIMARY KEY (`id`) USING BTREE,
-    INDEX `idx_user_id` (`user_id` ASC) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci COMMENT = '在线简历表';
-
--- ----------------------------
--- Table structure for user_teacher_info
--- ----------------------------
-DROP TABLE IF EXISTS `user_teacher_info`;
-CREATE TABLE `user_teacher_info`
-(
-    `id`      bigint NOT NULL,
-    `user_id` bigint NOT NULL,
-    PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB
-  CHARACTER SET = utf8mb3
-  COLLATE = utf8mb3_general_ci;
-SET FOREIGN_KEY_CHECKS = 1;
+CREATE TABLE sys_role (
+                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                          role_name VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
+                          role_code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码(如ROLE_ADMIN)',
+                          description VARCHAR(200) COMMENT '角色描述',
+                          create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+) COMMENT '角色表';
