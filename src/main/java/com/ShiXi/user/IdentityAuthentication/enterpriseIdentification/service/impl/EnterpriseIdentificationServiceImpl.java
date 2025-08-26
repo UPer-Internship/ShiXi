@@ -1,5 +1,6 @@
 package com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.EnterpriseIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
@@ -14,117 +15,133 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
+/**
+ * 企业身份认证服务实现类
+ */
 @Slf4j
 @Service
 public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseIdentificationMapper, EnterpriseIdentification> implements EnterpriseIdentificationService {
 
     @Resource
-    private  OSSUploadService ossPictureService;
+    IdentificationService identificationService;
+
     @Resource
-    private IdentificationService identificationService;
-    // 存储目录
-    private static final String ENTERPRISE_ID_CARD_DIR = "enterpriseIdCard/";
+    OSSUploadService ossPictureService;
+
+    // 企业认证图片存储目录
+    private static final String ENTERPRISE_IDENTIFICATION_PICTURE_MATERIAL_URL = "enterprise_picture_material_url/";
 
     @Override
-    public Result getMyIdentificationData() {
-        //查询用户id
+    @Transactional(rollbackFor = Exception.class)
+    public Result uploadIdentificationPictureData(MultipartFile file) {
+        // 获取用户id
         Long userId = UserHolder.getUser().getId();
-        //查询该用户的学生身份上传资料
+        
+        // 查询现有的企业认证信息
         EnterpriseIdentification enterpriseIdentification = lambdaQuery()
                 .eq(EnterpriseIdentification::getUserId, userId)
                 .one();
-        //判空
+        
+        // 如果存在旧的认证图片，先删除
+        if (enterpriseIdentification != null && enterpriseIdentification.getBusinessLicense() != null) {
+            String oldUrl = enterpriseIdentification.getBusinessLicense();
+            ossPictureService.deletePicture(oldUrl);
+        }
+        
+        // 上传新的认证图片
+        String url = ossPictureService.uploadPicture(file, ENTERPRISE_IDENTIFICATION_PICTURE_MATERIAL_URL);
+        
+        // 更新数据库中的图片URL
+        LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
+        updateWrapper.set(EnterpriseIdentification::getBusinessLicense, url);
+        update(updateWrapper);
+        
+        // 设置对应的审核状态：待审核（企业认证为2）
+        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
+        statusUpdateWrapper.eq(Identification::getUserId, userId)
+                .set(Identification::getIsEnterprise, 1);
+        identificationService.update(statusUpdateWrapper);
+        
+        log.info("用户[{}]企业身份认证图片上传成功", userId);
+        return Result.ok();
+    }
+
+    @Override
+    public Result getMyIdentificationData() {
+        // 查询用户id
+        Long userId = UserHolder.getUser().getId();
+        
+        // 查询该用户的企业身份上传资料
+        EnterpriseIdentification enterpriseIdentification = lambdaQuery()
+                .eq(EnterpriseIdentification::getUserId, userId)
+                .one();
+        
+        // 判空
         if (enterpriseIdentification == null) {
             return Result.fail("出现错误");
         }
-        //构造vo对象
-        EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = new EnterpriseGetIdentificationDataVO();
-        enterpriseGetIdentificationDataVO.setEnterpriseScale(enterpriseIdentification.getEnterpriseScale())
-                .setEnterpriseName(enterpriseIdentification.getEnterpriseName())
-                .setEnterpriseType(enterpriseIdentification.getEnterpriseType())
-                .setEnterpriseIdCard(enterpriseIdentification.getEnterpriseIdCard());
-
+        
+        // 构造vo对象
+        EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = 
+                BeanUtil.toBean(enterpriseIdentification, EnterpriseGetIdentificationDataVO.class);
+        enterpriseGetIdentificationDataVO.setIdentification(2); // 企业认证标识为2
+        enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getBusinessLicense());
+        
         return Result.ok(enterpriseGetIdentificationDataVO);
     }
 
     @Override
-    public Result uploadIdentificationTextData(EnterpriseUploadIdentificationTextDataReqDTO reqDTO) {
-        Long userId = UserHolder.getUser().getId();
-        LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
-        if (reqDTO.getEnterpriseName() != null) {
-            updateWrapper.set(EnterpriseIdentification::getEnterpriseName, reqDTO.getEnterpriseName());
-        }
-        if (reqDTO.getEnterpriseScale() != null) {
-            updateWrapper.set(EnterpriseIdentification::getEnterpriseScale, reqDTO.getEnterpriseScale());
-        }
-        if (reqDTO.getEnterpriseType() != null) {
-            updateWrapper.set(EnterpriseIdentification::getEnterpriseType, reqDTO.getEnterpriseType());
-        }
-        //设置对应的审核状态：待审核
-        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-        statusUpdateWrapper.eq(Identification::getUserId, userId)
-                .set(Identification::getIsEnterprise, 1);
-        boolean success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
-        if (success) {
-            return Result.ok();
-        }
-        return Result.fail("更新失败");
-    }
-
-    @Override
     public EnterpriseGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
-        //查询该用户的学生身份上传资料
+        // 查询该用户的企业身份上传资料
         EnterpriseIdentification enterpriseIdentification = lambdaQuery()
                 .eq(EnterpriseIdentification::getUserId, userId)
                 .one();
-        //判空
+        
+        // 判空
         if (enterpriseIdentification == null) {
             return null;
         }
-        //构造vo对象
-        EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = new EnterpriseGetIdentificationDataVO();
-        enterpriseGetIdentificationDataVO.setEnterpriseScale(enterpriseIdentification.getEnterpriseScale())
-                .setEnterpriseName(enterpriseIdentification.getEnterpriseName())
-                .setEnterpriseType(enterpriseIdentification.getEnterpriseType())
-                .setUserId(userId)
-                .setIdentification("enterprise")
-                .setEnterpriseIdCard(enterpriseIdentification.getEnterpriseIdCard());
-
+        
+        // 构造vo对象
+        EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = 
+                BeanUtil.toBean(enterpriseIdentification, EnterpriseGetIdentificationDataVO.class);
+        enterpriseGetIdentificationDataVO.setIdentification(2); // 企业认证标识为2
+        enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getBusinessLicense());
+        
         return enterpriseGetIdentificationDataVO;
     }
 
     @Override
-    public Result uploadIdentificationPictureData(String type, MultipartFile file) {
-                // 获取用户id
+    @Transactional(rollbackFor = Exception.class)
+    public Result uploadIdentificationTextData(EnterpriseUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
-        String url = "";
-        boolean success = false;
-        if (type.equals("enterpriseIdCard")) {
-            // 删除旧的认证
-            EnterpriseIdentification enterpriseIdentification = lambdaQuery().eq(EnterpriseIdentification::getUserId, userId).one();
-            url = enterpriseIdentification.getEnterpriseIdCard();
-            ossPictureService.deletePicture(url);
-            // 上传新的认证
-            url = ossPictureService.uploadPicture(file, ENTERPRISE_ID_CARD_DIR);
-            LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
-            updateWrapper.set(EnterpriseIdentification::getEnterpriseIdCard, url);
-            //设置对应的审核状态：待审核
-            LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-            statusUpdateWrapper.eq(Identification::getUserId, userId)
-                    .set(Identification::getIsEnterprise, 1);
-            success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
-        }
-
-        if (success) {
-            return Result.ok();
-        }
-        return Result.fail("更新失败");
+        
+        // 将DTO转换为实体对象
+        EnterpriseIdentification enterpriseIdentification = BeanUtil.copyProperties(reqDTO, EnterpriseIdentification.class);
+        enterpriseIdentification.setUserId(userId);
+        
+        // 更新企业认证信息
+        LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
+        update(enterpriseIdentification, updateWrapper);
+        
+        // 设置身份认证状态（企业认证为2）
+        identificationService.lambdaUpdate()
+                .eq(Identification::getUserId, userId)
+                .set(Identification::getIsEnterprise, 1)
+                .update();
+        
+        log.info("用户[{}]企业身份认证信息上传成功", userId);
+        
+        // 通知管理员审核（企业认证类型为2）
+        identificationService.notifyAdminToAudit(2);
+        
+        return Result.ok();
     }
-
 }

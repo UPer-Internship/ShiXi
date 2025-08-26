@@ -1,6 +1,5 @@
 package com.ShiXi.team.service.impl;
 
-import cn.hutool.core.lang.UUID;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.team.domin.dto.CreateTeamDTO;
 import com.ShiXi.team.domin.dto.JoinTeamDTO;
@@ -14,6 +13,7 @@ import com.ShiXi.team.service.TeamService;
 import com.ShiXi.team.service.TeamMemberService;
 import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.common.utils.UuidGenerator;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +36,9 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private UuidGenerator uuidGenerator;
 
     @Override
     @Transactional
@@ -70,7 +73,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
             // 创建团队
             Team team = new Team();
             BeanUtils.copyProperties(createTeamDTO, team);
-            team.setUuid(UUID.randomUUID().toString());
+            team.setUuid(uuidGenerator.generateUuid(8, "BASE_62"));
             team.setLeaderId(userId);
             team.setCreateTime(LocalDateTime.now());
             team.setUpdateTime(LocalDateTime.now());

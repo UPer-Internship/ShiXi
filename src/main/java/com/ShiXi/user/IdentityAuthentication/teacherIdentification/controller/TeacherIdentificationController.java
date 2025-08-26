@@ -16,20 +16,24 @@ import javax.annotation.Resource;
 @RequestMapping("/user/identification/teacher")
 @Api(tags = "教师认证资料接口")
 public class TeacherIdentificationController {
+
     @Resource
     TeacherIdentificationService teacherIdentificationService;
+
     @PostMapping("/uploadIdentificationData/fileType")
-    @ApiOperation("教师发起身份验证，上传图片（身份证，教师从业资格证）资料")
-    public Result uploadIdentificationPictureData(@RequestParam String type, @RequestParam MultipartFile file){
-        return teacherIdentificationService.uploadIdentificationPictureData(type, file);
+    @ApiOperation("教师发起身份验证，上传图片（身份证，教师证，工作证明）资料")
+    public Result uploadIdentificationPictureData(@RequestParam MultipartFile file){
+        return teacherIdentificationService.uploadIdentificationPictureData(file);
     }
+
     @PostMapping("/uploadIdentificationData/textType")
-    @ApiOperation("教师发起身份验证，上传非图片资料（名字，学校，专业）")
+    @ApiOperation("教师发起身份验证，上传非图片资料（名字，学校，学院）")
     public Result uploadIdentificationTextData(@RequestBody TeacherUploadIdentificationTextDataReqDTO reqDTO){
         return teacherIdentificationService.uploadIdentificationTextData(reqDTO);
     }
+
     @GetMapping("/getMyIdentificationData")
-    @ApiOperation("查看自己作为教师身份验证资料")
+    @ApiOperation("查看自己的图片类身份验证资料")
     public Result getMyIdentificationData(){
         return teacherIdentificationService.getMyIdentificationData();
     }

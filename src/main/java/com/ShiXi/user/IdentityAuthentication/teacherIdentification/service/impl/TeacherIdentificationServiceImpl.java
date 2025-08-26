@@ -1,5 +1,6 @@
 package com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.TeacherIdentificationMapper;
 import com.ShiXi.common.service.OSSUploadService;
@@ -14,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -23,17 +25,46 @@ import javax.annotation.Resource;
 public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentificationMapper, TeacherIdentification> implements TeacherIdentificationService {
 
     @Resource
-    OSSUploadService ossPictureService;
+    IdentificationService identificationService;
 
     @Resource
-    private IdentificationService identificationService;
+    OSSUploadService ossPictureService;
 
-    private static final String TEACHER_ID_CARD_DIR = "teacherIdCard/";
+    // 教师认证图片存储目录
+    private static final String TEACHER_IDENTIFICATION_PICTURE_MATERIAL_URL = "teacher_picture_material_url/";
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result uploadIdentificationPictureData(MultipartFile file) {
+        //获取用户id
+        Long userId = UserHolder.getUser().getId();
+        //删除旧的认证
+        TeacherIdentification teacherIdentification = lambdaQuery().eq(TeacherIdentification::getUserId, userId).one();
+        if (teacherIdentification != null) {
+            String url = teacherIdentification.getWorkCertificate(); // 修正：使用workCertificate字段
+            if (url != null) {
+                ossPictureService.deletePicture(url);
+            }
+        }
+        //上传新的认证
+        String url = ossPictureService.uploadPicture(file, TEACHER_IDENTIFICATION_PICTURE_MATERIAL_URL);
+        LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(TeacherIdentification::getUserId, userId);
+        updateWrapper.set(TeacherIdentification::getWorkCertificate, url); // 修正：使用workCertificate字段
+        update(updateWrapper);
+        //设置对应的审核状态：待审核
+        identificationService.lambdaUpdate()
+                .eq(Identification::getUserId, userId)
+                .set(Identification::getIsTeacher, 1)
+                .update();
+        return Result.ok();
+    }
+
     @Override
     public Result getMyIdentificationData() {
         //查询用户id
         Long userId = UserHolder.getUser().getId();
-        //查询该用户的教师团队上传资料
+        //查询该用户的教师身份上传资料
         TeacherIdentification teacherIdentification = lambdaQuery()
                 .eq(TeacherIdentification::getUserId, userId)
                 .one();
@@ -42,16 +73,14 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
             return Result.fail("出现错误");
         }
         //构造vo对象
-        TeacherGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherGetIdentificationDataVO();
-        teacherTeamGetIdentificationDataVO.setName(teacherIdentification.getName())
-                .setSchoolName(teacherIdentification.getSchoolName())
-                .setMajor(teacherIdentification.getMajor())
-                .setTeacherIdCardUrl(teacherIdentification.getTeacherIdCard());
-        return Result.ok(teacherTeamGetIdentificationDataVO);
+        TeacherGetIdentificationDataVO teacherGetIdentificationDataVO = BeanUtil.toBean(teacherIdentification, TeacherGetIdentificationDataVO.class);
+        teacherGetIdentificationDataVO.setIdentification(2); // 2表示教师身份
+        return Result.ok(teacherGetIdentificationDataVO);
     }
 
     @Override
     public TeacherGetIdentificationDataVO getIdentificationDataByUserId(Long userId) {
+        //查询该用户的教师身份上传资料
         TeacherIdentification teacherIdentification = lambdaQuery()
                 .eq(TeacherIdentification::getUserId, userId)
                 .one();
@@ -60,68 +89,26 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
             return null;
         }
         //构造vo对象
-        TeacherGetIdentificationDataVO teacherTeamGetIdentificationDataVO = new TeacherGetIdentificationDataVO();
-        teacherTeamGetIdentificationDataVO.setName(teacherIdentification.getName())
-                .setSchoolName(teacherIdentification.getSchoolName())
-                .setMajor(teacherIdentification.getMajor())
-                .setUserId(userId)
-                .setIdentification("teacher")
-                .setTeacherIdCardUrl(teacherIdentification.getTeacherIdCard());
-        return teacherTeamGetIdentificationDataVO;
-    }
-
-
-    @Override
-    public Result uploadIdentificationPictureData(String type, MultipartFile file) {
-        // 获取用户id
-        Long userId = UserHolder.getUser().getId();
-        String url = "";
-        boolean success = false;
-        if (type.equals("teacherIdCard")) {
-            // 删除旧的认证
-            TeacherIdentification teacherIdentification = lambdaQuery().eq(TeacherIdentification::getUserId, userId).one();
-            url = teacherIdentification.getTeacherIdCard();
-            ossPictureService.deletePicture(url);
-            // 上传新的认证
-            url = ossPictureService.uploadPicture(file, TEACHER_ID_CARD_DIR);
-            LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.eq(TeacherIdentification::getUserId, userId);
-            updateWrapper.set(TeacherIdentification::getTeacherIdCard, url);
-            //设置对应的审核状态：待审核
-            LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-            statusUpdateWrapper.eq(Identification::getUserId, userId)
-                    .set(Identification::getIsTeacher, 1);
-            success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
-        }
-        if (success) {
-            return Result.ok();
-        }
-        return Result.fail("更新失败");
+        TeacherGetIdentificationDataVO teacherGetIdentificationDataVO = BeanUtil.toBean(teacherIdentification, TeacherGetIdentificationDataVO.class);
+        teacherGetIdentificationDataVO.setIdentification(2); // 2表示教师身份
+        return teacherGetIdentificationDataVO;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result uploadIdentificationTextData(TeacherUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
+        TeacherIdentification teacherIdentification = BeanUtil.copyProperties(reqDTO, TeacherIdentification.class);
+        teacherIdentification.setUserId(userId);
         LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(TeacherIdentification::getUserId, userId);
-        if (reqDTO.getName() != null) {
-            updateWrapper.set(TeacherIdentification::getName, reqDTO.getName());
-        }
-        if (reqDTO.getSchoolName() != null) {
-            updateWrapper.set(TeacherIdentification::getSchoolName, reqDTO.getSchoolName());
-        }
-        if (reqDTO.getMajor() != null) {
-            updateWrapper.set(TeacherIdentification::getMajor, reqDTO.getMajor());
-        }
-        //设置对应的审核状态：待审核
-        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-        statusUpdateWrapper.eq(Identification::getUserId, userId)
-                .set(Identification::getIsTeacher, 1);
-        boolean success = update(updateWrapper)&&identificationService.update(statusUpdateWrapper);
-
-        if (success) {
-            return Result.ok();
-        }
-        return Result.fail("更新失败");
+        update(teacherIdentification, updateWrapper);
+        identificationService.lambdaUpdate()
+                .eq(Identification::getUserId, userId)
+                .set(Identification::getIsTeacher, 1)
+                .update();
+        log.info("用户[{}]教师身份认证信息上传成功", userId);
+        identificationService.notifyAdminToAudit(2); // 2表示教师认证类型
+        return Result.ok();
     }
 }
