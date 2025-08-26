@@ -1,16 +1,11 @@
-package com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo;
+package com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.dto;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 
 @Data
-@Accessors(chain = true)
-public class SchoolFriendGetIdentificationDataVO {
-    private Long userId; // 用户ID
-    private Integer identification; // 认证状态
-    private String graduationCertificate; // 毕业证书
+public class SchoolFriendUploadIdentificationTextDataReqDTO {
     private String name; // 姓名
     private String gender; // 性别
     private LocalDate birthDate; // 出生日期

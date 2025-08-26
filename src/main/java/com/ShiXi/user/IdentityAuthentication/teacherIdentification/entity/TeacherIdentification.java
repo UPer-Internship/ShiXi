@@ -8,24 +8,52 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
+/**
+ * 教师身份认证实体类
+ */
 @Data
 @Accessors(chain = true)
 @TableName("teacher_identification")
 public class TeacherIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    // 主键ID
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     
+    // 用户ID
     private Long userId;
     
+    // 教师姓名
     private String name;
     
-    private String schoolName;
-
-    private String major;
+    // 教师昵称
+    private String nickname;
     
-    private String teacherIdCard;
+    // 性别
+    private String gender;
+    
+    // 出生日期
+    private LocalDate birthDate;
+    
+    // 学校名称
+    private String university;
+    
+    // 学院名称
+    private String school;
+    
+    // 入职时间
+    private LocalDate joinDate;
+    
+    // 邮箱地址
+    private String email;
+    
+    // 工作证明
+    private String workCertificate;
+    
+    // 逻辑删除标志，0-未删除，1-已删除
     @TableLogic
     private Integer isDeleted;
 }
