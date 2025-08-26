@@ -90,18 +90,18 @@ CREATE TABLE `current_identification`
 DROP TABLE IF EXISTS `enterprise_identification`;
 CREATE TABLE `enterprise_identification`
 (
-    `id`                 bigint                                                        NOT NULL AUTO_INCREMENT,
-    `user_id`            bigint                                                        NOT NULL COMMENT '用户ID',
-    `enterprise_name`    varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业名称',
-    `your_position`     varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '你的职位',
-    `enterprise_scale`   varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业规模',
-    `enterprise_industry` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT ''COMMENT '企业所属行业',
-    `enterprise_address` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业地址',
+    `id`                  bigint                                                        NOT NULL AUTO_INCREMENT,
+    `user_id`             bigint                                                        NOT NULL COMMENT '用户ID',
+    `enterprise_name`     varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业名称',
+    `your_position`       varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '你的职位',
+    `enterprise_scale`    varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业规模',
+    `enterprise_industry` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业所属行业',
+    `enterprise_address`  varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '企业地址',
     `name`                varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '申请人真实姓名',
     `gender`              varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '申请人性别',
     `email`               varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '申请人邮箱',
-    `business_license`   varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '营业执照',
-    `is_deleted`         tinyint(1)                                                    NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    `business_license`    varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL     DEFAULT '' COMMENT '营业执照',
+    `is_deleted`          tinyint(1)                                                    NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
     PRIMARY KEY (`id`) USING BTREE,
     INDEX `user_id` (`user_id` ASC) USING BTREE
 ) ENGINE = InnoDB
@@ -391,53 +391,57 @@ CREATE TABLE `team`
 DROP TABLE IF EXISTS `team_member`;
 CREATE TABLE `team_member`
 (
-    `id`        BIGINT                                   NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
-    `team_id`   BIGINT                                   NOT NULL COMMENT '团队ID，外键到团队表',
-    `user_id`   BIGINT                                   NOT NULL COMMENT '用户ID，外键到用户表',
-    `role`      ENUM ('leader', 'member')                COMMENT '成员角色，leader表示团队负责人，member表示普通成员',
+    `id`             BIGINT                                   NOT NULL AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+    `team_id`        BIGINT                                   NOT NULL COMMENT '团队ID，外键到团队表',
+    `user_id`        BIGINT                                   NOT NULL COMMENT '用户ID，外键到用户表',
+    `role`           ENUM ('leader', 'member') COMMENT '成员角色，leader表示团队负责人，member表示普通成员',
     `responsibility` TEXT COMMENT '成员职责描述',
-    `apply_reason` TEXT COMMENT '申请说明',
-    `join_time` DATETIME                                 NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
-    `quit_time` DATETIME COMMENT '退出时间',
-    `status`    ENUM ('pending', 'approved', 'rejected') NOT NULL COMMENT '申请状态，pending表示待审核，approved表示审核通过，rejected表示审核拒绝',
-    `is_deleted` TINYINT NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    `apply_reason`   TEXT COMMENT '申请说明',
+    `join_time`      DATETIME                                 NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '加入时间',
+    `quit_time`      DATETIME COMMENT '退出时间',
+    `status`         ENUM ('pending', 'approved', 'rejected') NOT NULL COMMENT '申请状态，pending表示待审核，approved表示审核通过，rejected表示审核拒绝',
+    `is_deleted`     TINYINT                                  NOT NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
     KEY (`team_id`),
     KEY (`user_id`)
-)COMMENT '团队成员关系表';
-CREATE TABLE sys_role_permission (
-                                     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                     role_id BIGINT NOT NULL COMMENT '角色ID',
-                                     perm_id BIGINT NOT NULL COMMENT '权限ID',
-                                     UNIQUE KEY uk_role_perm (role_id, perm_id), -- 避免重复关联
-                                     FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE,
-                                     FOREIGN KEY (perm_id) REFERENCES sys_permission(id) ON DELETE CASCADE
+) COMMENT '团队成员关系表';
+CREATE TABLE sys_role_permission
+(
+    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    role_id BIGINT NOT NULL COMMENT '角色ID',
+    perm_id BIGINT NOT NULL COMMENT '权限ID',
+    UNIQUE KEY uk_role_perm (role_id, perm_id), -- 避免重复关联
+    FOREIGN KEY (role_id) REFERENCES sys_role (id) ON DELETE CASCADE,
+    FOREIGN KEY (perm_id) REFERENCES sys_permission (id) ON DELETE CASCADE
 ) COMMENT '角色-权限关联表';
 
-CREATE TABLE sys_user_role (
-                               id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                               user_id BIGINT NOT NULL COMMENT '用户ID',
-                               role_id BIGINT NOT NULL COMMENT '角色ID',
-                               UNIQUE KEY uk_user_role (user_id, role_id), -- 避免重复关联
-                               FOREIGN KEY (user_id) REFERENCES sys_user(id) ON DELETE CASCADE,
-                               FOREIGN KEY (role_id) REFERENCES sys_role(id) ON DELETE CASCADE
+CREATE TABLE sys_user_role
+(
+    id      BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    role_id BIGINT NOT NULL COMMENT '角色ID',
+    UNIQUE KEY uk_user_role (user_id, role_id), -- 避免重复关联
+    FOREIGN KEY (user_id) REFERENCES sys_user (id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES sys_role (id) ON DELETE CASCADE
 ) COMMENT '用户-角色关联表';
 
-CREATE TABLE sys_permission (
-                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                                perm_name VARCHAR(100) NOT NULL COMMENT '权限名称',
-                                perm_code VARCHAR(100) NOT NULL UNIQUE COMMENT '权限编码(如user:list)',
-                                perm_type TINYINT COMMENT '权限类型(1=菜单,2=按钮,3=接口)',
-                                url VARCHAR(255) COMMENT '接口路径',
-                                method VARCHAR(10) COMMENT '请求方法(GET/POST等)',
-                                parent_id BIGINT COMMENT '父权限ID',
-                                sort INT DEFAULT 0 COMMENT '排序号',
-                                FOREIGN KEY (parent_id) REFERENCES sys_permission(id) ON DELETE SET NULL
+CREATE TABLE sys_permission
+(
+    id        BIGINT AUTO_INCREMENT PRIMARY KEY,
+    perm_name VARCHAR(100) NOT NULL COMMENT '权限名称',
+    perm_code VARCHAR(100) NOT NULL UNIQUE COMMENT '权限编码(如user:list)',
+    perm_type TINYINT COMMENT '权限类型(1=菜单,2=按钮,3=接口)',
+    url       VARCHAR(255) COMMENT '接口路径',
+    method    VARCHAR(10) COMMENT '请求方法(GET/POST等)',
+    parent_id BIGINT COMMENT '父权限ID',
+    sort      INT DEFAULT 0 COMMENT '排序号',
+    FOREIGN KEY (parent_id) REFERENCES sys_permission (id) ON DELETE SET NULL
 ) COMMENT '权限表';
 
-CREATE TABLE sys_role (
-                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                          role_name VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
-                          role_code VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码(如ROLE_ADMIN)',
-                          description VARCHAR(200) COMMENT '角色描述',
-                          create_time DATETIME DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE sys_role
+(
+    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
+    role_name   VARCHAR(50) NOT NULL UNIQUE COMMENT '角色名称',
+    role_code   VARCHAR(50) NOT NULL UNIQUE COMMENT '角色编码(如ROLE_ADMIN)',
+    description VARCHAR(200) COMMENT '角色描述',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP
 ) COMMENT '角色表';
