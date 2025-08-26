@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 @RestController
 @RequestMapping("/user/identification/enterprise")
 @Api(tags = "企业认证资料接口")
-public class EnterpriseIdentificationController {
+public class enterpriseIdentificationController {
 
   @Resource
   EnterpriseIdentificationService enterpriseIdentificationService;
