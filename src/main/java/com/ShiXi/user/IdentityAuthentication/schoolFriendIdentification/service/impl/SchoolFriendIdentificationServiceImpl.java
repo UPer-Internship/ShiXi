@@ -96,6 +96,10 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
     @Transactional(rollbackFor = Exception.class)
     public Result uploadIdentificationTextData(SchoolFriendUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
+        Integer isSchoolFriend = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsSchoolFriend();
+        if(isSchoolFriend==1){
+            return Result.ok("您已提交申请");
+        }
         SchoolFriendIdentification schoolFriendIdentification = BeanUtil.copyProperties(reqDTO, SchoolFriendIdentification.class);
         schoolFriendIdentification.setUserId(userId);
         LambdaUpdateWrapper<SchoolFriendIdentification> updateWrapper = new LambdaUpdateWrapper<>();

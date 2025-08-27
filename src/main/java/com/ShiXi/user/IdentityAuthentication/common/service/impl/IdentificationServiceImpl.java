@@ -180,11 +180,11 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals(2)){
-            TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(userId);
+            SchoolFriendGetIdentificationDataVO identificationDataByUserId =schoolFriendIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals(3)){
-            SchoolFriendGetIdentificationDataVO identificationDataByUserId = schoolFriendIdentificationService.getIdentificationDataByUserId(userId);
+             TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(userId);
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals(4)){
@@ -208,23 +208,23 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     }
 
     @Override
-    public Result passIdentificationDataRequest(Long userId, String identification) {
+    public Result passIdentificationDataRequest(Long userId, Integer identification) {
         LambdaUpdateWrapper<Identification> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Identification::getUserId, userId);
-        if(identification.equals("student")){
+        if(identification.equals(1)){
             updateWrapper.set(Identification::getIsStudent, 3);
         }
-        else if(identification.equals("teacher")){
+        else if(identification.equals(2)){
             updateWrapper.set(Identification::getIsTeacher, 3);
         }
-        else if(identification.equals("schoolFriend")){
+        else if(identification.equals(3)){
             updateWrapper.set(Identification::getIsSchoolFriend, 3);
         }
-        else if(identification.equals("enterprise")){
+        else if(identification.equals(4)){
             updateWrapper.set(Identification::getIsEnterprise, 3);
         }
-        else if(identification.equals("studentTeam")){
-            updateWrapper.set(Identification::getIsStudentTeam, 3);
+        else if(identification.equals(6)){
+            updateWrapper.set(Identification::getIsAdmin, 3);
         }
         boolean success = update(updateWrapper);
         if(success){
@@ -234,23 +234,23 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     }
 
     @Override
-    public Result refuseIdentificationDataRequest(Long userId, String identification) {
+    public Result refuseIdentificationDataRequest(Long userId, Integer identification) {
         LambdaUpdateWrapper<Identification> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(Identification::getUserId, userId);
-        if(identification.equals("student")){
+        if(identification.equals(1)){
             updateWrapper.set(Identification::getIsStudent, 2);
         }
-        else if(identification.equals("teacher")){
+        else if(identification.equals(2)){
             updateWrapper.set(Identification::getIsTeacher, 2);
         }
-        else if(identification.equals("schoolFriend")){
+        else if(identification.equals(3)){
             updateWrapper.set(Identification::getIsSchoolFriend, 2);
         }
-        else if(identification.equals("enterprise")){
+        else if(identification.equals(4)){
             updateWrapper.set(Identification::getIsEnterprise, 2);
         }
-        else if(identification.equals("studentTeam")){
-            updateWrapper.set(Identification::getIsStudentTeam, 2);
+        else if(identification.equals(6)){
+            updateWrapper.set(Identification::getIsAdmin, 2);
         }
         boolean success = update(updateWrapper);
         if(success){

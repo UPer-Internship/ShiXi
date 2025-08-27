@@ -94,6 +94,10 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
     @Transactional(rollbackFor = Exception.class)
     public Result uploadIdentificationTextData(StudentUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
+        Integer isStudent = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsStudent();
+        if(isStudent==1){
+            return Result.ok("您已提交申请");
+        }
         StudentIdentification studentIdentification = BeanUtil.copyProperties(reqDTO, StudentIdentification.class);
         studentIdentification.setUserId(userId);
         LambdaUpdateWrapper<StudentIdentification> updateWrapper = new LambdaUpdateWrapper<>();

@@ -19,5 +19,5 @@ public class SchoolFriendGetIdentificationDataVO {
     private String major; // 专业
     private LocalDate enrollmentDate; // 入学时间
     private LocalDate graduationDate; // 毕业时间
-    private String pictureMaterial;
+    private String pictureMaterialUrl;
 }

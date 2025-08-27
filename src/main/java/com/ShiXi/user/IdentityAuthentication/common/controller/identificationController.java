@@ -45,12 +45,12 @@ public class identificationController {
     }
     @PostMapping("/admin/passIdentificationDataRequest")
     @ApiOperation("管理端通过审核身份验证资料")
-    public Result passIdentificationDataRequest(Long userId,String  identification){
+    public Result passIdentificationDataRequest(Long userId,Integer  identification){
         return identificationService.passIdentificationDataRequest(userId,identification);
     }
     @PostMapping("/admin/refuseIdentificationDataRequest")
     @ApiOperation("管理端不通过审核身份验证资料")
-    public Result refuseIdentificationDataRequest(Long userId,String  identification){
+    public Result refuseIdentificationDataRequest(Long userId,Integer  identification){
         return identificationService.refuseIdentificationDataRequest(userId,identification);
     }
 }

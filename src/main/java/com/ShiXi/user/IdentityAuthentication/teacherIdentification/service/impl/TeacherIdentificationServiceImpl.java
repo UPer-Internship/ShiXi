@@ -74,7 +74,7 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
         }
         //构造vo对象
         TeacherGetIdentificationDataVO teacherGetIdentificationDataVO = BeanUtil.toBean(teacherIdentification, TeacherGetIdentificationDataVO.class);
-        teacherGetIdentificationDataVO.setIdentification(2); // 2表示教师身份
+        teacherGetIdentificationDataVO.setIdentification(3);
         return Result.ok(teacherGetIdentificationDataVO);
     }
 
@@ -90,7 +90,7 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
         }
         //构造vo对象
         TeacherGetIdentificationDataVO teacherGetIdentificationDataVO = BeanUtil.toBean(teacherIdentification, TeacherGetIdentificationDataVO.class);
-        teacherGetIdentificationDataVO.setIdentification(2); // 2表示教师身份
+        teacherGetIdentificationDataVO.setIdentification(3);
         return teacherGetIdentificationDataVO;
     }
 
@@ -98,6 +98,10 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
     @Transactional(rollbackFor = Exception.class)
     public Result uploadIdentificationTextData(TeacherUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
+        Integer isTeacher = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsTeacher();
+        if(isTeacher==1){
+            return Result.ok("您已提交申请");
+        }
         TeacherIdentification teacherIdentification = BeanUtil.copyProperties(reqDTO, TeacherIdentification.class);
         teacherIdentification.setUserId(userId);
         LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
@@ -108,7 +112,7 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
                 .set(Identification::getIsTeacher, 1)
                 .update();
         log.info("用户[{}]教师身份认证信息上传成功", userId);
-        identificationService.notifyAdminToAudit(2); // 2表示教师认证类型
+        identificationService.notifyAdminToAudit(3); // 2表示教师认证类型
         return Result.ok();
     }
 }

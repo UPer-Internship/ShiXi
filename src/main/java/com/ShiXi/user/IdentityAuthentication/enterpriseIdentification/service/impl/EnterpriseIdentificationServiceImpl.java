@@ -62,7 +62,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         updateWrapper.set(EnterpriseIdentification::getPictureMaterialUrl, url);
         update(updateWrapper);
         
-        // 设置对应的审核状态：待审核（企业认证为2）
+        // 设置对应的审核状态：待审核
         LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
         statusUpdateWrapper.eq(Identification::getUserId, userId)
                 .set(Identification::getIsEnterprise, 1);
@@ -90,7 +90,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         // 构造vo对象
         EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = 
                 BeanUtil.toBean(enterpriseIdentification, EnterpriseGetIdentificationDataVO.class);
-        enterpriseGetIdentificationDataVO.setIdentification(2); // 企业认证标识为2
+        enterpriseGetIdentificationDataVO.setIdentification(4);
         enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getPictureMaterialUrl());
         
         return Result.ok(enterpriseGetIdentificationDataVO);
@@ -111,7 +111,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         // 构造vo对象
         EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = 
                 BeanUtil.toBean(enterpriseIdentification, EnterpriseGetIdentificationDataVO.class);
-        enterpriseGetIdentificationDataVO.setIdentification(2); // 企业认证标识为2
+        enterpriseGetIdentificationDataVO.setIdentification(4); // 企业认证标识为2
         enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getPictureMaterialUrl());
         
         return enterpriseGetIdentificationDataVO;
@@ -121,7 +121,10 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
     @Transactional(rollbackFor = Exception.class)
     public Result uploadIdentificationTextData(EnterpriseUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
-        
+        Integer isEnterprise = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsEnterprise();
+        if(isEnterprise==1){
+            return Result.ok("您已提交申请");
+        }
         // 将DTO转换为实体对象
         EnterpriseIdentification enterpriseIdentification = BeanUtil.copyProperties(reqDTO, EnterpriseIdentification.class);
         enterpriseIdentification.setUserId(userId);
@@ -131,7 +134,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
         update(enterpriseIdentification, updateWrapper);
         
-        // 设置身份认证状态（企业认证为2）
+        // 设置身份认证状态
         identificationService.lambdaUpdate()
                 .eq(Identification::getUserId, userId)
                 .set(Identification::getIsEnterprise, 1)
@@ -140,7 +143,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         log.info("用户[{}]企业身份认证信息上传成功", userId);
         
         // 通知管理员审核（企业认证类型为2）
-        identificationService.notifyAdminToAudit(2);
+        identificationService.notifyAdminToAudit(4);
         
         return Result.ok();
     }

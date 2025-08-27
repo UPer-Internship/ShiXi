@@ -19,7 +19,7 @@ public interface IdentificationService extends IService<Identification> {
 
     void notifyAdminToAudit(Integer identification);
 
-    Result passIdentificationDataRequest(Long userId, String identification);
+    Result passIdentificationDataRequest(Long userId, Integer identification);
 
-    Result refuseIdentificationDataRequest(Long userId, String identification);
+    Result refuseIdentificationDataRequest(Long userId, Integer identification);
 }
