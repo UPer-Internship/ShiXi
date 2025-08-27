@@ -6,6 +6,9 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.config.smsClientConfig;
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.domin.vo.RegionVO;
+import com.ShiXi.common.entity.Region;
+import com.ShiXi.common.service.RegionService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
@@ -30,8 +33,12 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.ShiXi.common.utils.MessageConstants.LOGIN_CODE_TEMPLATE_CODE;
 import static com.ShiXi.common.utils.MessageConstants.SIGN_NAME;
@@ -46,7 +53,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private FeishuService feishuService;
     @Resource
     private IdentificationService identificationService;
-    @Autowired
+    @Resource
+    private RegionService regionService;
+    @Resource
     private WeChatProperties weChatProperties;
     //微信端登录接口请求的url
     public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
@@ -276,6 +285,58 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return Result.fail("用户不存在");
         }
         return Result.ok(user);
+    }
+
+    //TODO 分布式锁
+    @Override
+    public Result getRegion() {
+        String key = "regionList:";
+        String regionListJson = stringRedisTemplate.opsForValue().get(key);
+        if(regionListJson != null){
+            return Result.ok(JSONUtil.toBean(regionListJson, Region.class));
+        }
+
+        List<Region> regionList = regionService.lambdaQuery().list();
+        RegionVO regionVO = new RegionVO();
+
+        // 按省份分组
+        Map<String, List<Region>> provincesMap = regionList.stream()
+            .collect(Collectors.groupingBy(Region::getProvince));
+
+        List<RegionVO.Provinces> provincesList = new ArrayList<>();
+
+        // 遍历每个省份
+        for (Map.Entry<String, List<Region>> provinceEntry : provincesMap.entrySet()) {
+            RegionVO.Provinces provinces = new RegionVO.Provinces();
+            provinces.setProvince(provinceEntry.getKey());
+            
+            // 按城市分组
+            Map<String, List<Region>> citiesMap = provinceEntry.getValue().stream()
+                .collect(Collectors.groupingBy(Region::getCity));
+            
+            List<RegionVO.cities> citiesList = new ArrayList<>();
+            
+            // 遍历每个城市
+            for (Map.Entry<String, List<Region>> cityEntry : citiesMap.entrySet()) {
+                RegionVO.cities cities = new RegionVO.cities();
+                cities.setCity(cityEntry.getKey());
+                
+                // 获取区域列表
+                List<String> districtList = cityEntry.getValue().stream()
+                    .map(Region::getDistrict)
+                    .collect(Collectors.toList());
+                
+                cities.setDistrict(districtList);
+                citiesList.add(cities);
+            }
+            
+            provinces.setCities(citiesList);
+            provincesList.add(provinces);
+        }
+
+        regionVO.setRegions(provincesList);
+        return Result.ok(regionVO);
+
     }
 
 

@@ -25,4 +25,6 @@ public interface UserService extends IService<User> {
 //    Result getIdentification();
     
     Result getUserInfoByUuid(String uuid);
+
+    Result getRegion();
 }
