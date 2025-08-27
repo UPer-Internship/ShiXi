@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.IdentificationMapper;
+import com.ShiXi.common.utils.RedissonLockUtil;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.IdentityAuthentication.common.domin.dto.DeserializeUserIdAndIdentificationInRedisListDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
@@ -30,8 +31,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.ShiXi.common.utils.RedisConstants.LOGIN_USER_KEY;
-import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.WAIT_FOR_AUDITING_LIST;
+import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.*;
 
 @Slf4j
 @Service
@@ -55,7 +58,8 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     CurrentIdentificationService currentIdentificationService;;
     @Resource
     StringRedisTemplate stringRedisTemplate;
-
+    @Resource
+    RedissonLockUtil redissonLockUtil;
 
     @Override
     public Result getAllIdentificationStatus() {
@@ -168,27 +172,67 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
 
     @Override
     public Result getIdentificationDataRequest() {
-        String waitForAuditingUserId = stringRedisTemplate.opsForList().leftPop(WAIT_FOR_AUDITING_LIST);
-        if(waitForAuditingUserId==null){
+        //产看审核人员自己的审核列表是否还有没完成的工作
+        //有
+        Long userId = UserHolder.getUser().getId();
+        String key=ADMIN_AUDITING_BUFFER_POOL+userId;
+        String undone = stringRedisTemplate.opsForValue().get(key);
+        if(undone!=null){
+            DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(undone, DeserializeUserIdAndIdentificationInRedisListDTO.class);
+            Long waitingForAuditingUserId = dto.getUserId();
+            Integer identification = dto.getIdentification();
+            if(identification.equals(1)){
+                StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
+                return Result.ok(identificationDataByUserId);
+            }
+            else if(identification.equals(2)){
+                SchoolFriendGetIdentificationDataVO identificationDataByUserId =schoolFriendIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
+                return Result.ok(identificationDataByUserId);
+            }
+            else if(identification.equals(3)){
+                TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
+                return Result.ok(identificationDataByUserId);
+            }
+            else if(identification.equals(4)){
+                EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
+                return Result.ok(identificationDataByUserId);
+            }
+            return Result.fail("未知错误");
+        }
+        //没有
+        //加锁获取待审核列表
+        boolean isLock = redissonLockUtil.tryLock(WAIT_FOR_AUDITING_LIST_LOCK, 3, 10, TimeUnit.SECONDS);
+        if(!isLock){
+            //加锁失败
+            return Result.fail("请稍后再试");
+        }
+        //加锁成功
+        //取出一个等待审核表单
+        String waitForAuditingUserJsonStr = stringRedisTemplate.opsForList().leftPop(WAIT_FOR_AUDITING_LIST);
+        if(waitForAuditingUserJsonStr==null){
             return Result.ok("暂无需要审核的资料");
         }
-        DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserId, DeserializeUserIdAndIdentificationInRedisListDTO.class);
-        Long userId = dto.getUserId();
+        //加入自己的缓存工作区
+        stringRedisTemplate.opsForValue().set(key, waitForAuditingUserJsonStr);
+        //释放锁
+        redissonLockUtil.unlock(WAIT_FOR_AUDITING_LIST_LOCK);
+        DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserJsonStr, DeserializeUserIdAndIdentificationInRedisListDTO.class);
+        Long waitingForAuditingUserId = dto.getUserId();
         Integer identification = dto.getIdentification();
         if(identification.equals(1)){
-            StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(userId);
+            StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals(2)){
-            SchoolFriendGetIdentificationDataVO identificationDataByUserId =schoolFriendIdentificationService.getIdentificationDataByUserId(userId);
+            SchoolFriendGetIdentificationDataVO identificationDataByUserId =schoolFriendIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals(3)){
-             TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(userId);
+             TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
             return Result.ok(identificationDataByUserId);
         }
         else if(identification.equals(4)){
-            EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(userId);
+            EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
             return Result.ok(identificationDataByUserId);
         }
         return Result.fail("未知错误");
@@ -207,9 +251,18 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     }
 
     @Override
-    public Result passIdentificationDataRequest(Long userId, Integer identification) {
+    public Result passIdentificationDataRequest() {
+        Long userId = UserHolder.getUser().getId();
+        String key=ADMIN_AUDITING_BUFFER_POOL+userId;
+        String waitForAuditingUserJsonStr = stringRedisTemplate.opsForValue().get(key);
+        if(waitForAuditingUserJsonStr==null){
+            return Result.fail("请勿重复操作");
+        }
+        DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserJsonStr, DeserializeUserIdAndIdentificationInRedisListDTO.class);
+        Long waitingForAuditingUserId = dto.getUserId();
+        Integer identification = dto.getIdentification();
         LambdaUpdateWrapper<Identification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Identification::getUserId, userId);
+        updateWrapper.eq(Identification::getUserId, waitingForAuditingUserId);
         if(identification.equals(1)){
             updateWrapper.set(Identification::getIsStudent, 3);
         }
@@ -227,15 +280,25 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         }
         boolean success = update(updateWrapper);
         if(success){
+            stringRedisTemplate.delete(key);
             return Result.ok();
         }
         return Result.fail("更新失败");
     }
 
     @Override
-    public Result refuseIdentificationDataRequest(Long userId, Integer identification) {
+    public Result refuseIdentificationDataRequest() {
+        Long userId = UserHolder.getUser().getId();
+        String key=ADMIN_AUDITING_BUFFER_POOL+userId;
+        String waitForAuditingUserJsonStr = stringRedisTemplate.opsForValue().get(key);
+        if(waitForAuditingUserJsonStr==null){
+            return Result.fail("请勿重复操作");
+        }
+        DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserJsonStr, DeserializeUserIdAndIdentificationInRedisListDTO.class);
+        Long waitingForAuditingUserId = dto.getUserId();
+        Integer identification = dto.getIdentification();
         LambdaUpdateWrapper<Identification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(Identification::getUserId, userId);
+        updateWrapper.eq(Identification::getUserId, waitingForAuditingUserId);
         if(identification.equals(1)){
             updateWrapper.set(Identification::getIsStudent, 2);
         }
@@ -253,6 +316,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         }
         boolean success = update(updateWrapper);
         if(success){
+            stringRedisTemplate.delete(key);
             return Result.ok();
         }
         return Result.fail("更新失败");

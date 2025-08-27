@@ -19,9 +19,9 @@ public interface IdentificationService extends IService<Identification> {
 
     void notifyAdminToAudit(Integer identification);
 
-    Result passIdentificationDataRequest(Long userId, Integer identification);
+    Result passIdentificationDataRequest();
 
-    Result refuseIdentificationDataRequest(Long userId, Integer identification);
+    Result refuseIdentificationDataRequest();
 
     Result getSpecifiedIdentificationStatus(Integer identification);
 }
