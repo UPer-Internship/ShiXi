@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 
 import static com.ShiXi.common.utils.RedisConstants.LOGIN_USER_KEY;
+import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.WAIT_FOR_AUDITING_LIST;
 
 @Slf4j
 @Service
@@ -57,7 +58,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
 
 
     @Override
-    public Result getIdentificationStatus() {
+    public Result getAllIdentificationStatus() {
         //获取用户id
         Long id = UserHolder.getUser().getId();
         Identification identification = lambdaQuery()
@@ -167,8 +168,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
 
     @Override
     public Result getIdentificationDataRequest() {
-        final String key = "waitForAuditingList:";
-        String waitForAuditingUserId = stringRedisTemplate.opsForList().leftPop(key);
+        String waitForAuditingUserId = stringRedisTemplate.opsForList().leftPop(WAIT_FOR_AUDITING_LIST);
         if(waitForAuditingUserId==null){
             return Result.ok("暂无需要审核的资料");
         }
@@ -197,12 +197,11 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     @Override
     public void notifyAdminToAudit(Integer identification) {
         Long userId = UserHolder.getUser().getId();
-        String key = "waitForAuditingList:";
         DeserializeUserIdAndIdentificationInRedisListDTO dto = new DeserializeUserIdAndIdentificationInRedisListDTO();
         dto.setIdentification(identification)
                 .setUserId(userId);
         String value = JSONUtil.toJsonStr(dto);
-        stringRedisTemplate.opsForList().rightPush(key, value);
+        stringRedisTemplate.opsForList().rightPush(WAIT_FOR_AUDITING_LIST, value);
 
 
     }
@@ -257,5 +256,29 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             return Result.ok();
         }
         return Result.fail("更新失败");
+    }
+
+    @Override
+    public Result getSpecifiedIdentificationStatus(Integer identification) {
+        Long id = UserHolder.getUser().getId();
+        Identification status = lambdaQuery()
+                .eq(Identification::getUserId, id)  // 直接引用实体类的userId字段
+                .one();
+        if(identification==1){
+           return Result.ok(status.getIsStudent());
+        }
+        else if(identification==2){
+            return Result.ok(status.getIsSchoolFriend());
+        }
+        else if(identification==3){
+            return Result.ok(status.getIsTeacher());
+        }
+        else if(identification==4){
+            return Result.ok(status.getIsEnterprise());
+        }
+        else if(identification==6){
+            return Result.ok(status.getIsAdmin());
+        }
+        return Result.fail("未知错误");
     }
 }

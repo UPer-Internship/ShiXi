@@ -2,8 +2,10 @@ package com.ShiXi.user.IdentityAuthentication.common.controller;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
+import com.ShiXi.user.IdentityAuthentication.common.service.impl.IdentificationServiceImpl;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -14,8 +16,10 @@ import javax.annotation.Resource;
 public class identificationController {
     @Resource
     IdentificationService identificationService;
+    @Autowired
+    private IdentificationServiceImpl identificationServiceImpl;
 
-//    @PostMapping("/notifyAdminToAudit")
+    //    @PostMapping("/notifyAdminToAudit")
 //    @ApiOperation("用户上传的认证资料后通知审核端端口")
 //    public Result notifyAdminToAudit(@RequestParam String identification){
 //        return identificationService.notifyAdminToAudit(identification);
@@ -30,11 +34,17 @@ public class identificationController {
     public Result getCurrentIdentification(){
         return Result.ok(identificationService.getCurrentIdentification());
     }
-    @GetMapping("/getIdentificationStatus")
+    @GetMapping("/getAllIdentificationStatus")
     @ApiOperation("获取用户的四种身份信息是否通过认证 0:未提交过资料 1：已提交待审核 2：审核不通过 3：审核通过，拥有此身份")
-    public Result getIdentificationStatus(){
-        Result identification = identificationService.getIdentificationStatus();
-        return Result.ok(identification);
+    public Result getAllIdentificationStatus(){
+        Result Status = identificationService.getAllIdentificationStatus();
+        return Result.ok(Status);
+    }
+    @GetMapping("/getSpecifiedIdentificationStatus")
+    @ApiOperation("获取用户某身份信息是否通过认证 0:未提交过资料 1：已提交待审核 2：审核不通过 3：审核通过，拥有此身份")
+    public Result getSpecifiedIdentificationStatus(Integer identification){
+        Result Status = identificationService.getSpecifiedIdentificationStatus(identification);
+        return Result.ok(Status);
     }
 
     //TODO 设置相关管理权限 只有管理账号能看
