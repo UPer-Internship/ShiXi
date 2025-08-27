@@ -36,7 +36,9 @@ public class EnterpriseIdentification implements Serializable {
     
     private String email; // 申请人邮箱
     
-    private String businessLicense; // 营业执照
+    private String pictureMaterialUrl; // 营业执照图片
+
+    private String businessLicenseNumber;// 营业执照编号
     
     @TableLogic
     private Integer isDeleted; // 逻辑删除标志，0-未删除，1-已删除

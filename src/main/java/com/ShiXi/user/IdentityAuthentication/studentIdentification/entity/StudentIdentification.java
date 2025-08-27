@@ -25,6 +25,7 @@ public class StudentIdentification implements Serializable {
     private String major;
     private String enrollmentDate;
     private String graduationDate;
+    private String studentCardNumber;
 
 
 

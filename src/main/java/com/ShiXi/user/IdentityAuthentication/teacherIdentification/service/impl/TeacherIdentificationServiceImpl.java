@@ -41,7 +41,7 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
         //删除旧的认证
         TeacherIdentification teacherIdentification = lambdaQuery().eq(TeacherIdentification::getUserId, userId).one();
         if (teacherIdentification != null) {
-            String url = teacherIdentification.getWorkCertificate(); // 修正：使用workCertificate字段
+            String url = teacherIdentification.getPictureMaterialUrl(); // 修正：使用workCertificate字段
             if (url != null) {
                 ossPictureService.deletePicture(url);
             }
@@ -50,7 +50,7 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
         String url = ossPictureService.uploadPicture(file, TEACHER_IDENTIFICATION_PICTURE_MATERIAL_URL);
         LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(TeacherIdentification::getUserId, userId);
-        updateWrapper.set(TeacherIdentification::getWorkCertificate, url); // 修正：使用workCertificate字段
+        updateWrapper.set(TeacherIdentification::getPictureMaterialUrl, url); // 修正：使用workCertificate字段
         update(updateWrapper);
         //设置对应的审核状态：待审核
         identificationService.lambdaUpdate()

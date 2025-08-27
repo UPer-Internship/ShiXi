@@ -12,5 +12,6 @@ public class StudentUploadIdentificationTextDataReqDTO {
     private String major;
     private String enrollmentDate;
     private String graduationDate;
+    private String studentCardNumber;
 
 }

@@ -33,5 +33,5 @@ public class EnterpriseUploadIdentificationTextDataReqDTO {
     private String email;
     
     // 营业执照号码或相关信息
-    private String businessLicense;
+    private String businessLicenseNumber;
 }

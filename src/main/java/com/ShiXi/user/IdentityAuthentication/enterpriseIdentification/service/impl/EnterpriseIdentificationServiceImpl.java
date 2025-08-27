@@ -48,8 +48,8 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
                 .one();
         
         // 如果存在旧的认证图片，先删除
-        if (enterpriseIdentification != null && enterpriseIdentification.getBusinessLicense() != null) {
-            String oldUrl = enterpriseIdentification.getBusinessLicense();
+        if (enterpriseIdentification != null && enterpriseIdentification.getPictureMaterialUrl() != null) {
+            String oldUrl = enterpriseIdentification.getPictureMaterialUrl();
             ossPictureService.deletePicture(oldUrl);
         }
         
@@ -59,7 +59,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         // 更新数据库中的图片URL
         LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
-        updateWrapper.set(EnterpriseIdentification::getBusinessLicense, url);
+        updateWrapper.set(EnterpriseIdentification::getPictureMaterialUrl, url);
         update(updateWrapper);
         
         // 设置对应的审核状态：待审核（企业认证为2）
@@ -91,7 +91,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = 
                 BeanUtil.toBean(enterpriseIdentification, EnterpriseGetIdentificationDataVO.class);
         enterpriseGetIdentificationDataVO.setIdentification(2); // 企业认证标识为2
-        enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getBusinessLicense());
+        enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getPictureMaterialUrl());
         
         return Result.ok(enterpriseGetIdentificationDataVO);
     }
@@ -112,7 +112,7 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = 
                 BeanUtil.toBean(enterpriseIdentification, EnterpriseGetIdentificationDataVO.class);
         enterpriseGetIdentificationDataVO.setIdentification(2); // 企业认证标识为2
-        enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getBusinessLicense());
+        enterpriseGetIdentificationDataVO.setPictureMaterialUrl(enterpriseIdentification.getPictureMaterialUrl());
         
         return enterpriseGetIdentificationDataVO;
     }

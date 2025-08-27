@@ -41,14 +41,14 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
         //删除旧的认证
         SchoolFriendIdentification schoolFriendIdentification = lambdaQuery().eq(SchoolFriendIdentification::getUserId, userId).one();
         if (schoolFriendIdentification != null) {
-            String url = schoolFriendIdentification.getGraduationCertificate();
+            String url = schoolFriendIdentification.getPictureMaterialUrl();
             ossPictureService.deletePicture(url);
         }
         //上传新的认证
         String url = ossPictureService.uploadPicture(file, SCHOOL_FRIEND_IDENTIFICATION_PICTURE_MATERIAL_URL);
         LambdaUpdateWrapper<SchoolFriendIdentification> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(SchoolFriendIdentification::getUserId, userId);
-        updateWrapper.set(SchoolFriendIdentification::getGraduationCertificate, url);
+        updateWrapper.set(SchoolFriendIdentification::getPictureMaterialUrl, url);
         update(updateWrapper);
         //设置对应的审核状态：待审核
         LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();

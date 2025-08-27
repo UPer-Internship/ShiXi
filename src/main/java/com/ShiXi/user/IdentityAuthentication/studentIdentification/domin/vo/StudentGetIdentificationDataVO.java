@@ -17,4 +17,5 @@ public class StudentGetIdentificationDataVO {
     private String major;
     private String enrollmentDate;
     private String graduationDate;
+    private String studentCardNumber;
 }

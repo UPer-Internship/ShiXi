@@ -21,45 +21,36 @@ public class SchoolFriendIdentification implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    // 用户ID
-    @TableField("user_id")
+
     private Long userId;
 
-    // 姓名
-    @TableField("name")
+
     private String name;
 
-    // 性别
-    @TableField("gender")
+
     private String gender;
 
-    // 出生日期
-    @TableField("birth_date")
     private LocalDate birthDate;
 
-    // 学历
-    @TableField("education")
-    private String education;
 
-    // 学校名称
-    @TableField("school")
-    private String school;
+    private String educationLevel;
 
-    // 专业名称
-    @TableField("major")
+
+    private String university;
+
+
     private String major;
 
-    // 入学时间
-    @TableField("begin_time")
-    private LocalDate beginTime;
 
-    // 毕业时间
-    @TableField("graduation_time")
-    private LocalDate graduationTime;
+    private LocalDate enrollmentDate;
+
+
+    private LocalDate graduationDate;
 
     // 毕业证书
-    @TableField("graduation_certificate")
-    private String graduationCertificate;
+    private String pictureMaterialUrl;
+    // 毕业证书
+    private String  graduationCertificateNumber;
 
     // 逻辑删除标志，0-未删除，1-已删除
     @TableLogic

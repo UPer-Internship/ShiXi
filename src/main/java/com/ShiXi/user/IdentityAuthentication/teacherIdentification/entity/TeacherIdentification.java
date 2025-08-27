@@ -29,20 +29,17 @@ public class TeacherIdentification implements Serializable {
     // 教师姓名
     private String name;
     
-    // 教师昵称
-    private String nickname;
+
     
     // 性别
     private String gender;
-    
-    // 出生日期
-    private LocalDate birthDate;
+
     
     // 学校名称
     private String university;
     
     // 学院名称
-    private String school;
+    private String college;
     
     // 入职时间
     private LocalDate joinDate;
@@ -51,7 +48,8 @@ public class TeacherIdentification implements Serializable {
     private String email;
     
     // 工作证明
-    private String workCertificate;
+    private String pictureMaterialUrl;
+    private String workCertificateNumber;
     
     // 逻辑删除标志，0-未删除，1-已删除
     @TableLogic
