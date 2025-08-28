@@ -18,7 +18,6 @@ import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.Stud
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.domin.vo.StudentTeamGetIdentificationDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.service.StudentTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
@@ -216,9 +215,12 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         stringRedisTemplate.opsForValue().set(key, waitForAuditingUserJsonStr);
         //释放锁
         redissonLockUtil.unlock(WAIT_FOR_AUDITING_LIST_LOCK);
+        //反序列化后进行处理
         DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(waitForAuditingUserJsonStr, DeserializeUserIdAndIdentificationInRedisListDTO.class);
         Long waitingForAuditingUserId = dto.getUserId();
         Integer identification = dto.getIdentification();
+        //将缓存工作区加入一个按时间排列的zset，与定时任务配合
+        stringRedisTemplate.opsForZSet().add(ADMIN_AUDITING_BUFFER_POOL_ZSET,key, System.currentTimeMillis());
         if(identification.equals(1)){
             StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
             return Result.ok(identificationDataByUserId);
@@ -267,10 +269,10 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             updateWrapper.set(Identification::getIsStudent, 3);
         }
         else if(identification.equals(2)){
-            updateWrapper.set(Identification::getIsTeacher, 3);
+            updateWrapper.set(Identification::getIsSchoolFriend, 3);
         }
         else if(identification.equals(3)){
-            updateWrapper.set(Identification::getIsSchoolFriend, 3);
+            updateWrapper.set(Identification::getIsTeacher, 3);
         }
         else if(identification.equals(4)){
             updateWrapper.set(Identification::getIsEnterprise, 3);
@@ -280,7 +282,10 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         }
         boolean success = update(updateWrapper);
         if(success){
+            //清空缓冲区
             stringRedisTemplate.delete(key);
+            //删除zset中对应的记录
+            stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, key);
             return Result.ok();
         }
         return Result.fail("更新失败");
@@ -303,10 +308,10 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             updateWrapper.set(Identification::getIsStudent, 2);
         }
         else if(identification.equals(2)){
-            updateWrapper.set(Identification::getIsTeacher, 2);
+            updateWrapper.set(Identification::getIsSchoolFriend, 2);
         }
         else if(identification.equals(3)){
-            updateWrapper.set(Identification::getIsSchoolFriend, 2);
+            updateWrapper.set(Identification::getIsTeacher, 2);
         }
         else if(identification.equals(4)){
             updateWrapper.set(Identification::getIsEnterprise, 2);
@@ -316,7 +321,10 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         }
         boolean success = update(updateWrapper);
         if(success){
+            //清空缓冲区
             stringRedisTemplate.delete(key);
+            //删除zset中对应的记录
+            stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, key);
             return Result.ok();
         }
         return Result.fail("更新失败");
