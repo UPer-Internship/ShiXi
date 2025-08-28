@@ -45,13 +45,14 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         ossPictureService.deletePicture(url);
         //上传新的认证
         url = ossPictureService.uploadPicture(file, STUDENT_IDENTIFICATION_PICTURE_MATERIAL_URL);
-        LambdaUpdateWrapper<StudentIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(StudentIdentification::getUserId, userId);
-        updateWrapper.set(StudentIdentification::getPictureMaterialUrl, url);
+        lambdaUpdate().eq(StudentIdentification::getUserId, userId)
+                .set(StudentIdentification::getPictureMaterialUrl, url)
+                .update();
         //设置对应的审核状态：待审核
-        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-        statusUpdateWrapper.eq(Identification::getUserId, userId)
-                .set(Identification::getIsStudent, 1);
+        identificationService.lambdaUpdate()
+                .eq(Identification::getUserId, userId)
+                .set(Identification::getIsStudent, 1)
+                .update();
         return Result.ok();
 
     }
@@ -95,8 +96,8 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
     public Result uploadIdentificationTextData(StudentUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
         Integer isStudent = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsStudent();
-        if(isStudent==1){
-            return Result.ok("您已提交申请");
+        if(isStudent==3){
+            return Result.ok("您已经拥有此身份");
         }
         StudentIdentification studentIdentification = BeanUtil.copyProperties(reqDTO, StudentIdentification.class);
         studentIdentification.setUserId(userId);
@@ -107,7 +108,9 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
                 .eq(Identification::getUserId, userId)
                 .set(Identification::getIsStudent, 1)
                 .update();
-        log.info("用户[{}]学生身份认证信息上传成功", userId);
+        if(isStudent==1){
+            return Result.ok();
+        }
         identificationService.notifyAdminToAudit(1);
         return Result.ok();
     }

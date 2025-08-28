@@ -46,15 +46,14 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
         }
         //上传新的认证
         String url = ossPictureService.uploadPicture(file, SCHOOL_FRIEND_IDENTIFICATION_PICTURE_MATERIAL_URL);
-        LambdaUpdateWrapper<SchoolFriendIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(SchoolFriendIdentification::getUserId, userId);
-        updateWrapper.set(SchoolFriendIdentification::getPictureMaterialUrl, url);
-        update(updateWrapper);
+        lambdaUpdate().eq(SchoolFriendIdentification::getUserId, userId)
+                .set(SchoolFriendIdentification::getPictureMaterialUrl, url)
+                .update();
         //设置对应的审核状态：待审核
-        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-        statusUpdateWrapper.eq(Identification::getUserId, userId)
-                .set(Identification::getIsSchoolFriend, 1);
-        identificationService.update(statusUpdateWrapper);
+        identificationService.lambdaUpdate()
+                .eq(Identification::getUserId, userId)
+                .set(Identification::getIsSchoolFriend, 1)
+                .update();
         return Result.ok();
     }
 
@@ -97,8 +96,8 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
     public Result uploadIdentificationTextData(SchoolFriendUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
         Integer isSchoolFriend = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsSchoolFriend();
-        if(isSchoolFriend==1){
-            return Result.ok("您已提交申请");
+        if(isSchoolFriend==3){
+            return Result.ok("您已经拥有此身份");
         }
         SchoolFriendIdentification schoolFriendIdentification = BeanUtil.copyProperties(reqDTO, SchoolFriendIdentification.class);
         schoolFriendIdentification.setUserId(userId);
@@ -109,7 +108,9 @@ public class SchoolFriendIdentificationServiceImpl extends ServiceImpl<SchoolFri
                 .eq(Identification::getUserId, userId)
                 .set(Identification::getIsSchoolFriend, 1)
                 .update();
-        log.info("用户[{}]校友身份认证信息上传成功", userId);
+        if(isSchoolFriend==1){
+            return Result.ok();
+        }
         identificationService.notifyAdminToAudit(2);
         return Result.ok();
     }

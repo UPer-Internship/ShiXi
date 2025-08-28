@@ -55,20 +55,14 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
         
         // 上传新的认证图片
         String url = ossPictureService.uploadPicture(file, ENTERPRISE_IDENTIFICATION_PICTURE_MATERIAL_URL);
-        
-        // 更新数据库中的图片URL
-        LambdaUpdateWrapper<EnterpriseIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(EnterpriseIdentification::getUserId, userId);
-        updateWrapper.set(EnterpriseIdentification::getPictureMaterialUrl, url);
-        update(updateWrapper);
-        
+        lambdaUpdate().eq(EnterpriseIdentification::getUserId, userId)
+                .set(EnterpriseIdentification::getPictureMaterialUrl, url)
+                .update();;
         // 设置对应的审核状态：待审核
-        LambdaUpdateWrapper<Identification> statusUpdateWrapper = new LambdaUpdateWrapper<>();
-        statusUpdateWrapper.eq(Identification::getUserId, userId)
-                .set(Identification::getIsEnterprise, 1);
-        identificationService.update(statusUpdateWrapper);
-        
-        log.info("用户[{}]企业身份认证图片上传成功", userId);
+        identificationService.lambdaUpdate()
+                .eq(Identification::getUserId, userId)
+                .set(Identification::getIsEnterprise, 1)
+                .update();
         return Result.ok();
     }
 
@@ -122,8 +116,8 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
     public Result uploadIdentificationTextData(EnterpriseUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
         Integer isEnterprise = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsEnterprise();
-        if(isEnterprise==1){
-            return Result.ok("您已提交申请");
+        if(isEnterprise==3){
+            return Result.ok("您已经拥有此身份");
         }
         // 将DTO转换为实体对象
         EnterpriseIdentification enterpriseIdentification = BeanUtil.copyProperties(reqDTO, EnterpriseIdentification.class);
@@ -139,9 +133,9 @@ public class EnterpriseIdentificationServiceImpl extends ServiceImpl<EnterpriseI
                 .eq(Identification::getUserId, userId)
                 .set(Identification::getIsEnterprise, 1)
                 .update();
-        
-        log.info("用户[{}]企业身份认证信息上传成功", userId);
-        
+        if(isEnterprise==1){
+            return Result.ok();
+        }
         // 通知管理员审核（企业认证类型为2）
         identificationService.notifyAdminToAudit(4);
         

@@ -48,10 +48,9 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
         }
         //上传新的认证
         String url = ossPictureService.uploadPicture(file, TEACHER_IDENTIFICATION_PICTURE_MATERIAL_URL);
-        LambdaUpdateWrapper<TeacherIdentification> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(TeacherIdentification::getUserId, userId);
-        updateWrapper.set(TeacherIdentification::getPictureMaterialUrl, url); // 修正：使用workCertificate字段
-        update(updateWrapper);
+        lambdaUpdate().eq(TeacherIdentification::getUserId, userId)
+                .set(TeacherIdentification::getPictureMaterialUrl, url)
+                .update();
         //设置对应的审核状态：待审核
         identificationService.lambdaUpdate()
                 .eq(Identification::getUserId, userId)
@@ -99,8 +98,8 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
     public Result uploadIdentificationTextData(TeacherUploadIdentificationTextDataReqDTO reqDTO) {
         Long userId = UserHolder.getUser().getId();
         Integer isTeacher = identificationService.lambdaQuery().eq(Identification::getUserId, userId).one().getIsTeacher();
-        if(isTeacher==1){
-            return Result.ok("您已提交申请");
+        if(isTeacher==3){
+            return Result.ok("您已经拥有此身份");
         }
         TeacherIdentification teacherIdentification = BeanUtil.copyProperties(reqDTO, TeacherIdentification.class);
         teacherIdentification.setUserId(userId);
@@ -111,8 +110,10 @@ public class TeacherIdentificationServiceImpl extends ServiceImpl<TeacherIdentif
                 .eq(Identification::getUserId, userId)
                 .set(Identification::getIsTeacher, 1)
                 .update();
-        log.info("用户[{}]教师身份认证信息上传成功", userId);
-        identificationService.notifyAdminToAudit(3); // 2表示教师认证类型
+        if (isTeacher == 1) {
+            return Result.ok();
+        }
+        identificationService.notifyAdminToAudit(3);
         return Result.ok();
     }
 }
