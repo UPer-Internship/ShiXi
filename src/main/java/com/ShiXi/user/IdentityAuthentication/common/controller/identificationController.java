@@ -32,19 +32,20 @@ public class identificationController {
     @GetMapping("/getCurrentIdentification")
     @ApiOperation("获取当前身份 0：游客身份 1：学生 2：校友 3：老师 4：企业 5：学生团队 6：管理员")
     public Result getCurrentIdentification(){
+
         return Result.ok(identificationService.getCurrentIdentification());
     }
     @GetMapping("/getAllIdentificationStatus")
     @ApiOperation("获取用户的四种身份信息是否通过认证 0:未提交过资料 1：已提交待审核 2：审核不通过 3：审核通过，拥有此身份")
     public Result getAllIdentificationStatus(){
-        Result Status = identificationService.getAllIdentificationStatus();
-        return Result.ok(Status);
+        return identificationService.getAllIdentificationStatus();
+
     }
     @GetMapping("/getSpecifiedIdentificationStatus")
     @ApiOperation("获取用户某身份信息是否通过认证 0:未提交过资料 1：已提交待审核 2：审核不通过 3：审核通过，拥有此身份")
     public Result getSpecifiedIdentificationStatus(Integer identification){
-        Result Status = identificationService.getSpecifiedIdentificationStatus(identification);
-        return Result.ok(Status);
+        return  identificationService.getSpecifiedIdentificationStatus(identification);
+
     }
 
     //TODO 设置相关管理权限 只有管理账号能看
