@@ -103,7 +103,14 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         // 7.2.将User对象转为HashMap存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
         //获取当前用户的身份
-        userDTO.setIdentification(0);
+        CurrentIdentification currentIdentification = currentIdentificationService.getById(user.getId());
+        if (currentIdentification != null) {
+            userDTO.setIdentification(currentIdentification.getCurrentIdentification());
+        }
+        else{
+            userDTO.setIdentification(0);
+        }
+
         // 7.3.存储
         String tokenKey = LOGIN_USER_KEY + token;
         String userDTOJson = JSONUtil.toJsonStr(userDTO);

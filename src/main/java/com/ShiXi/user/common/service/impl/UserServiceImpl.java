@@ -6,8 +6,11 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.config.smsClientConfig;
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.domin.vo.MajorVO;
 import com.ShiXi.common.domin.vo.RegionVO;
+import com.ShiXi.common.entity.Major;
 import com.ShiXi.common.entity.Region;
+import com.ShiXi.common.service.MajorsService;
 import com.ShiXi.common.service.RegionService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
@@ -59,6 +62,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private WeChatProperties weChatProperties;
     //微信端登录接口请求的url
     public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
+    @Resource
+    private MajorsService majorsService;
 
     //基本不用密码登录 主要使用验证码登录
     @Override
@@ -162,20 +167,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 5.发送验证码
         log.debug("发送短信验证码成功，验证码：{}", code);
-        feishuService.sendTextMessage(phone+":"+ code);
+        feishuService.sendTextMessage(phone + ":" + code);
         // 构造请求对象
-        try{
+        try {
             Client client = smsClientConfig.createClient();
             SendSmsRequest sendSmsRequest = new SendSmsRequest()
                     .setPhoneNumbers(phone)
                     .setSignName(SIGN_NAME)
                     .setTemplateCode(LOGIN_CODE_TEMPLATE_CODE)
                     // TemplateParam 为序列化后的 JSON 字符串。其中\"表示转义后的双引号。
-                    .setTemplateParam("{\"code\":\""+code+"\"}");
+                    .setTemplateParam("{\"code\":\"" + code + "\"}");
 
             // 发送 API 请求
             SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -269,19 +274,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Result getUserInfoById(Long id) {
         // 根据id查询用户
         User user = query().eq("id", id).one();
-        if(user == null){
+        if (user == null) {
             return Result.fail("用户不存在");
         }
         return Result.ok(user);
     }
 
 
-
     @Override
     public Result getUserInfoByUuid(String uuid) {
         // 根据uuid查询用户
         User user = query().eq("uuid", uuid).one();
-        if(user == null){
+        if (user == null) {
             return Result.fail("用户不存在");
         }
         return Result.ok(user);
@@ -292,7 +296,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public Result getRegion() {
         String key = "regionList:";
         String regionListJson = stringRedisTemplate.opsForValue().get(key);
-        if(regionListJson != null){
+        if (regionListJson != null) {
             return Result.ok(JSONUtil.toBean(regionListJson, Region.class));
         }
 
@@ -301,7 +305,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 按省份分组
         Map<String, List<Region>> provincesMap = regionList.stream()
-            .collect(Collectors.groupingBy(Region::getProvince));
+                .collect(Collectors.groupingBy(Region::getProvince));
 
         List<RegionVO.Provinces> provincesList = new ArrayList<>();
 
@@ -309,27 +313,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         for (Map.Entry<String, List<Region>> provinceEntry : provincesMap.entrySet()) {
             RegionVO.Provinces provinces = new RegionVO.Provinces();
             provinces.setProvince(provinceEntry.getKey());
-            
+
             // 按城市分组
             Map<String, List<Region>> citiesMap = provinceEntry.getValue().stream()
-                .collect(Collectors.groupingBy(Region::getCity));
-            
+                    .collect(Collectors.groupingBy(Region::getCity));
+
             List<RegionVO.cities> citiesList = new ArrayList<>();
-            
+
             // 遍历每个城市
             for (Map.Entry<String, List<Region>> cityEntry : citiesMap.entrySet()) {
                 RegionVO.cities cities = new RegionVO.cities();
                 cities.setCity(cityEntry.getKey());
-                
+
                 // 获取区域列表
                 List<String> districtList = cityEntry.getValue().stream()
-                    .map(Region::getDistrict)
-                    .collect(Collectors.toList());
-                
+                        .map(Region::getDistrict)
+                        .collect(Collectors.toList());
+
                 cities.setDistrict(districtList);
                 citiesList.add(cities);
             }
-            
+
             provinces.setCities(citiesList);
             provincesList.add(provinces);
         }
@@ -338,6 +342,60 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.ok(regionVO);
 
     }
+
+    @Override
+    public Result getMajorList() {
+        String key = "majorList:";
+        String majorListJson = stringRedisTemplate.opsForValue().get(key);
+        if (majorListJson != null) {
+            return Result.ok(JSONUtil.toBean(majorListJson, Major.class));
+        }
+
+        List<Major> majorList = majorsService.lambdaQuery().list();
+        MajorVO majorVO = new MajorVO();
+
+        // 按省份分组
+        Map<String, List<Major>> majorsMap = majorList.stream()
+                .collect(Collectors.groupingBy(Major::getSecondLevelCategoryLabel));
+
+        List<MajorVO.SecondLevelCategoryLabel> SecondLevelCategoryLabelList = new ArrayList<>();
+
+        // 遍历每个省份
+        for (Map.Entry<String, List<Major>> SecondLevelCategoryLabelEntry : majorsMap.entrySet()) {
+            MajorVO.SecondLevelCategoryLabel secondLevelCategoryLabel = new MajorVO.SecondLevelCategoryLabel();
+            secondLevelCategoryLabel.setSecondLevelCategoryLabel(SecondLevelCategoryLabelEntry.getKey());
+
+            // 按城市分组
+            Map<String, List<Major>> FirstLevelCategoryLabelsMap = SecondLevelCategoryLabelEntry.getValue().stream()
+                    .collect(Collectors.groupingBy(Major::getFirstLevelCategoryLabel));
+
+            List<MajorVO.FirstLevelCategoryLabel> firstLevelCategoryLabelList = new ArrayList<>();
+
+            // 遍历每个城市
+            for (Map.Entry<String, List<Major>> firstLevelCategoryLabelEntry : FirstLevelCategoryLabelsMap.entrySet()) {
+                MajorVO.FirstLevelCategoryLabel firstLevelCategoryLabel = new MajorVO.FirstLevelCategoryLabel();
+                firstLevelCategoryLabel.setFirstLevelCategoryLabel(firstLevelCategoryLabelEntry.getKey());
+
+
+                // 获取区域列表
+                List<String> majorsList = firstLevelCategoryLabelEntry.getValue().stream()
+                        .map(Major::getMajor)
+                        .collect(Collectors.toList());
+
+                firstLevelCategoryLabel.setMajor(majorsList);
+                firstLevelCategoryLabelList.add(firstLevelCategoryLabel);
+            }
+
+            secondLevelCategoryLabel.setFirstLevelCategoryLabel(firstLevelCategoryLabelList);
+            SecondLevelCategoryLabelList.add(secondLevelCategoryLabel);
+        }
+
+        majorVO.setMajors(SecondLevelCategoryLabelList);
+        return Result.ok(majorVO);
+    }
+
+
+
 
 
     @Override

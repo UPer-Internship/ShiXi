@@ -48,6 +48,7 @@ public class identificationController {
 
     }
 
+
     //TODO 设置相关管理权限 只有管理账号能看
     @GetMapping("/admin/getIdentificationDataRequest")
     @ApiOperation("管理端获取审核身份验证资料")

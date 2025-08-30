@@ -3,6 +3,7 @@ package com.ShiXi.user.common.controller;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.common.service.UserService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +20,15 @@ public class CommonController {
     @Resource
     private UserService userService;
 
-    @GetMapping("/common/getRegion")
+    @GetMapping("/common/getRegions")
     public Result getRegion(){
         return userService.getRegion();
+    }
+
+    @GetMapping("/common/getMajors")
+    @ApiOperation("获取专业列表")
+    public Result getMajorList(){
+        return userService.getMajorList();
+
     }
 }

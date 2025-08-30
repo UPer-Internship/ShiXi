@@ -24,4 +24,6 @@ public interface IdentificationService extends IService<Identification> {
     Result refuseIdentificationDataRequest();
 
     Result getSpecifiedIdentificationStatus(Integer identification);
+
+
 }
