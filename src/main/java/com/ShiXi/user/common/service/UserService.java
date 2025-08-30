@@ -29,4 +29,8 @@ public interface UserService extends IService<User> {
     Result getRegion();
 
     Result getMajorList();
+
+    Result getIndustryList();
+
+    Result getUniversityList();
 }

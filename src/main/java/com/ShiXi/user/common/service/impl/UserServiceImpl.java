@@ -367,24 +367,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         List<Major> majorList = majorsService.lambdaQuery().list();
         MajorVO majorVO = new MajorVO();
 
-        // 按省份分组
+
         Map<String, List<Major>> majorsMap = majorList.stream()
                 .collect(Collectors.groupingBy(Major::getSecondLevelCategoryLabel));
 
         List<MajorVO.SecondLevelCategoryLabel> SecondLevelCategoryLabelList = new ArrayList<>();
 
-        // 遍历每个省份
+
         for (Map.Entry<String, List<Major>> SecondLevelCategoryLabelEntry : majorsMap.entrySet()) {
             MajorVO.SecondLevelCategoryLabel secondLevelCategoryLabel = new MajorVO.SecondLevelCategoryLabel();
             secondLevelCategoryLabel.setSecondLevelCategoryLabel(SecondLevelCategoryLabelEntry.getKey());
 
-            // 按城市分组
+
             Map<String, List<Major>> FirstLevelCategoryLabelsMap = SecondLevelCategoryLabelEntry.getValue().stream()
                     .collect(Collectors.groupingBy(Major::getFirstLevelCategoryLabel));
 
             List<MajorVO.FirstLevelCategoryLabel> firstLevelCategoryLabelList = new ArrayList<>();
 
-            // 遍历每个城市
+
             for (Map.Entry<String, List<Major>> firstLevelCategoryLabelEntry : FirstLevelCategoryLabelsMap.entrySet()) {
                 MajorVO.FirstLevelCategoryLabel firstLevelCategoryLabel = new MajorVO.FirstLevelCategoryLabel();
                 firstLevelCategoryLabel.setFirstLevelCategoryLabel(firstLevelCategoryLabelEntry.getKey());
@@ -409,8 +409,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.ok(majorVO);
     }
 
+    @Override
+    public Result getIndustryList() {
+        return null;
+    }
 
-
+    @Override
+    public Result getUniversityList() {
+        return null;
+    }
 
 
     @Override

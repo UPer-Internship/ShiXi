@@ -29,6 +29,17 @@ public class CommonController {
     @ApiOperation("获取专业列表")
     public Result getMajorList(){
         return userService.getMajorList();
+    }
 
+    @GetMapping("/common/getIndustryList")
+    @ApiOperation("获取行业列表")
+    public Result getIndustryList(){
+        return userService.getIndustryList();
+    }
+
+    @GetMapping("/common/getUniversityList")
+    @ApiOperation("获取学校列表")
+    public Result getUniversityList(){
+        return userService.getUniversityList();
     }
 }
