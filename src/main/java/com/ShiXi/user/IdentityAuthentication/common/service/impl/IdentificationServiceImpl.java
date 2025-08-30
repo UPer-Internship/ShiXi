@@ -43,9 +43,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
    
     @Resource
     TeacherIdentificationService teacherIdentificationService;
-   
-    @Resource
-    StudentTeamIdentificationService studentTeamIdentificationService;
+
    
     @Resource
     EnterpriseIdentificationService enterpriseIdentificationService;

@@ -12,6 +12,7 @@ import com.ShiXi.common.entity.Major;
 import com.ShiXi.common.entity.Region;
 import com.ShiXi.common.service.MajorsService;
 import com.ShiXi.common.service.RegionService;
+import com.ShiXi.common.utils.RedissonLockUtil;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import static com.ShiXi.common.utils.MessageConstants.LOGIN_CODE_TEMPLATE_CODE;
 import static com.ShiXi.common.utils.MessageConstants.SIGN_NAME;
 import static com.ShiXi.common.utils.RedisConstants.*;
+import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.*;
 
 @Slf4j
 @Service
@@ -65,6 +67,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     private MajorsService majorsService;
 
+    @Resource
+    RedissonLockUtil redissonLockUtil;
     //基本不用密码登录 主要使用验证码登录
     @Override
     public Result loginByAccount(String account, String password) {
@@ -291,15 +295,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.ok(user);
     }
 
-    //TODO 分布式锁
+
     @Override
     public Result getRegion() {
         String key = "regionList:";
         String regionListJson = stringRedisTemplate.opsForValue().get(key);
         if (regionListJson != null) {
-            return Result.ok(JSONUtil.toBean(regionListJson, Region.class));
+            return Result.ok(JSONUtil.toBean(regionListJson, RegionVO.class));
         }
 
+        boolean isLock = redissonLockUtil.tryLock(REBUILD_REGION_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
+        if(!isLock){
+            return Result.fail("请稍后再试");
+        }
         List<Region> regionList = regionService.lambdaQuery().list();
         RegionVO regionVO = new RegionVO();
 
@@ -339,6 +347,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         regionVO.setRegions(provincesList);
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(regionVO));
+        redissonLockUtil.unlock(REBUILD_REGION_BUFFER_LOCK);
         return Result.ok(regionVO);
 
     }
@@ -348,9 +358,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String key = "majorList:";
         String majorListJson = stringRedisTemplate.opsForValue().get(key);
         if (majorListJson != null) {
-            return Result.ok(JSONUtil.toBean(majorListJson, Major.class));
+            return Result.ok(JSONUtil.toBean(majorListJson, MajorVO.class));
         }
-
+        boolean isLock = redissonLockUtil.tryLock(REBUILD_MAJOR_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
+        if(!isLock){
+            return Result.fail("请稍后再试");
+        }
         List<Major> majorList = majorsService.lambdaQuery().list();
         MajorVO majorVO = new MajorVO();
 
@@ -391,6 +404,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         majorVO.setMajors(SecondLevelCategoryLabelList);
+       stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(majorVO));
+       redissonLockUtil.unlock(REBUILD_MAJOR_BUFFER_LOCK);
         return Result.ok(majorVO);
     }
 
