@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
-@TableName("enterprise_identification")
+@TableName("identification_enterprise")
 public class EnterpriseIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -37,7 +37,7 @@ public class EnterpriseIdentification implements Serializable {
     private String email; // 申请人邮箱
     
     private String pictureMaterialUrl; // 营业执照图片
-
+    private String feedback;
     private String businessLicenseNumber;// 营业执照编号
     
     @TableLogic

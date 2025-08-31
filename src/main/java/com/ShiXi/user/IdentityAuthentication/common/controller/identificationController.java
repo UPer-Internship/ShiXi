@@ -47,7 +47,12 @@ public class identificationController {
         return  identificationService.getSpecifiedIdentificationStatus(identification);
 
     }
+    @GetMapping("/getRefusedReason")
+    @ApiOperation("获取被拒绝的理由")
+    public Result getRefusedReason(Integer identification){
+        return  identificationService.getRefusedReason(identification);
 
+    }
 
     //TODO 设置相关管理权限 只有管理账号能看
     @GetMapping("/admin/getIdentificationDataRequest")
@@ -62,7 +67,8 @@ public class identificationController {
     }
     @PostMapping("/admin/refuseIdentificationDataRequest")
     @ApiOperation("管理端不通过审核身份验证资料")
-    public Result refuseIdentificationDataRequest(){
-        return identificationService.refuseIdentificationDataRequest();
+    public Result refuseIdentificationDataRequest(String  reason){
+        return identificationService.refuseIdentificationDataRequest(reason);
     }
+
 }

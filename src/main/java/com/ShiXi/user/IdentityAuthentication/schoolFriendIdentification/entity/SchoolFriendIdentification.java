@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 @Data
 @Accessors(chain = true)
-@TableName("school_friend_identification")
+@TableName("identification_school_friend")
 public class SchoolFriendIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -35,7 +35,7 @@ public class SchoolFriendIdentification implements Serializable {
 
     private String educationLevel;
 
-
+    private String feedback;
     private String university;
 
 

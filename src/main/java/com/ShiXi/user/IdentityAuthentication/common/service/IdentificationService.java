@@ -21,9 +21,10 @@ public interface IdentificationService extends IService<Identification> {
 
     Result passIdentificationDataRequest();
 
-    Result refuseIdentificationDataRequest();
+    Result refuseIdentificationDataRequest(String reason);
 
     Result getSpecifiedIdentificationStatus(Integer identification);
 
 
+    Result getRefusedReason(Integer identification);
 }

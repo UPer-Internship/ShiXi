@@ -15,7 +15,7 @@ import java.time.LocalDate;
  */
 @Data
 @Accessors(chain = true)
-@TableName("teacher_identification")
+@TableName("identification_teacher")
 public class TeacherIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
     
@@ -50,7 +50,7 @@ public class TeacherIdentification implements Serializable {
     // 工作证明
     private String pictureMaterialUrl;
     private String workCertificateNumber;
-    
+    private String feedback;
     // 逻辑删除标志，0-未删除，1-已删除
     @TableLogic
     private Integer isDeleted;

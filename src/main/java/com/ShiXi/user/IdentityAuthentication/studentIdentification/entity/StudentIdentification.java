@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Data
 @Accessors(chain = true)
-@TableName("student_identification")
+@TableName("identification_student")
 public class StudentIdentification implements Serializable {
     private static final long serialVersionUID = 1L;
     @TableId(value = "id", type = IdType.AUTO)
@@ -26,7 +26,7 @@ public class StudentIdentification implements Serializable {
     private String enrollmentDate;
     private String graduationDate;
     private String studentCardNumber;
-
+    private String feedback;
 
 
 }

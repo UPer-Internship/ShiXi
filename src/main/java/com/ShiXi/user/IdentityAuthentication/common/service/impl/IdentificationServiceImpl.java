@@ -13,10 +13,14 @@ import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.CurrentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.vo.EnterpriseGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo.SchoolFriendGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.SchoolFriendIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.service.StudentTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
@@ -290,7 +294,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     }
 
     @Override
-    public Result refuseIdentificationDataRequest() {
+    public Result refuseIdentificationDataRequest(String reason) {
         Long userId = UserHolder.getUser().getId();
         String key=ADMIN_AUDITING_BUFFER_POOL+userId;
         String waitForAuditingUserJsonStr = stringRedisTemplate.opsForValue().get(key);
@@ -304,15 +308,31 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         updateWrapper.eq(Identification::getUserId, waitingForAuditingUserId);
         if(identification.equals(1)){
             updateWrapper.set(Identification::getIsStudent, 2);
+            studentIdentificationService.lambdaUpdate()
+                    .eq(StudentIdentification::getUserId, waitingForAuditingUserId)
+                    .set(StudentIdentification::getFeedback, reason)
+                    .update();
         }
         else if(identification.equals(2)){
             updateWrapper.set(Identification::getIsSchoolFriend, 2);
+            schoolFriendIdentificationService.lambdaUpdate()
+                    .eq(SchoolFriendIdentification::getUserId, waitingForAuditingUserId)
+                    .set(SchoolFriendIdentification::getFeedback, reason)
+                    .update();
         }
         else if(identification.equals(3)){
             updateWrapper.set(Identification::getIsTeacher, 2);
+            teacherIdentificationService.lambdaUpdate()
+                    .eq(TeacherIdentification::getUserId, waitingForAuditingUserId)
+                    .set(TeacherIdentification::getFeedback, reason)
+                    .update();
         }
         else if(identification.equals(4)){
             updateWrapper.set(Identification::getIsEnterprise, 2);
+            enterpriseIdentificationService.lambdaUpdate()
+                    .eq(EnterpriseIdentification::getUserId, waitingForAuditingUserId)
+                    .set(EnterpriseIdentification::getFeedback, reason)
+                    .update();
         }
         else if(identification.equals(6)){
             updateWrapper.set(Identification::getIsAdmin, 2);
@@ -349,6 +369,37 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         else if(identification==6){
             return Result.ok(status.getIsAdmin());
         }
+        return Result.fail("未知错误");
+    }
+
+    @Override
+    public Result getRefusedReason(Integer identification) {
+        Long id = UserHolder.getUser().getId();
+        if(identification==1){
+            StudentIdentification status = studentIdentificationService.lambdaQuery()
+                    .eq(StudentIdentification::getUserId, id)  // 直接引用实体类的userId字段
+                    .one();
+            return Result.ok(status.getFeedback());
+        }
+        else if(identification==2){
+            SchoolFriendIdentification status = schoolFriendIdentificationService.lambdaQuery()
+                    .eq(SchoolFriendIdentification::getUserId, id)  // 直接引用实体类的userId字段
+                    .one();
+            return Result.ok(status.getFeedback());
+        }
+        else if(identification==3){
+            TeacherIdentification status = teacherIdentificationService.lambdaQuery()
+                    .eq(TeacherIdentification::getUserId, id)  // 直接引用实体类的userId字段
+                    .one();
+            return Result.ok(status.getFeedback());
+        }
+        else if(identification==4){
+            EnterpriseIdentification status = enterpriseIdentificationService.lambdaQuery()
+                    .eq(EnterpriseIdentification::getUserId, id)  // 直接引用实体类的userId字段
+                    .one();
+            return Result.ok(status.getFeedback());
+        }
+
         return Result.fail("未知错误");
     }
 
