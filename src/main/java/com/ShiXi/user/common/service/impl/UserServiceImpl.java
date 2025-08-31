@@ -55,6 +55,7 @@ import com.ShiXi.common.entity.Industry;
 import com.ShiXi.common.service.IndustryService;
 
 // 在导入部分添加
+import com.ShiXi.common.domin.vo.UniversityVO;
 import com.ShiXi.common.entity.University;
 import com.ShiXi.common.service.UniversityService;
 
@@ -460,7 +461,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         industryVO.setIndustries(firstLevelCategoryLabelList);
         //缓存结果
-        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(industryVO));//TODO 感觉这里要加一个过期时间稍微维护一下一致性
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(industryVO));
         //放锁
         redissonLockUtil.unlock(REBUILD_INDUSTRY_BUFFER_LOCK);
         return Result.ok(industryVO);
@@ -472,7 +473,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //查缓存
         String universityListJson = stringRedisTemplate.opsForValue().get(key);
         if (universityListJson != null) {
-            return Result.ok(JSONUtil.toList(universityListJson, University.class));
+            return Result.ok(JSONUtil.toList(universityListJson, UniversityVO.class));
         }
         //拿锁
         boolean isLock = redissonLockUtil.tryLock(REBUILD_UNIVERSITY_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
@@ -481,12 +482,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return Result.fail("请稍后再试");
         }
         List<University> universityList = universityService.lambdaQuery().list();
-
+        List<UniversityVO> universityVOList = universityList.stream()
+                .map(university -> {
+                    UniversityVO vo = new UniversityVO();
+                    vo.setId(university.getId());
+                    vo.setUniversityName(university.getUniversityName());
+                    return vo;
+                })
+                .collect(Collectors.toList());
         //缓存结果
-        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(universityList));
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(universityVOList));
         //释放锁
         redissonLockUtil.unlock(REBUILD_UNIVERSITY_BUFFER_LOCK);
-        return Result.ok(universityList);
+        return Result.ok(universityVOList);
     }
 
 
