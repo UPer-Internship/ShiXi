@@ -49,6 +49,15 @@ import static com.ShiXi.common.utils.MessageConstants.SIGN_NAME;
 import static com.ShiXi.common.utils.RedisConstants.*;
 import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.*;
 
+// 在导入部分添加
+import com.ShiXi.common.domin.vo.IndustryVO;
+import com.ShiXi.common.entity.Industry;
+import com.ShiXi.common.service.IndustryService;
+
+// 在导入部分添加
+import com.ShiXi.common.entity.University;
+import com.ShiXi.common.service.UniversityService;
+
 @Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -66,9 +75,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public static String WX_LOGIN = "https://api.weixin.qq.com/sns/jscode2session";
     @Resource
     private MajorsService majorsService;
+    @Resource
+    private IndustryService industryService;
+    @Resource
+    private UniversityService universityService;
 
     @Resource
     RedissonLockUtil redissonLockUtil;
+
     //基本不用密码登录 主要使用验证码登录
     @Override
     public Result loginByAccount(String account, String password) {
@@ -305,7 +319,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         boolean isLock = redissonLockUtil.tryLock(REBUILD_REGION_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
-        if(!isLock){
+        if (!isLock) {
             return Result.fail("请稍后再试");
         }
         List<Region> regionList = regionService.lambdaQuery().list();
@@ -361,7 +375,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             return Result.ok(JSONUtil.toBean(majorListJson, MajorVO.class));
         }
         boolean isLock = redissonLockUtil.tryLock(REBUILD_MAJOR_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
-        if(!isLock){
+        if (!isLock) {
             return Result.fail("请稍后再试");
         }
         List<Major> majorList = majorsService.lambdaQuery().list();
@@ -404,19 +418,75 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
 
         majorVO.setMajors(SecondLevelCategoryLabelList);
-       stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(majorVO));
-       redissonLockUtil.unlock(REBUILD_MAJOR_BUFFER_LOCK);
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(majorVO));
+        redissonLockUtil.unlock(REBUILD_MAJOR_BUFFER_LOCK);
         return Result.ok(majorVO);
     }
 
     @Override
     public Result getIndustryList() {
-        return null;
+        String key = "industryList:";
+        String industryListJson = stringRedisTemplate.opsForValue().get(key);
+        if (industryListJson != null) {
+            //缓存命中
+            return Result.ok(JSONUtil.toBean(industryListJson, IndustryVO.class));
+        }
+        boolean isLock = redissonLockUtil.tryLock(REBUILD_INDUSTRY_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
+        if (!isLock) {
+            //拿锁失败
+            return Result.fail("请稍后再试");
+        }
+        List<Industry> industryList = industryService.lambdaQuery().list();
+        IndustryVO industryVO = new IndustryVO();
+
+        //获取一级行业分类的map
+        Map<String, List<Industry>> industriesMap = industryList.stream()
+                .collect(Collectors.groupingBy(Industry::getFirstLevelCategoryLabel));
+
+        List<IndustryVO.FirstLevelCategoryLabel> firstLevelCategoryLabelList = new ArrayList<>();
+
+        for (Map.Entry<String, List<Industry>> firstLevelCategoryLabelEntry : industriesMap.entrySet()) {
+            IndustryVO.FirstLevelCategoryLabel firstLevelCategoryLabel = new IndustryVO.FirstLevelCategoryLabel();
+            firstLevelCategoryLabel.setFirstLevelCategoryLabel(firstLevelCategoryLabelEntry.getKey());
+
+            // 查行业列表
+            List<String> industryNamesList = firstLevelCategoryLabelEntry.getValue().stream()
+                    .map(Industry::getIndustryName)
+                    .collect(Collectors.toList());
+
+            firstLevelCategoryLabel.setIndustry(industryNamesList);
+            firstLevelCategoryLabelList.add(firstLevelCategoryLabel);
+        }
+
+        industryVO.setIndustries(firstLevelCategoryLabelList);
+        //缓存结果
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(industryVO));//TODO 感觉这里要加一个过期时间稍微维护一下一致性
+        //放锁
+        redissonLockUtil.unlock(REBUILD_INDUSTRY_BUFFER_LOCK);
+        return Result.ok(industryVO);
     }
 
     @Override
     public Result getUniversityList() {
-        return null;
+        String key = "universityList:";
+        //查缓存
+        String universityListJson = stringRedisTemplate.opsForValue().get(key);
+        if (universityListJson != null) {
+            return Result.ok(JSONUtil.toList(universityListJson, University.class));
+        }
+        //拿锁
+        boolean isLock = redissonLockUtil.tryLock(REBUILD_UNIVERSITY_BUFFER_LOCK, 3, 10, TimeUnit.SECONDS);
+        if (!isLock) {
+            //获取锁失败
+            return Result.fail("请稍后再试");
+        }
+        List<University> universityList = universityService.lambdaQuery().list();
+
+        //缓存结果
+        stringRedisTemplate.opsForValue().set(key, JSONUtil.toJsonStr(universityList));
+        //释放锁
+        redissonLockUtil.unlock(REBUILD_UNIVERSITY_BUFFER_LOCK);
+        return Result.ok(universityList);
     }
 
 
