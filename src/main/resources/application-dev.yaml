@@ -45,3 +45,14 @@ feishu:
 aliyun:
   accessKeyId:
   accessKeySecret:
+
+xxl:
+  job:
+    admin:
+      addresses:
+    executor:
+      appname:
+      port:
+      logpath:
+      logretentiondays:
+    accessToken:
