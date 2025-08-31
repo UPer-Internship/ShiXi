@@ -49,10 +49,20 @@ aliyun:
 xxl:
   job:
     admin:
-      addresses:
+      # 调度中心地址（多个用逗号分隔）
+      addresses: http://www.up-jih.com:9999/xxl-job-admin
     executor:
-      appname:
-      port:
-      logpath:
-      logretentiondays:
-    accessToken:
+      # 执行器名称（需与调度中心配置一致）
+      appname: my-springboot-executor
+      # 执行器端口（默认9999，若多实例需不同端口）
+      port: 9998
+      # 执行器注册地址（可选，默认自动获取）
+      address:
+      # 执行器IP（可选，默认自动获取）
+      ip:
+      # 日志路径
+      logpath: /data/applogs/xxl-job/jobhandler
+      # 日志保存天数
+      logretentiondays: 30
+    # 执行器与调度中心通信的accessToken（若调度中心配置了则需一致）
+    accessToken: default_token
