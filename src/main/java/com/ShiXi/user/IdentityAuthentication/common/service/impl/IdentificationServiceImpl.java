@@ -7,22 +7,26 @@ import com.ShiXi.common.mapper.IdentificationMapper;
 import com.ShiXi.common.utils.RedissonLockUtil;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.IdentityAuthentication.common.domin.dto.DeserializeUserIdAndIdentificationInRedisListDTO;
+import com.ShiXi.user.IdentityAuthentication.common.domin.dto.KeyAndWaitForAuditingUserDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
 import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.IdentityAuthentication.common.service.CurrentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.common.service.IdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.vo.EnterpriseGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.vo.EnterpriseIdentificationForAuditingDataVO;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo.SchoolFriendGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.domin.vo.SchoolFriendIdentificationForAuditingDataVO;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.entity.SchoolFriendIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.studentIdentification.domin.vo.StudentIdentificationForAuditingDataVO;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.entity.StudentIdentification;
 import com.ShiXi.user.IdentityAuthentication.studentIdentification.service.StudentIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherGetIdentificationDataVO;
+import com.ShiXi.user.IdentityAuthentication.teacherIdentification.domin.vo.TeacherIdentificationForAuditingDataVO;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.entity.TeacherIdentification;
 import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.TeacherIdentificationService;
-import com.ShiXi.user.IdentityAuthentication.studentTeamIdentification.service.StudentTeamIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
@@ -34,7 +38,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.ShiXi.common.utils.RedisConstants.LOGIN_USER_KEY;
 import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.*;
@@ -173,7 +179,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
 
     @Override
     public Result getIdentificationDataRequest() {
-        //产看审核人员自己的审核列表是否还有没完成的工作
+        //查看审核人员自己的审核列表是否还有没完成的工作
         //有
         Long userId = UserHolder.getUser().getId();
         String key=ADMIN_AUDITING_BUFFER_POOL+userId;
@@ -182,23 +188,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             DeserializeUserIdAndIdentificationInRedisListDTO dto = JSONUtil.toBean(undone, DeserializeUserIdAndIdentificationInRedisListDTO.class);
             Long waitingForAuditingUserId = dto.getUserId();
             Integer identification = dto.getIdentification();
-            if(identification.equals(1)){
-                StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-                return Result.ok(identificationDataByUserId);
-            }
-            else if(identification.equals(2)){
-                SchoolFriendGetIdentificationDataVO identificationDataByUserId =schoolFriendIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-                return Result.ok(identificationDataByUserId);
-            }
-            else if(identification.equals(3)){
-                TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-                return Result.ok(identificationDataByUserId);
-            }
-            else if(identification.equals(4)){
-                EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-                return Result.ok(identificationDataByUserId);
-            }
-            return Result.fail("未知错误");
+            return processIdentificationData(identification, waitingForAuditingUserId, false);
         }
         //没有
         //加锁获取待审核列表
@@ -222,22 +212,101 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         Long waitingForAuditingUserId = dto.getUserId();
         Integer identification = dto.getIdentification();
         //将缓存工作区加入一个按时间排列的zset，与定时任务配合
-        stringRedisTemplate.opsForZSet().add(ADMIN_AUDITING_BUFFER_POOL_ZSET,key, System.currentTimeMillis());
+        KeyAndWaitForAuditingUserDTO keyAndWaitForAuditingUserDTO = new KeyAndWaitForAuditingUserDTO();
+        keyAndWaitForAuditingUserDTO.setKey(key)
+            .setWaitingForAuditingUserId(waitingForAuditingUserId)
+            .setIdentification(identification);
+        stringRedisTemplate.opsForZSet().add(ADMIN_AUDITING_BUFFER_POOL_ZSET,JSONUtil.toJsonStr(keyAndWaitForAuditingUserDTO), System.currentTimeMillis());
+        return processIdentificationData(identification, waitingForAuditingUserId, true);
+    }
+
+    /**
+     * 处理身份认证数据请求的通用方法
+     * @param identification 身份类型
+     * @param waitingForAuditingUserId 待审核用户ID
+     * @param isNew 是否是新获取的数据
+     * @return Result
+     */
+    private Result processIdentificationData(Integer identification, Long waitingForAuditingUserId, boolean isNew) {
         if(identification.equals(1)){
+            //获取学生信息
             StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-            return Result.ok(identificationDataByUserId);
+            //获取近似的已认证的学生信息
+            List<StudentIdentification> similarStudentIdentifications = studentIdentificationService
+                    .lambdaQuery()
+                    .eq(StudentIdentification::getStudentCardNumber, identificationDataByUserId.getStudentCardNumber())
+                    .eq(StudentIdentification::getUniversity, identificationDataByUserId.getUniversity())
+                    .ne(StudentIdentification::getUserId, waitingForAuditingUserId)
+                    .list();
+            StudentIdentificationForAuditingDataVO studentIdentificationForAuditingDataVO = BeanUtil.copyProperties(identificationDataByUserId,StudentIdentificationForAuditingDataVO.class);
+            if(similarStudentIdentifications!=null){
+                studentIdentificationForAuditingDataVO.setSuspected(true);
+                studentIdentificationForAuditingDataVO.setSuspectedUserIds(similarStudentIdentifications
+                        .stream()
+                        .map(StudentIdentification::getUserId)
+                        .collect(Collectors.toList()));
+            }
+            return Result.ok(studentIdentificationForAuditingDataVO);
         }
         else if(identification.equals(2)){
+            //获取校友信息
             SchoolFriendGetIdentificationDataVO identificationDataByUserId =schoolFriendIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-            return Result.ok(identificationDataByUserId);
+            //获取近似的已认证的校友信息
+            List<SchoolFriendIdentification> similarSchoolFriendIdentifications = schoolFriendIdentificationService
+                    .lambdaQuery()
+                    .eq(SchoolFriendIdentification::getGraduationCertificateNumber, identificationDataByUserId.getGraduationCertificateNumber())
+                    .eq(SchoolFriendIdentification::getUniversity, identificationDataByUserId.getUniversity())
+                    .ne(SchoolFriendIdentification::getUserId, waitingForAuditingUserId)
+                    .list();
+            SchoolFriendIdentificationForAuditingDataVO schoolFriendIdentificationForAuditingDataVO = BeanUtil.copyProperties(identificationDataByUserId, SchoolFriendIdentificationForAuditingDataVO.class);
+            if(similarSchoolFriendIdentifications!=null){
+                schoolFriendIdentificationForAuditingDataVO.setSuspected(true);
+                schoolFriendIdentificationForAuditingDataVO.setSuspectedUserIds(similarSchoolFriendIdentifications
+                        .stream()
+                        .map(SchoolFriendIdentification::getUserId)
+                        .collect(Collectors.toList()));
+            }
+            return Result.ok(schoolFriendIdentificationForAuditingDataVO);
         }
         else if(identification.equals(3)){
+             //获取教师信息
              TeacherGetIdentificationDataVO identificationDataByUserId = teacherIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-            return Result.ok(identificationDataByUserId);
+             //获取近似的已认证的教师信息
+             List<TeacherIdentification>  similarTeacherIdentifications= teacherIdentificationService
+                     .lambdaQuery()
+                     .eq(TeacherIdentification::getWorkCertificateNumber, identificationDataByUserId.getWorkCertificateNumber())
+                     .eq(TeacherIdentification::getUniversity, identificationDataByUserId.getUniversity())
+                     .ne(TeacherIdentification::getUserId, waitingForAuditingUserId)
+                     .list();
+             TeacherIdentificationForAuditingDataVO teacherIdentificationForAuditingDataVO = BeanUtil.copyProperties(identificationDataByUserId, TeacherIdentificationForAuditingDataVO.class);
+             if(similarTeacherIdentifications!=null){
+                 teacherIdentificationForAuditingDataVO.setSuspected(true);
+                 teacherIdentificationForAuditingDataVO.setSuspectedUserIds(similarTeacherIdentifications
+                         .stream()
+                         .map(TeacherIdentification::getUserId)
+                         .collect(Collectors.toList()));
+             }
+             return Result.ok(teacherIdentificationForAuditingDataVO);
         }
         else if(identification.equals(4)){
+            //获取企业信息
             EnterpriseGetIdentificationDataVO identificationDataByUserId = enterpriseIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
-            return Result.ok(identificationDataByUserId);
+            //获取近似的已认证的企业信息
+            List<EnterpriseIdentification> similarEnterpriseIdentification = enterpriseIdentificationService
+                    .lambdaQuery()
+                    .eq(EnterpriseIdentification::getBusinessLicenseNumber, identificationDataByUserId.getBusinessLicenseNumber())
+                    .eq(EnterpriseIdentification::getEnterpriseName, identificationDataByUserId.getEnterpriseName())
+                    .ne(EnterpriseIdentification::getUserId, waitingForAuditingUserId)
+                    .list();
+            EnterpriseIdentificationForAuditingDataVO enterpriseIdentificationForAuditingDataVO = BeanUtil.copyProperties(identificationDataByUserId, EnterpriseIdentificationForAuditingDataVO.class);
+            if(similarEnterpriseIdentification!=null){
+                enterpriseIdentificationForAuditingDataVO.setSuspected(true);
+                enterpriseIdentificationForAuditingDataVO.setSuspectedUserIds(similarEnterpriseIdentification
+                        .stream()
+                        .map(EnterpriseIdentification::getUserId)
+                        .collect(Collectors.toList()));
+            }
+            return Result.ok(enterpriseIdentificationForAuditingDataVO);
         }
         return Result.fail("未知错误");
     }

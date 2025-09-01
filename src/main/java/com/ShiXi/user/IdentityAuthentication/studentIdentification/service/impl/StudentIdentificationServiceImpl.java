@@ -81,6 +81,7 @@ public class StudentIdentificationServiceImpl extends ServiceImpl<StudentIdentif
         StudentIdentification studentIdentification = lambdaQuery()
                 .eq(StudentIdentification::getUserId, userId)
                 .one();
+
         //判空
         if (studentIdentification == null) {
             return null;
