@@ -14,38 +14,44 @@ import java.time.LocalDateTime;
 @TableName("job_part_time")
 public class JobPartTime {
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    private Long id; // 自增id
     
-    private Long publisherId;
+    private Long publisherId; // 发布岗位者id
     
-    private Long companyId;
+    private Long companyId; // 关联的公司id
     
-    private String title;
+    private String title; // 标题
     
-    private BigDecimal salaryMin;
+    private BigDecimal salaryMin; // 薪水下限（单位元）
     
-    private BigDecimal salaryMax;
+    private BigDecimal salaryMax; // 薪水上限（单位元）
     
-    private String mainText;
+    private String mainText; // 正文
     
-    private String province;
+    private String province; // 公司所在省份
     
-    private String city;
+    private String city; // 城市
     
-    private String district;
+    private String district; // 区县
     
-    private String type;
+    private String type; // 正职/兼职/实习
     
-    private String tag;
+    private String tag; // 编略图tag列表 以json格式
     
-    private Integer status;
+    private Integer status; // 状态 0/1 课件/不可见
     
     @TableLogic
-    private Integer isDeleted;
+    private Integer isDeleted; // 逻辑删除 0/1 未删除/删除
     
-    private String category;
+    private String category; // 职位
     
-    private String label;
+    private String label; // 系统打标（暂时没用）
+    
+    private String financingProgress; // 融资进度
+    
+    private String enterpriseScale; // 企业规模
+    
+    private String industry; // 企业所在行业
     
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
