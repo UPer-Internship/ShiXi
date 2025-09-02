@@ -60,6 +60,11 @@ public class identificationController {
     public Result getIdentificationDataRequest(){
         return identificationService.getIdentificationDataRequest();
     }
+    @GetMapping("/admin/getIdentificationDataByUserId")
+    @ApiOperation("管理端获取审核身份验证资料")
+    public Result getIdentificationDataByUserId(Integer userId, Integer identification){
+        return identificationService.getIdentificationDataByUserId(userId, identification);
+    }
     @PostMapping("/admin/passIdentificationDataRequest")
     @ApiOperation("管理端通过审核身份验证资料")
     public Result passIdentificationDataRequest(){
