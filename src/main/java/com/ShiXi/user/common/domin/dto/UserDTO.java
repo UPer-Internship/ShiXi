@@ -9,9 +9,7 @@ public class UserDTO {
     private String uuid;
     private String nickName;
     private String icon;
-    private String phone;
     //当前身份
     private Integer identification;
-    private String major;
     private String token;
 }

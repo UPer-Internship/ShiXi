@@ -10,12 +10,15 @@ import com.ShiXi.common.domin.vo.MajorVO;
 import com.ShiXi.common.domin.vo.RegionVO;
 import com.ShiXi.common.entity.Major;
 import com.ShiXi.common.entity.Region;
-import com.ShiXi.common.service.MajorsService;
-import com.ShiXi.common.service.RegionService;
+import com.ShiXi.common.service.*;
 import com.ShiXi.common.utils.RedissonLockUtil;
+import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
+import com.ShiXi.user.common.domin.dto.ChangeInfoDTO;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
 import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
+import com.ShiXi.user.common.domin.vo.UserSaveVO;
+import com.ShiXi.user.common.domin.vo.UserVO;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.properties.WeChatProperties;
@@ -52,12 +55,11 @@ import static com.ShiXi.user.IdentityAuthentication.common.utils.RedisConstants.
 // 在导入部分添加
 import com.ShiXi.common.domin.vo.IndustryVO;
 import com.ShiXi.common.entity.Industry;
-import com.ShiXi.common.service.IndustryService;
 
 // 在导入部分添加
 import com.ShiXi.common.domin.vo.UniversityVO;
 import com.ShiXi.common.entity.University;
-import com.ShiXi.common.service.UniversityService;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Service
@@ -80,10 +82,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private IndustryService industryService;
     @Resource
     private UniversityService universityService;
-
+    @Resource
+    private OSSUploadService ossPictureService;
     @Resource
     RedissonLockUtil redissonLockUtil;
 
+    private static final String AVATAR_DIR = "avatar/";
     //基本不用密码登录 主要使用验证码登录
     @Override
     public Result loginByAccount(String account, String password) {
@@ -220,20 +224,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public Result changeUserInfo(UserDTO userDTO) {
-        //获取当前登录用户
-        UserDTO currentUser = UserHolder.getUser();
-        //获取当前登录用户的id
-        Long userId = currentUser.getId();
+    public Result changeMyUserInfo(ChangeInfoDTO changeInfoDTO) {
+        Long userId  = UserHolder.getUser().getId();
         //根据id查询用户
-        User user = query().eq("id", userId).one();
-        //修改用户信息
-        user.setNickName(userDTO.getNickName());
-        user.setIcon(userDTO.getIcon());
-        UserHolder.removeUser();
-        UserHolder.saveUser(userDTO);
-        updateById(user);
-        return Result.ok(user);
+        lambdaUpdate().eq(User::getId, userId)
+                .set(User::getNickName, changeInfoDTO.getNickName())
+                .set(User::getGender, changeInfoDTO.getGender())
+                .set(User::getBirthDate, changeInfoDTO.getBirthDate())
+                .set(User::getName, changeInfoDTO.getName())
+                .set(User::getWechat, changeInfoDTO.getWechat())
+                .update();
+        return Result.ok();
     }
 
     /**
@@ -292,22 +293,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public Result getUserInfoById(Long id) {
         // 根据id查询用户
-        User user = query().eq("id", id).one();
+        User user = lambdaQuery().eq(User::getId, id).one();
         if (user == null) {
             return Result.fail("用户不存在");
         }
-        return Result.ok(user);
+        UserSaveVO userSaveVO = BeanUtil.copyProperties(user, UserSaveVO.class);
+        return Result.ok(userSaveVO);
     }
 
 
     @Override
     public Result getUserInfoByUuid(String uuid) {
         // 根据uuid查询用户
-        User user = query().eq("uuid", uuid).one();
+        User user = lambdaQuery().eq(User::getUuid, uuid).one();
         if (user == null) {
             return Result.fail("用户不存在");
         }
-        return Result.ok(user);
+        UserSaveVO saveVO = BeanUtil.copyProperties(user, UserSaveVO.class);
+        return Result.ok(saveVO);
     }
 
 
@@ -497,13 +500,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return Result.ok(universityVOList);
     }
 
+    @Override
+    public Result changeMyIcon(MultipartFile file) {
+        Long id = UserHolder.getUser().getId();
+        User user = lambdaQuery().eq(User::getId, id).one();
+        if(user!=null){
+            String oldUrl=user.getIcon();
+            ossPictureService.deletePicture(oldUrl);
+        }
+        String url = ossPictureService.uploadPicture(file, AVATAR_DIR);
+        lambdaUpdate().eq(User::getId, id)
+                .set(User::getIcon, url)
+                .update();;
+        return Result.ok();
+    }
+
 
     @Override
-    public User getMyUserInfo() {
+    public Result getMyUserInfo() {
         UserDTO userDTO = UserHolder.getUser();
         Long userId = userDTO.getId();
-        User user = query().eq("id", userId).one();
-        return user;
+        User user = lambdaQuery().eq(User::getId, userId).one();
+        if (user == null) {
+            return Result.fail("用户不存在");
+        }
+        UserVO userVO = BeanUtil.copyProperties(user, UserVO.class);
+        return Result.ok(userVO);
     }
 
 
