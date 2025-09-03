@@ -39,12 +39,19 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
     private ApplicationService applicationService;
     @Resource
     private StudentInfoService studentInfoService;
+
+
+
+
+
     /**
      * 分页模糊匹配
      * status字段：0-可申请，1-已截止
      * @param jobPageQueryDTO
      * @return
      */
+
+
     @Override
     public Result pageQuery(JobPageQueryDTO jobPageQueryDTO) {
         // 处理分页参数默认值

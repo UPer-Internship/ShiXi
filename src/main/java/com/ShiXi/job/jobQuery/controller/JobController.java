@@ -1,15 +1,20 @@
 package com.ShiXi.job.jobQuery.controller;
 
+import com.ShiXi.job.jobQuery.domin.dto.EsJobQueryDTO;
 import com.ShiXi.job.jobQuery.domin.dto.JobFuzzyQueryDTO;
 import com.ShiXi.job.jobQuery.domin.dto.JobPageQueryDTO;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.job.jobQuery.service.JobService;
+import com.ShiXi.job.jobQuery.service.impl.MysqlJobServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -18,12 +23,22 @@ import javax.annotation.Resource;
 public class JobController {
     @Resource
     private JobService jobService;
+@Resource
+private MysqlJobServiceImpl mysqlJobServiceImpl;
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
+    @PostMapping("/esQuery")
+    public Result queryJobEs(@RequestBody EsJobQueryDTO esJobQueryDTO) {
+        return mysqlJobServiceImpl.queryJob(esJobQueryDTO);
+    }
+
 
     /**
      * 分页且按条件查询岗位
      *
      * @return 分页查询结果
      */
+
     @GetMapping("/pageQuery")
     @ApiOperation("分页且按条件查询岗位")
     public Result pageQuery(@RequestParam(required = false) Integer page, // 页码
