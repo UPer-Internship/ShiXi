@@ -1,10 +1,7 @@
-package com.ShiXi.user.info.studentInfo.domin.vo;
+package com.ShiXi.user.废弃info.studentInfo.domin.vo;
 
-import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 @Data
 public class StudentInfoVO {
     private Long userId;

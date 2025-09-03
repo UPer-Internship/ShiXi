@@ -1,8 +1,8 @@
-package com.ShiXi.user.info.studentInfo.service;
+package com.ShiXi.user.废弃info.studentInfo.service;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.info.studentInfo.domin.dto.StudentChangeInfoDTO;
-import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.废弃info.studentInfo.domin.dto.StudentChangeInfoDTO;
+import com.ShiXi.user.废弃info.studentInfo.entity.StudentInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface StudentInfoService extends IService<StudentInfo> {

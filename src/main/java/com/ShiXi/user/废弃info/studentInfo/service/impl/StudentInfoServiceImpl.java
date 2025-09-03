@@ -1,15 +1,15 @@
-package com.ShiXi.user.info.studentInfo.service.impl;
+package com.ShiXi.user.废弃info.studentInfo.service.impl;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.common.service.UserService;
-import com.ShiXi.user.info.studentInfo.domin.dto.StudentChangeInfoDTO;
-import com.ShiXi.user.info.studentInfo.domin.vo.StudentInfoVO;
-import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.废弃info.studentInfo.domin.dto.StudentChangeInfoDTO;
+import com.ShiXi.user.废弃info.studentInfo.domin.vo.StudentInfoVO;
+import com.ShiXi.user.废弃info.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.ResumeExperienceMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
-import com.ShiXi.user.info.studentInfo.service.StudentInfoService;
+import com.ShiXi.user.废弃info.studentInfo.service.StudentInfoService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

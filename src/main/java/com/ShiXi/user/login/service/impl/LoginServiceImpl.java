@@ -75,6 +75,8 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     CurrentIdentificationService currentIdentificationService;;
     @Resource
     UuidGenerator uuidGenerator;
+
+    private static final String DEFAULT_AVTAR_URL="https://dev-env-oss.oss-cn-hangzhou.aliyuncs.com/avatar/up-active1.png";
     @Override
     public Result loginByPhone(String phone, String code) {
         if (RegexUtils.isPhoneInvalid(phone)) {
@@ -188,6 +190,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         String uuid = uuidGenerator.generateUuid(8, "BASE_62");
         user.setNickName(RandomUtil.randomString(10));
         user.setUuid(uuid);
+        user.setIcon(DEFAULT_AVTAR_URL);
         save(user);
         // 初始化身份认证
         Identification identification = new Identification();
@@ -213,6 +216,8 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         CurrentIdentification currentIdentification = new CurrentIdentification();
         currentIdentification.setUserId(user.getId());
         currentIdentificationService.save(currentIdentification);
+        //初始化头像
+
         return user;
     }
 

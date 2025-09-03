@@ -27,4 +27,6 @@ public interface IdentificationService extends IService<Identification> {
 
 
     Result getRefusedReason(Integer identification);
+
+    Result getIdentificationDataByUserId(Integer userId, Integer identification);
 }

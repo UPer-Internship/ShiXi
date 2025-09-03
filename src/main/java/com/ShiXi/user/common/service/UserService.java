@@ -1,9 +1,10 @@
 package com.ShiXi.user.common.service;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.common.domin.dto.UserDTO;
+import com.ShiXi.user.common.domin.dto.ChangeInfoDTO;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService extends IService<User> {
     Result loginByAccount(String account, String password);
@@ -12,7 +13,7 @@ public interface UserService extends IService<User> {
 
     Result loginByPhone(String phone, String code);
 
-    Result changeUserInfo(UserDTO userDTO);
+    Result changeMyUserInfo(ChangeInfoDTO changeInfoDTO);
 
     Result loginByWechat(String code);
 
@@ -20,7 +21,7 @@ public interface UserService extends IService<User> {
 
 //    User getUserById(Long id);
     //获取自己的用户信息
-    User getMyUserInfo();
+    Result getMyUserInfo();
 
 //    Result getIdentification();
     
@@ -33,4 +34,6 @@ public interface UserService extends IService<User> {
     Result getIndustryList();
 
     Result getUniversityList();
+
+    Result changeMyIcon(MultipartFile file);
 }

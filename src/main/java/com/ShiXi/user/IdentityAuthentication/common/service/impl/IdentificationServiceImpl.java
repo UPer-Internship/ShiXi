@@ -472,5 +472,44 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         return Result.fail("未知错误");
     }
 
+    @Override
+    public Result getIdentificationDataByUserId(Integer userId,Integer identification) {
+        if(identification==1){
+            StudentIdentification studentIdentification = studentIdentificationService.lambdaQuery()
+                    .eq(StudentIdentification::getUserId, userId)  // 直接引用实体类的userId字段
+                    .one();
+            StudentGetIdentificationDataVO studentGetIdentificationDataVO = new StudentGetIdentificationDataVO();
+            BeanUtil.copyProperties(studentIdentification, studentGetIdentificationDataVO);
+            return Result.ok(studentGetIdentificationDataVO);
+        }
+        else if(identification==2){
+            SchoolFriendIdentification schoolFriendIdentification = schoolFriendIdentificationService.lambdaQuery()
+                    .eq(SchoolFriendIdentification::getUserId, userId)  // 直接引用实体类的userId字段
+                    .one();
+            SchoolFriendGetIdentificationDataVO schoolFriendGetIdentificationDataVO = new SchoolFriendGetIdentificationDataVO();
+            BeanUtil.copyProperties(schoolFriendIdentification, schoolFriendGetIdentificationDataVO);
+            return Result.ok(schoolFriendGetIdentificationDataVO);
+        }
+        else if(identification==3){
+
+            TeacherIdentification teacherIdentification = teacherIdentificationService.lambdaQuery()
+                    .eq(TeacherIdentification::getUserId, userId)  // 直接引用实体类的userId字段
+                    .one();
+                    TeacherGetIdentificationDataVO teacherGetIdentificationDataVO = new TeacherGetIdentificationDataVO();
+                    BeanUtil.copyProperties(teacherIdentification, teacherGetIdentificationDataVO);
+                    return Result.ok(teacherGetIdentificationDataVO);
+        }
+        else if(identification==4){
+
+            EnterpriseIdentification enterpriseIdentification = enterpriseIdentificationService.lambdaQuery()
+                    .eq(EnterpriseIdentification::getUserId, userId)  // 直接引用实体类的userId字段
+                    .one();
+            EnterpriseGetIdentificationDataVO enterpriseGetIdentificationDataVO = new EnterpriseGetIdentificationDataVO();
+            BeanUtil.copyProperties(enterpriseIdentification, enterpriseGetIdentificationDataVO);
+            return Result.ok(enterpriseGetIdentificationDataVO);
+        }
+        return Result.fail("未知错误");
+    }
+
 
 }

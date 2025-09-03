@@ -1,4 +1,4 @@
-package com.ShiXi.user.info.studentInfo.domin.dto;
+package com.ShiXi.user.废弃info.studentInfo.domin.dto;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
