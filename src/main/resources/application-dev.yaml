@@ -29,8 +29,18 @@ spring:
     accessKeyId:
     accessKeySecret:
     bucketName: dev-env-oss
+
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
+
+  elasticsearch:
+    rest:
+      uris: http://116.62.60.208:9200
+      connection-timeout: 15000ms  # 连接超时15秒
+      read-timeout: 30000ms        # 读取超时30秒
+
+
+
 mybatis-plus:
   type-aliases-package: com.ShiXi.entity # 别名扫描包
 logging:
@@ -50,7 +60,7 @@ xxl:
   job:
     admin:
       # 调度中心地址（多个用逗号分隔）
-      addresses: http://www.up-jih.com:9999/xxl-job-admin
+      addresses: http://120.26.138.68:9999/xxl-job-admin
     executor:
       # 执行器名称（需与调度中心配置一致）
       appname: my-springboot-executor
