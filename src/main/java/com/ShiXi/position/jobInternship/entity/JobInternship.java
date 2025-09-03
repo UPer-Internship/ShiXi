@@ -22,9 +22,9 @@ public class JobInternship {
     
     private String title; // 标题
     
-    private BigDecimal salaryMin; // 薪水下限（单位元）
+    private Double salaryMin; // 薪水下限（单位元）
     
-    private BigDecimal salaryMax; // 薪水上限（单位元）
+    private Double salaryMax; // 薪水上限（单位元）
     
     private String mainText; // 正文
     

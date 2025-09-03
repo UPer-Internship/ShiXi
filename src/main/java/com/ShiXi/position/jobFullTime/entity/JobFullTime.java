@@ -1,12 +1,14 @@
 package com.ShiXi.position.jobFullTime.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -22,9 +24,9 @@ public class JobFullTime {
     
     private String title; // 标题
     
-    private BigDecimal salaryMin; // 薪水下限（单位K）
+    private Double salaryMin; // 薪水下限（单位K）
     
-    private BigDecimal salaryMax; // 薪水上限（单位K）
+    private Double salaryMax; // 薪水上限（单位K）
     
     private String salaryRound; // 年发薪次数
     
@@ -38,9 +40,11 @@ public class JobFullTime {
     
     private String type; // 正职/兼职/实习
     
-    private String tag; // 编略图tag列表 以json格式
+    @TableField(typeHandler = FastjsonTypeHandler.class)
+    @JSONField
+    private List<String> tag; // 标签列表，使用FastJSON序列化存储
     
-    private Integer status; // 状态 0/1 课件/不可见
+    private Integer status; // 状态 0/1 可见/不可见
     
     @TableLogic
     private Integer isDeleted; // 逻辑删除 0/1 未删除/删除

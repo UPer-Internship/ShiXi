@@ -1,16 +1,11 @@
-package com.ShiXi.position.jobFullTime.domin.vo;
+package com.ShiXi.position.jobFullTime.domin.dto;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class JobFullTimeVO {
-    private Long id; // 岗位id
-    
-    private Long publisherId; // 发布岗位者id
-    
+public class JobFullTimeCreateDTO {
     private Long companyId; // 关联的公司id
     
     private String title; // 标题
@@ -33,8 +28,6 @@ public class JobFullTimeVO {
     
     private List<String> tag; // 标签列表
     
-    private Integer status; // 状态 0/1 可见/不可见
-    
     private String category; // 职位
     
     private String financingProgress; // 融资进度
@@ -42,8 +35,4 @@ public class JobFullTimeVO {
     private String enterpriseScale; // 企业规模
     
     private String industry; // 企业所在行业
-    
-    private LocalDateTime createTime; // 创建时间
-    
-    private LocalDateTime updateTime; // 更新时间
 }
