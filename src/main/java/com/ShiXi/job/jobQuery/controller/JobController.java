@@ -23,10 +23,9 @@ import java.io.IOException;
 public class JobController {
     @Resource
     private JobService jobService;
-@Resource
-private MysqlJobServiceImpl mysqlJobServiceImpl;
-    @Autowired
-    private RestHighLevelClient restHighLevelClient;
+    @Resource
+    private MysqlJobServiceImpl mysqlJobServiceImpl;
+
     @PostMapping("/esQuery")
     public Result queryJobEs(@RequestBody EsJobQueryDTO esJobQueryDTO) {
         return mysqlJobServiceImpl.queryJob(esJobQueryDTO);
@@ -67,7 +66,7 @@ private MysqlJobServiceImpl mysqlJobServiceImpl;
 
     /**
      * 根据岗位id返回
-     * 
+     *
      * @return 单个岗位信息
      */
     @GetMapping("/queryById")
@@ -78,22 +77,22 @@ private MysqlJobServiceImpl mysqlJobServiceImpl;
 
     /**
      * 模糊查询Job信息
-     * 
+     *
      * @param keyWord 模糊查询条件
      * @return 模糊查询结果
      */
     @GetMapping("/fuzzyQuery")
     @ApiOperation("模糊查询Job信息")
     public Result fuzzyQuery(@RequestParam(required = false) String keyWord,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer pageSize) {
+                             @RequestParam(required = false) Integer page,
+                             @RequestParam(required = false) Integer pageSize) {
         JobFuzzyQueryDTO jobFuzzyQueryDTO = new JobFuzzyQueryDTO(keyWord, page, pageSize);
         return jobService.fuzzyQuery(jobFuzzyQueryDTO);
     }
 
     /**
      * 投递简历
-     * 
+     *
      * @param id 向id的工作投递简历，传入的是Job的id
      * @return
      */

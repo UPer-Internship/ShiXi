@@ -3,6 +3,7 @@ package com.ShiXi.job.jobQuery.service.impl;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.job.jobQuery.domin.dto.EsJobQueryDTO;
 import com.ShiXi.job.jobQuery.entity.es.EsJob;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
@@ -18,22 +19,50 @@ public class MysqlJobServiceImpl {
     private ElasticsearchRestTemplate elasticsearchRestTemplate;
 
     public Result queryJob(EsJobQueryDTO esJobQueryDTO){
+        // 创建一个BoolQueryBuilder用于构建动态查询条件
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+        
+        // 只有当keyword不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getTitle() != null && !esJobQueryDTO.getTitle().isEmpty()) {
+            boolQuery.must(QueryBuilders.matchQuery("title", esJobQueryDTO.getTitle()));
+        }
+        
+        // 只有当salaryMin不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getSalaryMin() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("salary_min").gte(esJobQueryDTO.getSalaryMin()));
+        }
+        
+        // 只有当salaryMax不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getSalaryMax() != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("salary_max").lte(esJobQueryDTO.getSalaryMax()));
+        }
+        
+        // 只有当financingProgress不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getFinancingProgress() != null && !esJobQueryDTO.getFinancingProgress().isEmpty()) {
+            boolQuery.must(QueryBuilders.matchQuery("financing_progress.keyword", esJobQueryDTO.getFinancingProgress()));
+        }
+        
+        // 只有当enterpriseScale不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getEnterpriseScale() != null && !esJobQueryDTO.getEnterpriseScale().isEmpty()) {
+            boolQuery.must(QueryBuilders.matchQuery("enterprise_scale.keyword", esJobQueryDTO.getEnterpriseScale()));
+        }
+        
+        // 只有当category不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getCategory() != null && !esJobQueryDTO.getCategory().isEmpty()) {
+            boolQuery.must(QueryBuilders.matchQuery("category.keyword", esJobQueryDTO.getCategory()));
+        }
+        
+        // 只有当type不为空时，才添加到查询条件中
+        if (esJobQueryDTO.getType() != null && !esJobQueryDTO.getType().isEmpty()) {
+            boolQuery.must(QueryBuilders.matchQuery("type.keyword", esJobQueryDTO.getType()));
+        }
+
+
         NativeSearchQuery searchQuery = new NativeSearchQueryBuilder()
-                // 对title字段进行模糊匹配（会进行分词后匹配）
-                .withQuery(QueryBuilders.matchQuery("title", esJobQueryDTO.getKeyWord()))
-                // 如果需要精确匹配不分词的场景，可使用wildcardQuery（*表示任意字符）
-                // .withQuery(QueryBuilders.wildcardQuery("title.keyword", "*" + keyword + "*"))
+                .withQuery(boolQuery)
                 .build();
         return Result.ok(elasticsearchRestTemplate.search(searchQuery, EsJob.class));
     }
 
-    // 使用示例：新增文档
-    public void save(EsJob job) {
-        elasticsearchRestTemplate.save(job);
-    }
 
-    // 其他操作：查询、更新、删除等
-    public EsJob findById(String id) {
-        return elasticsearchRestTemplate.get(id, EsJob.class);
-    }
 }
