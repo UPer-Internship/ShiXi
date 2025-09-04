@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user/login")
-@Api(tags = "用户服务")
+@Api(tags = "用户登录服务")
 public class loginController {
     @Resource
     private LoginService loginService;

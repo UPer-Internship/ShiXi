@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-@Api(tags = "用户服务")
+@Api(tags = "用户信息服务")
 public class UserController {
     @Resource
     private UserService userService;

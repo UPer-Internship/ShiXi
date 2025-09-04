@@ -31,6 +31,10 @@ public class JobController {
         return mysqlJobServiceImpl.queryJob(esJobQueryDTO);
     }
 
+    @PostMapping("/saveSearchHistory")
+    public Result saveSearchHistory(@RequestParam String word) {
+        return mysqlJobServiceImpl.saveSearchHistory(word);
+    }
 
     /**
      * 分页且按条件查询岗位

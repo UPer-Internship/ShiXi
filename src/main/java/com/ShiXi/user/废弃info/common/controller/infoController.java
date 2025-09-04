@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user/info")
-@Api(tags = "用户信息")
+@Api(tags = "废弃 用户信息")
 public class infoController {
 
     @Resource

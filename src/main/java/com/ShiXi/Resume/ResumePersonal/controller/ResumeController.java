@@ -25,7 +25,7 @@ public class ResumeController {
      * 获取在线简历信息
      * @return 在线简历的vo类
      */
-    @GetMapping("/getMy Resume")
+    @GetMapping("/getMyResume")
     @ApiOperation("获取我的简历")
     public Result getMyResume() {
         return onlineResumeService.getMyResume();
