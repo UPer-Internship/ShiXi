@@ -531,7 +531,7 @@ public class TeamServiceImpl extends ServiceImpl<TeamMapper, Team> implements Te
         }
 
         // 获取团队成员数量
-        Integer memberCount = teamMemberService.lambdaQuery()
+        Long memberCount = teamMemberService.lambdaQuery()
                 .eq(TeamMember::getTeamId, team.getId())
                 .eq(TeamMember::getStatus, "approved")
                 .count();

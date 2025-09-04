@@ -3,7 +3,7 @@ package com.ShiXi.user.common.controller;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.common.domin.dto.ChangeInfoDTO;
 import com.ShiXi.user.common.service.UserService;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-@Api(tags = "用户信息服务")
+@Tag(name = "用户信息服务")
 public class UserController {
     @Resource
     private UserService userService;
