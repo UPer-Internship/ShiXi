@@ -3,8 +3,8 @@ package com.ShiXi.job.jobPublish.controller;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.job.jobQuery.entity.Job;
 import com.ShiXi.job.jobPublish.service.JobPublishService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/enterprise")
-@Api(tags = "发布岗位相关接口")
+@Tag(name = "发布岗位相关接口")
 public class JobPublishController {
     @Resource
     JobPublishService jobPublishService;
@@ -23,7 +23,7 @@ public class JobPublishController {
      * @param job 岗位类
      * @return
      */
-    @ApiOperation("发布岗位")
+    @Operation(summary = "发布岗位")
     @PostMapping("/pubJob")
     Result pubJob(@RequestBody Job job) {
         return jobPublishService.pubJob(job);
@@ -34,7 +34,7 @@ public class JobPublishController {
      * @param id
      * @return
      */
-    @ApiOperation("删除岗位")
+    @Operation(summary ="删除岗位")
     @PostMapping("/deleteJob")
     Result pubJob(@RequestParam("id")Long id) {
         return jobPublishService.deleteJob(id);
@@ -42,7 +42,7 @@ public class JobPublishController {
     /**
      * 根据id查询某个岗位
      */
-    @ApiOperation("根据id查询某个岗位")
+    @Operation(summary ="根据id查询某个岗位")
     @GetMapping("/queryPubById")
     Result queryPubNyId(@RequestParam("id")Long id) {
         return jobPublishService.queryPubById(id);
@@ -52,7 +52,7 @@ public class JobPublishController {
      * 查询自己已经发布全部岗位
      * @return
      */
-    @ApiOperation("查询自己已经发布全部岗位")
+    @Operation(summary ="查询自己已经发布全部岗位")
     @GetMapping("/queryMyPubList")
     Result queryMyPubList() {
         return jobPublishService.queryMyPubList();
@@ -64,7 +64,7 @@ public class JobPublishController {
      * @param id 要更新的job的id
      * @return
      */
-    @ApiOperation("更新某个岗位")
+    @Operation(summary ="更新某个岗位")
     @PostMapping("/updateJob")
     Result updateJob(@RequestBody Job job,@RequestParam("id")Long id) {
         return jobPublishService.updateJob(job,id);
@@ -73,7 +73,7 @@ public class JobPublishController {
     /**
      * 改变岗位状态
      */
-    @ApiOperation("改变岗位状态")
+    @Operation(summary ="改变岗位状态")
     @PostMapping("/changeJobStatus")
     public Result changeJobStatus(@RequestParam("jobId") Long jobId, @RequestParam("status") Integer status) {
         return jobPublishService.changeJobStatus(jobId, status);
@@ -83,7 +83,7 @@ public class JobPublishController {
      * 查询收到的所有简历
      * @return 所有简历
      */
-    @ApiOperation("查询收到的所有简历")
+    @Operation(summary ="查询收到的所有简历")
     @GetMapping("/queryResumeList")
     Result queryResumeList() {
         return jobPublishService.queryResumeList();
@@ -93,7 +93,7 @@ public class JobPublishController {
      * 查询新投递的简历（从Redis消费）
      * @return 新投递的简历列表
      */
-    @ApiOperation("查询新投递的简历")
+    @Operation(summary ="查询新投递的简历")
     @GetMapping("/queryNewResumeList")
     Result queryNewResumeList() {
         return jobPublishService.queryNewResumeList();
@@ -105,7 +105,7 @@ public class JobPublishController {
      * @param pageSize 每页大小，默认为10
      * @return 分页查询结果
      */
-    @ApiOperation("查询历史全量简历")
+    @Operation(summary ="查询历史全量简历")
     @GetMapping("/queryHistoryResumeList")
     Result queryHistoryResumeList(@RequestParam(value = "page", defaultValue = "1") Integer page,
                                  @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
@@ -117,7 +117,7 @@ public class JobPublishController {
      * @param id 要查询的简历的id
      * @return 该简历
      */
-    @ApiOperation("根据id查询某个简历")
+    @Operation(summary ="根据id查询某个简历")
     @GetMapping("/queryResumeById")
     Result queryResumeById(@RequestParam("id")Long id) {
         return jobPublishService.queryResumeById(id);

@@ -4,8 +4,8 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.ResumePageQueryDTO;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/Resume")
-@Api(tags = "在线简历相关接口")
+@Tag(name = "在线简历相关接口")
 public class ResumeController {
     @Resource
     private OnlineResumeService onlineResumeService;
@@ -25,14 +25,14 @@ public class ResumeController {
      * 获取在线简历信息
      * @return 在线简历的vo类
      */
-    @GetMapping("/getMy Resume")
-    @ApiOperation("获取我的简历")
+    @GetMapping("/getMyResume")
+    @Operation(summary = "获取我的简历")
     public Result getMyResume() {
         return onlineResumeService.getMyResume();
     }
 
     @PostMapping("/updateMyResume")
-    @ApiOperation("修改我的简历")
+    @Operation(summary = "修改我的简历")
     public Result updateMyExperience(@RequestBody UpdateResumeDTO reqDTO) {
         return onlineResumeService.updateMyExperience(reqDTO);
     }
@@ -45,7 +45,7 @@ public class ResumeController {
      * @return 分页查询结果
      */
     @GetMapping("/pageQueryPublic")
-    @ApiOperation("分页查询简历公开信息")
+    @Operation(summary = "分页查询简历公开信息")
     public Result pageQueryPublicResumes(@RequestParam(required = false) Integer page,
                                        @RequestParam(required = false) Integer pageSize,
                                        @RequestParam(required = false) String expectedPosition) {

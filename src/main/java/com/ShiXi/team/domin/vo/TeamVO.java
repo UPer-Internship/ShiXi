@@ -15,6 +15,6 @@ public class TeamVO {
     private String school; // 团队所属院校
     private String industry; // 团队所属行业
     private LocalDateTime createTime; // 创建时间
-    private Integer memberCount; // 成员数量
+    private Long memberCount; // 成员数量
     private List<TeamMemberVO> members; // 团队成员列表
 }

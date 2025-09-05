@@ -3,7 +3,7 @@ package com.ShiXi.application.controller;
 import com.ShiXi.application.domin.dto.ApplicationDTO;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.application.service.ApplicationService;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/application")
-@Api(tags = "申请相关接口")
+@Tag(name = "申请相关接口")
 public class ApplicationController {
     @Resource
     private ApplicationService applicationService;

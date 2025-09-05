@@ -2,8 +2,8 @@ package com.ShiXi.icon.controller;
 
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.icon.service.IconService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +16,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/icon")
-@Api(tags = "头像相关接口")
+@Tag(name = "头像相关接口")
 public class IconController {
 
     @Resource
@@ -28,7 +28,7 @@ public class IconController {
      * @return 上传结果
      */
     @PostMapping("/upload")
-    @ApiOperation("上传用户头像")
+    @Operation(summary = "上传用户头像")
     public Result uploadAvatar(@RequestParam("file") MultipartFile file) {
         return iconService.uploadAvatar(file);
     }
@@ -39,7 +39,7 @@ public class IconController {
      * @return 删除结果
      */
     @DeleteMapping("/delete")
-    @ApiOperation("删除用户头像")
+    @Operation(summary = "删除用户头像")
     public Result deleteAvatar(@RequestParam("avatarUrl") String avatarUrl) {
         return iconService.deleteAvatar(avatarUrl);
     }
@@ -49,7 +49,7 @@ public class IconController {
      * @return 头像信息
      */
     @GetMapping("/current")
-    @ApiOperation("获取用户当前头像")
+    @Operation(summary = "获取用户当前头像")
     public Result getCurrentAvatar() {
         return iconService.getCurrentAvatar();
     }
@@ -60,7 +60,7 @@ public class IconController {
      * @return 更新结果
      */
     @PutMapping("/update")
-    @ApiOperation("更新用户头像信息")
+    @Operation(summary = "更新用户头像信息")
     public Result updateUserAvatar(@RequestParam("avatarUrl") String avatarUrl) {
         return iconService.updateUserAvatar(avatarUrl);
     }
@@ -71,7 +71,7 @@ public class IconController {
      * @return 检查结果
      */
     @GetMapping("/check")
-    @ApiOperation("检查头像文件是否存在")
+    @Operation(summary = "检查头像文件是否存在")
     public Result checkAvatarExists(@RequestParam("avatarUrl") String avatarUrl) {
         return iconService.checkAvatarExists(avatarUrl);
     }
@@ -82,7 +82,7 @@ public class IconController {
      * @return 预览URL
      */
     @GetMapping("/preview")
-    @ApiOperation("获取头像预览URL")
+    @Operation(summary = "获取头像预览URL")
     public Result getAvatarPreviewUrl(@RequestParam("avatarUrl") String avatarUrl) {
         return iconService.getAvatarPreviewUrl(avatarUrl);
     }

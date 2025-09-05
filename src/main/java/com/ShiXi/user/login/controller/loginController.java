@@ -1,10 +1,9 @@
 package com.ShiXi.user.login.controller;
 
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.user.login.service.LoginService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +15,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user/login")
-@Api(tags = "用户服务")
+@Tag(name = "用户登录服务")
 public class loginController {
     @Resource
     private LoginService loginService;
@@ -26,7 +25,7 @@ public class loginController {
      * @return
      */
     @PostMapping("/sendCode")
-    @ApiOperation("发送验证码")
+    @Operation(summary="发送验证码")
     public Result sendCode(@RequestParam("phone")String phone) {
         return loginService.sendCode(phone);
     }
@@ -38,7 +37,7 @@ public class loginController {
      * @return 登录结果与token
      */
     @PostMapping("/byPhone")
-    @ApiOperation("手机验证码登录")
+    @Operation(summary="手机验证码登录")
     public Result loginByPhone(@RequestParam("phone")String phone,@RequestParam("code")String code) {
         return loginService.loginByPhone(phone,code);
     }
@@ -51,14 +50,14 @@ public class loginController {
      * @return 用户信息
      */
     @PostMapping("/byWechat")
-    @ApiOperation("微信登录")
+    @Operation(summary="微信登录")
     public Result login(@RequestParam String code, @RequestParam(required = false) String phone) {
         return loginService.loginByWechat(code, phone);
     }
 
 
     @PostMapping("/logout")
-    @ApiOperation("登出")
+    @Operation(summary="登出")
     public Result logout() {
         return loginService.logout();
     }

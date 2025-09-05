@@ -6,8 +6,8 @@ import com.ShiXi.chat.entity.OutputMessage;
 import com.ShiXi.chat.service.MessageService;
 import com.ShiXi.common.utils.NativeWebSocketHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +16,7 @@ import java.util.Date;
 
 @Slf4j
 @RestController
-@Api(tags = "聊天相关接口")
+@Tag(name = "聊天相关接口")
 public class ChatController {
 
     @Resource
@@ -28,7 +28,7 @@ public class ChatController {
      * 接收前端发送的消息，并通过 WebSocket 发送给目标用户
      */
     @PostMapping("/chat/sendMessage")
-    @ApiOperation("发送消息")
+    @Operation(summary = "发送消息")
     public void sendMessage(@RequestBody ChatMessage chatMessage) {
         try {
             // 构造输出消息
@@ -50,55 +50,55 @@ public class ChatController {
 
 
     @PostMapping("/message/saveMessage")
-    @ApiOperation("保存消息到数据库")
+    @Operation(summary = "保存消息到数据库")
     public Result saveMessage(@RequestBody ChatMessage message){
         return messageService.saveMessage(message);
     }
 
     @GetMapping("/message/getMessages")
-    @ApiOperation("获取历史消息")
+    @Operation(summary = "获取历史消息")
     public Result getMessages(@RequestParam Long userId2){
         return messageService.getMessagesBetweenUsers(userId2);
     }
 
     @PostMapping("/message/markAsRead")
-    @ApiOperation("标记为已读")
+    @Operation(summary = "标记为已读")
     public Result markAsRead(@RequestParam Long userId2){
         return messageService.markMessageAsRead(userId2);
     }
 
     @PostMapping("/message/delete")
-    @ApiOperation("删除消息")
+    @Operation(summary = "删除消息")
     public Result deleteMessage(@RequestParam Long messageId){
         return messageService.deleteMessage(messageId);
     }
 
     @GetMapping("/contact/getList")
-    @ApiOperation("获取联系人列表")
+    @Operation(summary = "获取联系人列表")
     public Result getContactListByType(@RequestParam String contactType){
         return messageService.getContactListByType(contactType);
     }
 
     @PostMapping("/contact/markReadStatus")
-    @ApiOperation("标记联系人状态")
+    @Operation(summary = "标记联系人状态")
     public Result markContactAsRead(@RequestParam Long userId2,@RequestParam Integer status){
         return messageService.markContactAsRead(userId2,status);
     }
 
     @PostMapping("/contact/delete")
-    @ApiOperation("删除联系人")
+    @Operation(summary = "删除联系人")
     public Result deleteContact(@RequestParam Long userId2){
         return messageService.deleteContact(userId2);
     }
 
     @PostMapping("/contact/remark")
-    @ApiOperation("备注联系人")
+    @Operation(summary = "备注联系人")
     public Result remarkContact(@RequestParam Long userId2,@RequestParam String remark){
         return messageService.remarkContact(userId2,remark);
     }
 
     @PostMapping("/contact/addContact")
-    @ApiOperation("添加联系人")
+    @Operation(summary = "添加联系人")
     public Result addContactById(@RequestParam Long userId2,@RequestParam String contactType){
         return messageService.addContactById(userId2,contactType);
     }

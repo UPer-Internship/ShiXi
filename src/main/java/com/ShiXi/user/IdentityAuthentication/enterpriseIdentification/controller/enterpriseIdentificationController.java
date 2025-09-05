@@ -3,8 +3,8 @@ package com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.controlle
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.domin.dto.EnterpriseUploadIdentificationTextDataReqDTO;
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user/identification/enterprise")
-@Api(tags = "企业认证资料接口")
+@Tag(name = "企业认证资料接口")
 public class enterpriseIdentificationController {
 
   @Resource
@@ -30,7 +30,7 @@ public class enterpriseIdentificationController {
    * @return 操作结果
    */
   @PostMapping("/uploadIdentificationData/fileType")
-  @ApiOperation("企业发起身份验证，上传图片（营业执照等证件）资料")
+  @Operation(summary = "企业发起身份验证，上传图片（营业执照等证件）资料")
   public Result uploadIdentificationPictureData(@RequestParam MultipartFile file) {
     return enterpriseIdentificationService.uploadIdentificationPictureData(file);
   }
@@ -42,7 +42,7 @@ public class enterpriseIdentificationController {
    * @return 操作结果
    */
   @PostMapping("/uploadIdentificationData/textType")
-  @ApiOperation("企业发起身份验证，上传非图片资料（企业名称、规模、行业等）")
+  @Operation(summary = "企业发起身份验证，上传非图片资料（企业名称、规模、行业等）")
   public Result uploadIdentificationTextData(@RequestBody EnterpriseUploadIdentificationTextDataReqDTO reqDTO) {
     return enterpriseIdentificationService.uploadIdentificationTextData(reqDTO);
   }
@@ -53,7 +53,7 @@ public class enterpriseIdentificationController {
    * @return 企业认证数据
    */
   @GetMapping("/getMyIdentificationData")
-  @ApiOperation("查看自己的企业身份验证资料")
+  @Operation(summary = "查看自己的企业身份验证资料")
   public Result getMyIdentificationData() {
     return enterpriseIdentificationService.getMyIdentificationData();
   }
