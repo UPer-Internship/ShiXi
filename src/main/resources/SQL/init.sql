@@ -601,6 +601,6 @@ CREATE TABLE `position_favorite`
     KEY `idx_user_position` (`user_id`, `position_id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_0900_ai_ci COMMENT ='新的岗位收藏表，对应position模块'
+  COLLATE = utf8mb4_0900_ai_ci COMMENT ='新的岗位收藏表，对应position模块';
 
 SET FOREIGN_KEY_CHECKS = 1;
