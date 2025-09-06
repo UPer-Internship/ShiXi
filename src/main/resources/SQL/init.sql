@@ -589,4 +589,18 @@ create table if not exists `4_uper_up_intern`.job_part_time
     label        varchar(255)  null comment '标签'
 );
 
+CREATE TABLE `position_favorite`
+(
+    `id`          bigint     NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `user_id`     bigint     NOT NULL COMMENT '用户ID',
+    `position_id`      bigint     NOT NULL COMMENT '岗位ID',
+    `type` varchar(20) NOT NULL COMMENT '岗位类型：正职、兼职、实习',
+    `create_time` datetime            DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `is_deleted`  tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_position` (`user_id`, `position_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci COMMENT ='新的岗位收藏表，对应position模块'
+
 SET FOREIGN_KEY_CHECKS = 1;
