@@ -73,7 +73,7 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
                 return Result.fail("工作类型不能为空");
             }
             if (!isValidJobType(createDTO.getType())) {
-                return Result.fail("工作类型只能是：正职、兼职、实习");
+                return Result.fail("工作类型只能是：正职");
             }
             
             // 验证职位分类
@@ -152,7 +152,7 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
             
             // 验证工作类型
             if (StringUtils.hasText(updateDTO.getType()) && !isValidJobType(updateDTO.getType())) {
-                return Result.fail("工作类型只能是：正职、兼职、实习");
+                return Result.fail("工作类型只能是：正职");
             }
             
             // 验证状态
@@ -280,9 +280,9 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
     }
     
     /**
-     * 验证工作类型是否有效
+     * 验证工作类型是否符合
      */
     private boolean isValidJobType(String type) {
-        return "正职".equals(type) || "兼职".equals(type) || "实习".equals(type);
+        return "正职".equals(type);
     }
 }

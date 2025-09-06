@@ -1,22 +1,13 @@
-package com.ShiXi.position.jobInternship.entity;
+package com.ShiXi.position.jobInternship.domin.vo;
 
-import com.alibaba.fastjson.annotation.JSONField;
-import com.baomidou.mybatisplus.annotation.*;
-import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("job_internship")
-public class JobInternship {
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id; // 自增id
+public class JobInternshipVO {
+    private Long id; // 岗位id
     
     private Long publisherId; // 发布岗位者id
     
@@ -38,14 +29,9 @@ public class JobInternship {
     
     private String type; // 正职/兼职/实习
     
-    @TableField(typeHandler = FastjsonTypeHandler.class)
-    @JSONField
-    private List<String> tag; // 标签列表，使用FastJSON序列化存储
+    private List<String> tag; // 标签列表
     
     private Integer status; // 状态 0/1 可见/不可见
-    
-    @TableLogic
-    private Integer isDeleted; // 逻辑删除 0/1 未删除/删除
     
     private String category; // 职位
     
@@ -57,9 +43,7 @@ public class JobInternship {
     
     private String industry; // 企业所在行业
     
-    @TableField(fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    private LocalDateTime createTime; // 创建时间
     
-    @TableField(fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    private LocalDateTime updateTime; // 更新时间
 }

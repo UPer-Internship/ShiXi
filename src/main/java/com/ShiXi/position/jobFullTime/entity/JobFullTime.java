@@ -51,7 +51,7 @@ public class JobFullTime {
     
     private String category; // 职位
     
-    private String label; // 系统打标（暂时没用）
+    private String label; // 系统打标
     
     private String financingProgress; // 融资进度
     
