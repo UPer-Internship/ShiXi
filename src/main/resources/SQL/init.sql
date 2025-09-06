@@ -524,4 +524,83 @@ CREATE TABLE `user_teacher_info`  (
                                       PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb3 COLLATE = utf8mb3_general_ci ROW_FORMAT = Dynamic;
 
+create table if not exists `4_uper_up_intern`.job_full_time
+(
+    id           bigint auto_increment
+        primary key,
+    publisher_id int           null comment '发布者id
+',
+    company_id   int           null comment '公司id',
+    title        varchar(255)  null comment '岗位标题',
+    salary_min   float         null comment '薪水下线',
+    salary_max   float         null comment '薪水上限',
+    main_text    varchar(2000) null comment '正文',
+    province     varchar(255)  null comment '公司所在省份',
+    city         varchar(255)  null comment '公司所在城市',
+    district     varchar(255)  null comment '公司所在区',
+    type         varchar(255)  null comment '工作类型 实习 兼职 正职',
+    tag          varchar(255)  null comment 'tag',
+    status       tinyint       null comment 'status',
+    is_deleted   tinyint       null comment '逻辑删除',
+    category     varchar(255)  null comment '岗位类别',
+    label        varchar(255)  null comment '标签',
+    salary_round int           null comment '年发薪次数'
+);
+
+create table if not exists `4_uper_up_intern`.job_internship
+(
+    id           int auto_increment
+        primary key,
+    publisher_id int           null comment '发布者id',
+    company_id   int           null comment '公司id',
+    title        varchar(255)  null comment '岗位标题',
+    salary_min   float         null comment '薪水下线',
+    salary_max   float         null comment '薪水上限',
+    main_text    varchar(2000) null comment '正文',
+    province     varchar(255)  null comment '公司所在省份',
+    city         varchar(255)  null comment '公司所在城市',
+    district     varchar(255)  null comment '公司所在区',
+    type         varchar(255)  null comment '工作类型 实习 兼职 正职',
+    tag          varchar(255)  null comment 'tag',
+    status       tinyint       null comment 'status',
+    is_deleted   tinyint       null comment '逻辑删除',
+    category     varchar(255)  null comment '岗位类别',
+    label        varchar(255)  null comment '标签'
+);
+
+create table if not exists `4_uper_up_intern`.job_part_time
+(
+    id           int auto_increment
+        primary key,
+    publisher_id int           null comment '发布者id',
+    company_id   int           null comment '公司id',
+    title        varchar(255)  null comment '岗位标题',
+    salary_min   float         null comment '薪水下线',
+    salary_max   float         null comment '薪水上限',
+    main_text    varchar(2000) null comment '正文',
+    province     varchar(255)  null comment '公司所在省份',
+    city         varchar(255)  null comment '公司所在城市',
+    district     varchar(255)  null comment '公司所在区',
+    type         varchar(255)  null comment '工作类型 实习 兼职 正职',
+    tag          varchar(255)  null comment 'tag',
+    status       tinyint       null comment 'status',
+    is_deleted   tinyint       null comment '逻辑删除',
+    category     varchar(255)  null comment '岗位类别',
+    label        varchar(255)  null comment '标签'
+);
+
+CREATE TABLE `position_favorite`
+(
+    `id`          bigint     NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `user_id`     bigint     NOT NULL COMMENT '用户ID',
+    `position_id`      bigint     NOT NULL COMMENT '岗位ID',
+    `type` varchar(20) NOT NULL COMMENT '岗位类型：正职、兼职、实习',
+    `create_time` datetime            DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `is_deleted`  tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除标志，0-未删除，1-已删除',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_position` (`user_id`, `position_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_0900_ai_ci COMMENT ='新的岗位收藏表，对应position模块';
+
 SET FOREIGN_KEY_CHECKS = 1;
