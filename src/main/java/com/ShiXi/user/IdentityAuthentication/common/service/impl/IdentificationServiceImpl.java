@@ -3,7 +3,9 @@ package com.ShiXi.user.IdentityAuthentication.common.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
+import com.ShiXi.common.entity.University;
 import com.ShiXi.common.mapper.IdentificationMapper;
+import com.ShiXi.common.service.UniversityService;
 import com.ShiXi.common.utils.RedissonLockUtil;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.IdentityAuthentication.common.domin.dto.DeserializeUserIdAndIdentificationInRedisListDTO;
@@ -30,6 +32,8 @@ import com.ShiXi.user.IdentityAuthentication.teacherIdentification.service.Teach
 import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.service.EnterpriseIdentificationService;
 import com.ShiXi.user.IdentityAuthentication.schoolFriendIdentification.service.SchoolFriendIdentificationService;
 import com.ShiXi.user.common.domin.dto.UserDTO;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.service.StudentInfoService;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +57,8 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
    
     @Resource
     TeacherIdentificationService teacherIdentificationService;
-
+    @Resource
+    UniversityService universityService;
    
     @Resource
     EnterpriseIdentificationService enterpriseIdentificationService;
@@ -68,6 +73,8 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
     @Resource
     RedissonLockUtil redissonLockUtil;
 
+    @Resource
+    StudentInfoService studentInfoService;
     @Override
     public Result getAllIdentificationStatus() {
         //获取用户id
@@ -338,6 +345,17 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
         updateWrapper.eq(Identification::getUserId, waitingForAuditingUserId);
         if(identification.equals(1)){
             updateWrapper.set(Identification::getIsStudent, 3);
+            StudentGetIdentificationDataVO identificationDataByUserId = studentIdentificationService.getIdentificationDataByUserId(waitingForAuditingUserId);
+            University university = universityService.lambdaQuery().eq(University::getUniversity, identificationDataByUserId.getUniversity()).one();
+            studentInfoService.lambdaUpdate()
+                    .eq(StudentInfo::getUserId, identificationDataByUserId.getUserId())
+                    .set(StudentInfo::getSchoolName,identificationDataByUserId.getUniversity())
+                    .set(StudentInfo::getMajor,identificationDataByUserId.getMajor())
+                    .set(StudentInfo::getGraduationDate,identificationDataByUserId.getGraduationDate())
+                    .set(StudentInfo::getEducationLevel,identificationDataByUserId.getEducationLevel())
+                    .set(StudentInfo::getEnrollmentDate,identificationDataByUserId.getEnrollmentDate())
+                    .set(StudentInfo::getTags,university.getDesignation())
+                    .update();
         }
         else if(identification.equals(2)){
             updateWrapper.set(Identification::getIsSchoolFriend, 3);
@@ -357,6 +375,7 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             stringRedisTemplate.delete(key);
             //删除zset中对应的记录
             stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, key);
+
             return Result.ok();
         }
         return Result.fail("更新失败");
@@ -411,7 +430,12 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             //清空缓冲区
             stringRedisTemplate.delete(key);
             //删除zset中对应的记录
-            stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, key);
+            KeyAndWaitForAuditingUserDTO keyAndWaitForAuditingUser = new KeyAndWaitForAuditingUserDTO();
+            keyAndWaitForAuditingUser.setIdentification( identification)
+                    .setWaitingForAuditingUserId(waitingForAuditingUserId)
+                    .setKey(key);
+            String ZSetKey = JSONUtil.toJsonStr(keyAndWaitForAuditingUser);
+            stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, ZSetKey);
             return Result.ok();
         }
         return Result.fail("更新失败");

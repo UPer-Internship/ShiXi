@@ -1,15 +1,17 @@
-package com.ShiXi.user.废弃info.studentInfo.service.impl;
+package com.ShiXi.user.info.studentInfo.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.user.common.service.UserService;
-import com.ShiXi.user.废弃info.studentInfo.domin.dto.StudentChangeInfoDTO;
-import com.ShiXi.user.废弃info.studentInfo.domin.vo.StudentInfoVO;
-import com.ShiXi.user.废弃info.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.domin.dto.StudentChangeInfoDTO;
+import com.ShiXi.user.info.studentInfo.domin.vo.StudentInfoVO;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.ResumeExperienceMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
-import com.ShiXi.user.废弃info.studentInfo.service.StudentInfoService;
+import com.ShiXi.user.info.studentInfo.service.StudentInfoService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -88,79 +90,79 @@ public class StudentInfoServiceImpl extends ServiceImpl<StudentInfoMapper, Stude
 //    }
 
 
-    @Override
-    public void changeStudentInfo(StudentChangeInfoDTO reqDTO) {
-        //获取当前用户id
-        UserDTO user = UserHolder.getUser();
-        Long userId = user.getId();
-        //创建两个实体类
-        StudentInfo studentInfo = new StudentInfo();
-        User userInfo = new User();
-        //填充studentInfo
-        {
-            studentInfo.setUserId(userId);
-            studentInfo.setSchoolName(reqDTO.getSchoolName());
-            studentInfo.setMajor(reqDTO.getMajor());
-            studentInfo.setEducationLevel(reqDTO.getEducationLevel());
-            studentInfo.setGraduationDate(reqDTO.getGraduationDate());
-            studentInfo.setAdvantages(reqDTO.getAdvantages());
-            studentInfo.setExpectedPosition(reqDTO.getExpectedPosition());
-        }
-        //填充userInfo
-        {
-            userInfo.setId(userId);
-            userInfo.setGender(reqDTO.getGender());
-            userInfo.setName(reqDTO.getName());
-            userInfo.setNickName(reqDTO.getNickName());
-            userInfo.setBirthDate(reqDTO.getBirthDate());
-            userInfo.setIcon(reqDTO.getIcon());
-            userInfo.setName(reqDTO.getName());
-            userInfo.setWechat(reqDTO.getWechat());
-        }
-        //保存user信息
-        userMapper.updateById(userInfo);
-        //保存student信息
-        StudentInfo existingStudent = query().eq("user_id", userId).one();
-        if (existingStudent != null) {
-            // 存在则更新，设置主键ID
-            studentInfo.setId(existingStudent.getId());
-            // 如果需要保留原有未修改的字段，可以从existingStudent中获取
-            updateById(studentInfo);
-        } else {
-            // 不存在则新增
-            save(studentInfo);
-        }
-        //返回
-    }
+//    @Override
+//    public void changeStudentInfo(StudentChangeInfoDTO reqDTO) {
+//        //获取当前用户id
+//        UserDTO user = UserHolder.getUser();
+//        Long userId = user.getId();
+//        //创建两个实体类
+//        StudentInfo studentInfo = new StudentInfo();
+//        User userInfo = new User();
+//        //填充studentInfo
+//        {
+//            studentInfo.setUserId(userId);
+//            studentInfo.setSchoolName(reqDTO.getSchoolName());
+//            studentInfo.setMajor(reqDTO.getMajor());
+//            studentInfo.setEducationLevel(reqDTO.getEducationLevel());
+//            studentInfo.setGraduationDate(reqDTO.getGraduationDate());
+//            studentInfo.setAdvantages(reqDTO.getAdvantages());
+//            studentInfo.setExpectedPosition(reqDTO.getExpectedPosition());
+//        }
+//        //填充userInfo
+//        {
+//            userInfo.setId(userId);
+//            userInfo.setGender(reqDTO.getGender());
+//            userInfo.setName(reqDTO.getName());
+//            userInfo.setNickName(reqDTO.getNickName());
+//            userInfo.setBirthDate(reqDTO.getBirthDate());
+//            userInfo.setIcon(reqDTO.getIcon());
+//            userInfo.setName(reqDTO.getName());
+//            userInfo.setWechat(reqDTO.getWechat());
+//        }
+//        //保存user信息
+//        userMapper.updateById(userInfo);
+//        //保存student信息
+//        StudentInfo existingStudent = query().eq("user_id", userId).one();
+//        if (existingStudent != null) {
+//            // 存在则更新，设置主键ID
+//            studentInfo.setId(existingStudent.getId());
+//            // 如果需要保留原有未修改的字段，可以从existingStudent中获取
+//            updateById(studentInfo);
+//        } else {
+//            // 不存在则新增
+//            save(studentInfo);
+//        }
+//        //返回
+//    }
 
     @Override
     public Result getStudentInfo() {
         //获取当前用户id
         Long id = UserHolder.getUser().getId();
         //获取用户的student信息
-        StudentInfo studentInfo = query().eq("user_id", id).one();
-        //获取用户的user信息
-        User userInfo = userService.getById(id);
+        StudentInfo studentInfo = lambdaQuery().eq(StudentInfo::getUserId, id).one();
         //构造返回对象
-        StudentInfoVO studentInfoVO=new StudentInfoVO();
-
-        studentInfoVO.setUserId(userInfo.getId());
-        studentInfoVO.setPhone(userInfo.getPhone());
-        studentInfoVO.setNickName(userInfo.getNickName());
-        studentInfoVO.setIcon(userInfo.getIcon());
-        studentInfoVO.setGender(userInfo.getGender());
-        studentInfoVO.setBirthDate(userInfo.getBirthDate());
-        studentInfoVO.setName(userInfo.getName());
-        studentInfoVO.setWechat(userInfo.getWechat());
+        StudentInfoVO studentInfoVO= new StudentInfoVO();
 
         studentInfoVO.setSchoolName(studentInfo.getSchoolName());
         studentInfoVO.setMajor(studentInfo.getMajor());
         studentInfoVO.setGraduationDate(studentInfo.getGraduationDate());
         studentInfoVO.setEducationLevel(studentInfo.getEducationLevel());
-        studentInfoVO.setAdvantages(studentInfo.getAdvantages());
-        studentInfoVO.setExpectedPosition(studentInfo.getExpectedPosition());
+        studentInfoVO.setAdvantages(JSONUtil.toList(studentInfo.getAdvantages(),String.class));
+        studentInfoVO.setExpectedPosition(JSONUtil.toList(studentInfo.getExpectedPosition(),String.class));
+        studentInfoVO.setTags(JSONUtil.toList(studentInfo.getTags(), String.class));
 
         return  Result.ok(studentInfoVO);
+    }
+
+    @Override
+    public Result setMyStudentInfo(StudentChangeInfoDTO studentChangeInfoDTO) {
+        Long userId = UserHolder.getUser().getId();
+        lambdaUpdate().eq(StudentInfo::getUserId, userId)
+                .set(StudentInfo::getAdvantages, JSONUtil.toJsonStr(studentChangeInfoDTO.getAdvantages()))
+                .set(StudentInfo::getExpectedPosition, JSONUtil.toJsonStr(studentChangeInfoDTO.getExpectedPosition()))
+                .update();
+        return Result.ok();
     }
 
 }

@@ -8,7 +8,7 @@ import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.application.entity.Application;
 import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.job.jobQuery.entity.Job;
-import com.ShiXi.user.废弃info.studentInfo.entity.StudentInfo;
+import com.ShiXi.user.info.studentInfo.entity.StudentInfo;
 import com.ShiXi.common.mapper.JobMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
 import com.ShiXi.job.jobPublish.service.JobPublishService;
