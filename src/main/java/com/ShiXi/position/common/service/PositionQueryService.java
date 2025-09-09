@@ -21,7 +21,7 @@ public interface PositionQueryService {
     Result pageQueryMyPublishedJobs(Integer page, Integer pageSize, String type);
 
     /**
-     * 分类分页模糊搜索岗位推荐
+     * 分类分页模糊搜索岗位推荐(mysql版)
      * @param keyword 搜索关键词
      * @param page 页码
      * @param pageSize 每页大小
