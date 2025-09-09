@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @RestController
-@RequestMapping("/job/fulltime")
+@RequestMapping("/position/fulltime")
 @Tag(name = "全职岗位相关接口")
 public class JobFullTimeController {
 

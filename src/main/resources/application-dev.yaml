@@ -28,8 +28,8 @@ spring:
         time-between-eviction-runs: 10s  # 空闲连接检测周期
   oss:
     endpoint: oss-cn-hangzhou.aliyuncs.com
-    accessKeyId:
-    accessKeySecret:
+    accessKeyId: 123
+    accessKeySecret: 123
     bucketName: dev-env-oss
 
   jackson:
@@ -55,8 +55,8 @@ feishu:
   webhook:
     url: https://open.feishu.cn/open-apis/bot/v2/hook/1c70bec6-1e50-43c5-9cb7-f7f741a8b748
 aliyun:
-  accessKeyId:
-  accessKeySecret:
+  accessKeyId: 123
+  accessKeySecret: 123
 
 xxl:
   job:
