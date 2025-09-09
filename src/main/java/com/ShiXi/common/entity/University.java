@@ -7,6 +7,6 @@ import lombok.Data;
 @TableName("university")
 public class University {
     private Integer id;
-    private String universityName;
+    private String university;
     private String designation; // 985 211
 }

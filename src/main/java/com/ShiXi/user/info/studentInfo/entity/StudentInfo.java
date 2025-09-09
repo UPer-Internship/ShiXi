@@ -1,4 +1,4 @@
-package com.ShiXi.user.废弃info.studentInfo.entity;
+package com.ShiXi.user.info.studentInfo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -33,6 +33,10 @@ public class StudentInfo implements Serializable {
     private String advantages;
 
     private String expectedPosition;
+
+    private String enrollmentDate;
+
+    private String tags;
 
     private LocalDateTime createTime;
 
