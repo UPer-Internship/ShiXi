@@ -45,7 +45,7 @@ public class JobInternshipServiceImpl extends ServiceImpl<JobInternshipMapper, J
                 return Result.fail("岗位描述长度不能超过5000个字符");
             }
             
-            // 验证薪资范围（实习岗位薪资单位为元，范围相对较小）
+            // 验证薪资范围
             if (createDTO.getSalaryMin() != null && createDTO.getSalaryMin() < 0) {
                 return Result.fail("最低薪资不能为负数");
             }

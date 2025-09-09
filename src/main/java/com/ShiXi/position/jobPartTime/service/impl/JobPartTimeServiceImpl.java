@@ -45,7 +45,7 @@ public class JobPartTimeServiceImpl extends ServiceImpl<JobPartTimeMapper, JobPa
                 return Result.fail("岗位描述长度不能超过5000个字符");
             }
             
-            // 验证薪资范围（兼职按元计算）
+            // 验证薪资范围（兼职按K计算）
             if (createDTO.getSalaryMin() != null && createDTO.getSalaryMin() < 0) {
                 return Result.fail("最低薪资不能为负数");
             }
@@ -57,7 +57,7 @@ public class JobPartTimeServiceImpl extends ServiceImpl<JobPartTimeMapper, JobPa
                 return Result.fail("最低薪资不能大于最高薪资");
             }
             if (createDTO.getSalaryMax() != null && createDTO.getSalaryMax() > 10000) {
-                return Result.fail("兼职薪资上限不能超过10000元");
+                return Result.fail("兼职薪资上限不能超过10000K");
             }
             
             // 验证地址信息
@@ -147,7 +147,7 @@ public class JobPartTimeServiceImpl extends ServiceImpl<JobPartTimeMapper, JobPa
                 return Result.fail("最低薪资不能大于最高薪资");
             }
             if (updateDTO.getSalaryMax() != null && updateDTO.getSalaryMax() > 10000) {
-                return Result.fail("兼职薪资上限不能超过10000元");
+                return Result.fail("兼职薪资上限不能超过10000K");
             }
             
             // 验证工作类型
