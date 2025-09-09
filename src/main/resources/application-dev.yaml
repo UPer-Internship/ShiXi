@@ -45,6 +45,11 @@ spring:
 
 mybatis-plus:
   type-aliases-package: com.ShiXi.entity # 别名扫描包
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted  # 逻辑删除字段名
+      logic-delete-value: 1          # 逻辑删除值（已删除）
+      logic-not-delete-value: 0      # 逻辑未删除值（未删除）
 logging:
   level:
     com.ShiXi: debug

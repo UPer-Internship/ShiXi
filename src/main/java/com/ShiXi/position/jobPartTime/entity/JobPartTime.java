@@ -44,7 +44,7 @@ public class JobPartTime {
 
     private Integer status; // 状态 0/1 可见/不可见
 
-    @TableLogic(value = "0", delval = "1")
+    @TableLogic
     private Integer isDeleted; // 逻辑删除 0/1 未删除/删除
 
     private String category; // 职位
