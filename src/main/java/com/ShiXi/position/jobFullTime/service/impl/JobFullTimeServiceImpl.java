@@ -56,8 +56,8 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
                 && createDTO.getSalaryMin() > createDTO.getSalaryMax()) {
                 return Result.fail("最低薪资不能大于最高薪资");
             }
-            if (createDTO.getSalaryMax() != null && createDTO.getSalaryMax() > 1000) {
-                return Result.fail("薪资上限不能超过1000K");
+            if (createDTO.getSalaryMax() != null && createDTO.getSalaryMax() > 10000) {
+                return Result.fail("薪资上限不能超过10000K");
             }
             
             // 验证地址信息

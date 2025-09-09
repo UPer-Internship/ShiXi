@@ -28,8 +28,8 @@ spring:
         time-between-eviction-runs: 10s  # 空闲连接检测周期
   oss:
     endpoint: oss-cn-hangzhou.aliyuncs.com
-    accessKeyId:
-    accessKeySecret:
+    accessKeyId: 123
+    accessKeySecret: 123
     bucketName: dev-env-oss
 
   jackson:
@@ -45,6 +45,11 @@ spring:
 
 mybatis-plus:
   type-aliases-package: com.ShiXi.entity # 别名扫描包
+  global-config:
+    db-config:
+      logic-delete-field: isDeleted  # 逻辑删除字段名
+      logic-delete-value: 1          # 逻辑删除值（已删除）
+      logic-not-delete-value: 0      # 逻辑未删除值（未删除）
 logging:
   level:
     com.ShiXi: debug
@@ -55,8 +60,8 @@ feishu:
   webhook:
     url: https://open.feishu.cn/open-apis/bot/v2/hook/1c70bec6-1e50-43c5-9cb7-f7f741a8b748
 aliyun:
-  accessKeyId:
-  accessKeySecret:
+  accessKeyId: 123
+  accessKeySecret: 123
 
 xxl:
   job:

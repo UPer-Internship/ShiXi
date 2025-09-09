@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 
 @Slf4j
 @RestController
-@RequestMapping("/job/internship")
+@RequestMapping("/position/internship")
 @Tag(name = "实习岗位相关接口")
 public class JobInternshipController {
 

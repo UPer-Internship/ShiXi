@@ -36,4 +36,6 @@ public interface UserService extends IService<User> {
     Result getUniversityList();
 
     Result changeMyIcon(MultipartFile file);
+
+    Result setUniversityList();
 }

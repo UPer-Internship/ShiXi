@@ -12,11 +12,8 @@ import com.ShiXi.common.entity.Major;
 import com.ShiXi.common.entity.Region;
 import com.ShiXi.common.service.*;
 import com.ShiXi.common.utils.RedissonLockUtil;
-import com.ShiXi.user.IdentityAuthentication.enterpriseIdentification.entity.EnterpriseIdentification;
 import com.ShiXi.user.common.domin.dto.ChangeInfoDTO;
 import com.ShiXi.user.common.domin.dto.UserDTO;
-import com.ShiXi.user.IdentityAuthentication.common.domin.vo.IdentificationVO;
-import com.ShiXi.user.IdentityAuthentication.common.entity.Identification;
 import com.ShiXi.user.common.domin.vo.UserSaveVO;
 import com.ShiXi.user.common.domin.vo.UserVO;
 import com.ShiXi.user.common.entity.User;
@@ -35,7 +32,6 @@ import com.aliyun.dysmsapi20170525.models.SendSmsRequest;
 import com.aliyun.dysmsapi20170525.models.SendSmsResponse;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -489,7 +485,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .map(university -> {
                     UniversityVO vo = new UniversityVO();
                     vo.setId(university.getId());
-                    vo.setUniversityName(university.getUniversityName());
+                    vo.setUniversityName(university.getUniversity());
                     return vo;
                 })
                 .collect(Collectors.toList());
@@ -513,6 +509,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 .set(User::getIcon, url)
                 .update();;
         return Result.ok();
+    }
+
+    @Override
+    public Result setUniversityList() {
+        return null;
     }
 
 
