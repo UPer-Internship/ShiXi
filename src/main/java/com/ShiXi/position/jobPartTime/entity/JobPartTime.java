@@ -24,9 +24,9 @@ public class JobPartTime {
 
     private String title; // 标题
 
-    private Double salaryMin; // 薪水下限（单位元）
+    private Double salaryMin; // 薪水下限（单位K）
 
-    private Double salaryMax; // 薪水上限（单位元）
+    private Double salaryMax; // 薪水上限（单位K）
 
     private String mainText; // 正文
 
