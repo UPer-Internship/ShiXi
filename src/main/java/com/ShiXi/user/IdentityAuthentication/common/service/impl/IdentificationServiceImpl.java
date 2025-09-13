@@ -374,7 +374,12 @@ public class IdentificationServiceImpl extends ServiceImpl<IdentificationMapper,
             //清空缓冲区
             stringRedisTemplate.delete(key);
             //删除zset中对应的记录
-            stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, key);
+            KeyAndWaitForAuditingUserDTO keyAndWaitForAuditingUser = new KeyAndWaitForAuditingUserDTO();
+            keyAndWaitForAuditingUser.setIdentification( identification)
+                    .setWaitingForAuditingUserId(waitingForAuditingUserId)
+                    .setKey(key);
+            String ZSetKey = JSONUtil.toJsonStr(keyAndWaitForAuditingUser);
+            stringRedisTemplate.opsForZSet().remove(ADMIN_AUDITING_BUFFER_POOL_ZSET, ZSetKey);
 
             return Result.ok();
         }
