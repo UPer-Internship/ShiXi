@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/user/info/student")
-@Tag(name = "用户域通用服务")
+@Tag(name = "学生信息")
 public class StudentInfoController {
 
     @Resource
