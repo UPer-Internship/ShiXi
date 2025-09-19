@@ -225,6 +225,14 @@ public class JobInternshipServiceImpl extends ServiceImpl<JobInternshipMapper, J
             if (StringUtils.hasText(updateDTO.getIndustry())) {
                 existingJob.setIndustry(updateDTO.getIndustry());
             }
+            // 添加经验要求字段更新逻辑
+            if (StringUtils.hasText(updateDTO.getExperienceRequirement())) {
+                existingJob.setExperienceRequirement(updateDTO.getExperienceRequirement());
+            }
+            // 添加学历要求字段更新逻辑
+            if (StringUtils.hasText(updateDTO.getEducationRequirement())) {
+                existingJob.setEducationRequirement(updateDTO.getEducationRequirement());
+            }
             
             // 更新到数据库
             boolean success = this.updateById(existingJob);

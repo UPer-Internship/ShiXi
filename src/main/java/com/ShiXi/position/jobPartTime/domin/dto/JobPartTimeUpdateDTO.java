@@ -12,9 +12,9 @@ public class JobPartTimeUpdateDTO {
     
     private String title; // 标题
     
-    private Double salaryMin; // 薪水下限（单位K）
+    private Double salaryMin; // 薪水下限（单位元）
     
-    private Double salaryMax; // 薪水上限（单位K）
+    private Double salaryMax; // 薪水上限（单位元）
     
     private String mainText; // 正文
     
@@ -37,4 +37,8 @@ public class JobPartTimeUpdateDTO {
     private String enterpriseScale; // 企业规模
     
     private String industry; // 企业所在行业
+    
+    private String experienceRequirement; // 经验要求
+    
+    private String educationRequirement; // 学历要求
 }
