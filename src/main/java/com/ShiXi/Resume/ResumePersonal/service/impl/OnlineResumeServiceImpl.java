@@ -13,20 +13,29 @@ import com.ShiXi.common.mapper.ResumeExperienceMapper;
 import com.ShiXi.common.mapper.StudentInfoMapper;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.common.utils.OSSUtil;
 import com.ShiXi.user.common.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper, Resume> implements OnlineResumeService {
+
+    @Resource
+    private OSSUtil ossUtil;
+
+    // 简历附件存储目录前缀
+    private static final String RESUME_ATTACHMENT_DIR = "resume/attachments/";
 
 
 
@@ -200,5 +209,132 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
         }
 
         return publicVO;
+    }
+
+    @Override
+    public Result getResumeByUserId(Long userId) {
+        if (userId == null) {
+            return Result.fail("用户ID不能为空");
+        }
+        
+        Resume resumeExperience = lambdaQuery()
+                .eq(Resume::getUserId, userId)
+                .one();
+        
+        if (resumeExperience == null) {
+            return Result.fail("该用户还没有上传简历");
+        }
+        
+        ResumeVO resumeExperienceVO = new ResumeVO();
+        resumeExperienceVO.setId(resumeExperience.getId())
+                .setUserId(resumeExperience.getUserId())
+                .setProjectExperiences(JSONUtil.toList(resumeExperience.getProjectExperiences(), ResumeVO.projectExperience.class))
+                .setWorkAndInternshipExperiences(JSONUtil.toList(resumeExperience.getWorkAndInternshipExperiences(), ResumeVO.workAndInternshipExperience.class))
+                .setEducationExperiences(JSONUtil.toList(resumeExperience.getEducationExperiences(), ResumeVO.educationExperience.class))
+                .setGender(resumeExperience.getGender())
+                .setBirthDate(resumeExperience.getBirthDate())
+                .setName(resumeExperience.getName())
+                .setPhone(resumeExperience.getPhone())
+                .setWechat(resumeExperience.getWechat())
+                .setResumeLink(resumeExperience.getResumeLink())
+                .setAdvantages(resumeExperience.getAdvantages())
+                .setExpectedPosition(JSONUtil.toList(resumeExperience.getExpectedPosition(), String.class));
+        
+        return Result.ok(resumeExperienceVO);
+    }
+
+    @Override
+    public Result uploadResumeAttachment(MultipartFile file) {
+        try {
+            // 参数校验
+            if (file == null || file.isEmpty()) {
+                return Result.fail("请选择要上传的文件");
+            }
+
+            // 检查文件类型（支持常见的简历文件格式）
+            String originalFilename = file.getOriginalFilename();
+            if (!isValidResumeFile(originalFilename)) {
+                return Result.fail("只支持pdf、doc、docx格式的简历文件");
+            }
+
+            // 检查文件大小（限制为10MB）
+            if (file.getSize() > 10 * 1024 * 1024) {
+                return Result.fail("文件大小不能超过10MB");
+            }
+
+            // 获取当前用户ID
+            Long userId = UserHolder.getUser().getId();
+            if (userId == null) {
+                return Result.fail("用户未登录");
+            }
+
+            // 上传到OSS
+            String fileUrl = ossUtil.uploadAvatar(file, RESUME_ATTACHMENT_DIR);
+            if (fileUrl == null) {
+                return Result.fail("文件上传失败");
+            }
+
+            // 更新数据库中的简历附件链接
+            boolean updateSuccess = lambdaUpdate()
+                    .eq(Resume::getUserId, userId)
+                    .set(Resume::getResumeLink, fileUrl)
+                    .update();
+
+            if (!updateSuccess) {
+                // 如果更新失败，可能是用户还没有简历记录，创建一个新的
+                Resume newResume = new Resume();
+                newResume.setUserId(userId);
+                newResume.setResumeLink(fileUrl);
+                boolean saveSuccess = save(newResume);
+                if (!saveSuccess) {
+                    return Result.fail("保存简历附件信息失败");
+                }
+            }
+
+            return Result.ok(fileUrl);
+
+        } catch (IOException e) {
+            log.error("上传简历附件失败", e);
+            return Result.fail("文件上传失败：" + e.getMessage());
+        } catch (Exception e) {
+            log.error("上传简历附件时发生未知错误", e);
+            return Result.fail("上传失败，请稍后重试");
+        }
+    }
+
+    @Override
+    public Result getResumeAttachmentUrl(Long resumeId) {
+        if (resumeId == null) {
+            return Result.fail("简历ID不能为空");
+        }
+
+        Resume resume = lambdaQuery()
+                .eq(Resume::getId, resumeId)
+                .one();
+
+        if (resume == null) {
+            return Result.fail("简历不存在");
+        }
+
+        String resumeLink = resume.getResumeLink();
+        if (resumeLink == null || resumeLink.trim().isEmpty()) {
+            return Result.fail("该简历暂无附件");
+        }
+
+        return Result.ok(resumeLink);
+    }
+
+    /**
+     * 检查是否为有效的简历文件格式
+     */
+    private boolean isValidResumeFile(String filename) {
+        if (filename == null || filename.trim().isEmpty()) {
+            return false;
+        }
+        
+        String lowerCaseFilename = filename.toLowerCase();
+        return lowerCaseFilename.endsWith(".pdf") || 
+               lowerCaseFilename.endsWith(".doc") || 
+               lowerCaseFilename.endsWith(".docx");
     }
 }
