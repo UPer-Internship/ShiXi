@@ -15,9 +15,9 @@ public class JobPartTimeVO {
     
     private String title; // 标题
     
-    private Double salaryMin; // 薪水下限（单位K）
+    private Double salaryMin; // 薪水下限（单位元）
     
-    private Double salaryMax; // 薪水上限（单位K）
+    private Double salaryMax; // 薪水上限（单位元）
     
     private String mainText; // 正文
     
@@ -43,6 +43,10 @@ public class JobPartTimeVO {
     
     private String industry; // 企业所在行业
     
+    private String experienceRequirement; // 经验要求
+    
+    private String educationRequirement; // 学历要求
+
     private LocalDateTime createTime; // 创建时间
     
     private LocalDateTime updateTime; // 更新时间

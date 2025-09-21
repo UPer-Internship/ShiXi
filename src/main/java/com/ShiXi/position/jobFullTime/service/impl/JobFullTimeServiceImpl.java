@@ -56,9 +56,6 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
                 && createDTO.getSalaryMin() > createDTO.getSalaryMax()) {
                 return Result.fail("最低薪资不能大于最高薪资");
             }
-            if (createDTO.getSalaryMax() != null && createDTO.getSalaryMax() > 10000) {
-                return Result.fail("薪资上限不能超过10000K");
-            }
             
             // 验证地址信息
             if (!StringUtils.hasText(createDTO.getProvince())) {
@@ -146,9 +143,6 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
                 && updateDTO.getSalaryMin() > updateDTO.getSalaryMax()) {
                 return Result.fail("最低薪资不能大于最高薪资");
             }
-            if (updateDTO.getSalaryMax() != null && updateDTO.getSalaryMax() > 1000) {
-                return Result.fail("薪资上限不能超过1000K");
-            }
             
             // 验证工作类型
             if (StringUtils.hasText(updateDTO.getType()) && !isValidJobType(updateDTO.getType())) {
@@ -223,6 +217,14 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
             }
             if (StringUtils.hasText(updateDTO.getIndustry())) {
                 existingJob.setIndustry(updateDTO.getIndustry());
+            }
+            // 添加经验要求字段更新逻辑
+            if (StringUtils.hasText(updateDTO.getExperienceRequirement())) {
+                existingJob.setExperienceRequirement(updateDTO.getExperienceRequirement());
+            }
+            // 添加学历要求字段更新逻辑
+            if (StringUtils.hasText(updateDTO.getEducationRequirement())) {
+                existingJob.setEducationRequirement(updateDTO.getEducationRequirement());
             }
             
             // 更新到数据库

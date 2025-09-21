@@ -22,4 +22,5 @@ public class RedisConstants {
     
     // HR收件箱Redis key前缀，用于存储投递给HR的简历信息
     public static final String HR_INBOX_KEY = "inbox:";
+    public static final String REBUILD_JOB_CATEGORY_BUFFER_LOCK = "lock:rebuild:jobCategory";
 }

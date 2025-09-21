@@ -4,10 +4,12 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.ResumePageQueryDTO;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
+import com.ShiXi.user.common.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 
@@ -21,6 +23,10 @@ import javax.annotation.Resource;
 public class ResumeController {
     @Resource
     private OnlineResumeService onlineResumeService;
+    
+    @Resource
+    private UserService userService;
+    
     /**
      * 获取在线简历信息
      * @return 在线简历的vo类
@@ -54,6 +60,61 @@ public class ResumeController {
         
         ResumePageQueryDTO queryDTO = new ResumePageQueryDTO(page, pageSize, expectedPosition);
         return onlineResumeService.pageQueryPublicResumes(queryDTO);
+    }
+
+    /**
+     * 根据简历ID查询简历详情（包含文字资料和附件OSS URL）
+     * @param resumeId 简历ID
+     * @return 简历详情
+     */
+    @GetMapping("/getResumeById")
+    @Operation(summary = "根据简历ID查询简历详情")
+    public Result getResumeById(@RequestParam Long resumeId) {
+        return onlineResumeService.getResumeByResumeId(resumeId);
+    }
+
+    /**
+     * 根据用户ID查询简历（包含文字资料和附件OSS URL）
+     * @param userId 用户ID
+     * @return 简历信息
+     */
+    @GetMapping("/getResumeByUserId")
+    @Operation(summary = "根据用户ID查询简历")
+    public Result getResumeByUserId(@RequestParam Long userId) {
+        return onlineResumeService.getResumeByUserId(userId);
+    }
+
+    /**
+     * 根据用户UUID查询简历（包含文字资料和附件OSS URL）
+     * @param uuid 用户UUID
+     * @return 简历信息
+     */
+    @GetMapping("/getResumeByUuid")
+    @Operation(summary = "根据用户UUID查询简历")
+    public Result getResumeByUuid(@RequestParam String uuid) {
+        return onlineResumeService.getResumeByUuid(uuid);
+    }
+
+    /**
+     * 上传简历附件到OSS
+     * @param file 简历附件文件
+     * @return 上传结果，包含OSS URL
+     */
+    @PostMapping("/uploadAttachment")
+    @Operation(summary = "上传简历附件")
+    public Result uploadResumeAttachment(@RequestParam("file") MultipartFile file) {
+        return onlineResumeService.uploadResumeAttachment(file);
+    }
+
+    /**
+     * 查看简历附件OSS URL
+     * @param resumeId 简历ID
+     * @return 附件OSS URL
+     */
+    @GetMapping("/getAttachmentUrl")
+    @Operation(summary = "获取简历附件URL")
+    public Result getResumeAttachmentUrl(@RequestParam Long resumeId) {
+        return onlineResumeService.getResumeAttachmentUrl(resumeId);
     }
 
 
