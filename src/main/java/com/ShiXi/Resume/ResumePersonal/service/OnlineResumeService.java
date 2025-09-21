@@ -54,6 +54,13 @@ public interface OnlineResumeService extends IService<Resume> {
     Result getResumeByUserId(Long userId);
 
     /**
+     * 根据用户UUID查询简历（包含文字资料和附件OSS URL）
+     * @param uuid 用户UUID
+     * @return 简历信息
+     */
+    Result getResumeByUuid(String uuid);
+
+    /**
      * 上传简历附件到OSS
      * @param file 简历附件文件
      * @return 上传结果，包含OSS URL

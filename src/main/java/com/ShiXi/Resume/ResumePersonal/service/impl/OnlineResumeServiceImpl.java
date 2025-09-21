@@ -14,6 +14,7 @@ import com.ShiXi.common.mapper.StudentInfoMapper;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.utils.OSSUtil;
+import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.common.service.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -33,6 +34,9 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
 
     @Resource
     private OSSUtil ossUtil;
+
+    @Resource
+    private UserService userService;
 
     // 简历附件存储目录前缀
     private static final String RESUME_ATTACHMENT_DIR = "resume/attachments/";
@@ -241,6 +245,24 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
                 .setExpectedPosition(JSONUtil.toList(resumeExperience.getExpectedPosition(), String.class));
         
         return Result.ok(resumeExperienceVO);
+    }
+
+    @Override
+    public Result getResumeByUuid(String uuid) {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            return Result.fail("用户UUID不能为空");
+        }
+        
+        // 直接从user表根据UUID查询用户信息获取用户ID
+        User user = userService.lambdaQuery().eq(User::getUuid, uuid).one();
+        if (user == null) {
+            return Result.fail("用户不存在");
+        }
+        
+        Long userId = user.getId();
+        
+        // 调用已有的根据用户ID查询简历的方法
+        return getResumeByUserId(userId);
     }
 
     @Override

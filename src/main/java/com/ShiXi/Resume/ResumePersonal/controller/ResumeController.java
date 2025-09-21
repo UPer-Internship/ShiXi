@@ -4,6 +4,7 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.ResumePageQueryDTO;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
+import com.ShiXi.user.common.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,9 @@ import javax.annotation.Resource;
 public class ResumeController {
     @Resource
     private OnlineResumeService onlineResumeService;
+    
+    @Resource
+    private UserService userService;
     
     /**
      * 获取在线简历信息
@@ -63,9 +67,9 @@ public class ResumeController {
      * @param resumeId 简历ID
      * @return 简历详情
      */
-    @GetMapping("/getResumeById/{resumeId}")
+    @GetMapping("/getResumeById")
     @Operation(summary = "根据简历ID查询简历详情")
-    public Result getResumeById(@PathVariable Long resumeId) {
+    public Result getResumeById(@RequestParam Long resumeId) {
         return onlineResumeService.getResumeByResumeId(resumeId);
     }
 
@@ -74,10 +78,21 @@ public class ResumeController {
      * @param userId 用户ID
      * @return 简历信息
      */
-    @GetMapping("/getResumeByUserId/{userId}")
+    @GetMapping("/getResumeByUserId")
     @Operation(summary = "根据用户ID查询简历")
-    public Result getResumeByUserId(@PathVariable Long userId) {
+    public Result getResumeByUserId(@RequestParam Long userId) {
         return onlineResumeService.getResumeByUserId(userId);
+    }
+
+    /**
+     * 根据用户UUID查询简历（包含文字资料和附件OSS URL）
+     * @param uuid 用户UUID
+     * @return 简历信息
+     */
+    @GetMapping("/getResumeByUuid")
+    @Operation(summary = "根据用户UUID查询简历")
+    public Result getResumeByUuid(@RequestParam String uuid) {
+        return onlineResumeService.getResumeByUuid(uuid);
     }
 
     /**
@@ -96,9 +111,9 @@ public class ResumeController {
      * @param resumeId 简历ID
      * @return 附件OSS URL
      */
-    @GetMapping("/getAttachmentUrl/{resumeId}")
+    @GetMapping("/getAttachmentUrl")
     @Operation(summary = "获取简历附件URL")
-    public Result getResumeAttachmentUrl(@PathVariable Long resumeId) {
+    public Result getResumeAttachmentUrl(@RequestParam Long resumeId) {
         return onlineResumeService.getResumeAttachmentUrl(resumeId);
     }
 
