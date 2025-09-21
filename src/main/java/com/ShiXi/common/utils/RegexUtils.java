@@ -1,16 +1,22 @@
 package com.ShiXi.common.utils;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.lang.Validator;
 
 public class RegexUtils {
     /**
      * 是否是无效手机格式
+     * 使用 Hutool 的手机号验证
      *
      * @param phone 要校验的手机号
-     * @return true:符合，false：不符合
+     * @return true:无效，false：有效
      */
     public static boolean isPhoneInvalid(String phone) {
-        return mismatch(phone, RegexPatterns.PHONE_REGEX);
+        if (StrUtil.isBlank(phone)) {
+            return true;
+        }
+        // 使用 Hutool 的手机号验证
+        return !Validator.isMobile(phone);
     }
 
     /**
