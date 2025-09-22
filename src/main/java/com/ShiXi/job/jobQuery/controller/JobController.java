@@ -20,7 +20,7 @@ import java.io.IOException;
 @Slf4j
 @RestController
 @RequestMapping("/job")
-@Tag(name = "岗位相关接口")
+@Tag(name = "废弃")
 public class JobController {
     @Resource
     private JobService jobService;

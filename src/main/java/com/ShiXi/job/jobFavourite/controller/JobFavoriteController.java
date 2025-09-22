@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping("/job/favorite")
-@Tag(name = "岗位收藏相关接口")
+@Tag(name = "废弃")
 public class JobFavoriteController {
     @Resource
     private JobFavoriteService jobFavoriteService;
