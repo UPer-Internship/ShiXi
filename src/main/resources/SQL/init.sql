@@ -663,12 +663,20 @@ CREATE TABLE `user_student_info`
 DROP TABLE IF EXISTS `user_teacher_info`;
 CREATE TABLE `user_teacher_info`
 (
-    `id`      bigint NOT NULL,
+    `id`      bigint auto_increment,
     `user_id` bigint NOT NULL,
-    PRIMARY KEY (`id`) USING BTREE
+    `university` VARCHAR(255) DEFAULT NULL COMMENT '大学名称',
+    `college` VARCHAR(255) DEFAULT NULL COMMENT '学院名称',
+    `join_date` DATE DEFAULT NULL COMMENT '入职时间（格式：YYYY-MM-DD）',
+    `email` VARCHAR(255) DEFAULT NULL COMMENT '邮箱地址',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间（自动填充）',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间（自动更新）',
+    `is_deleted` TINYINT UNSIGNED NOT NULL DEFAULT 0 COMMENT '逻辑删除标志（0-未删除，1-已删除）',
+
+    PRIMARY KEY (`id` ASC) USING BTREE
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb3
-  COLLATE = utf8mb3_general_ci
+  COLLATE = utf8mb3_general_ci COMMENT = '用户教师信息表'
   ROW_FORMAT = Dynamic;
 
 create table if not exists `4_uper_up_intern`.job_full_time
