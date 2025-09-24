@@ -610,8 +610,16 @@ CREATE TABLE `user`
 DROP TABLE IF EXISTS `user_enterprise_info`;
 CREATE TABLE `user_enterprise_info`
 (
-    `id` bigint NOT NULL,
-    PRIMARY KEY (`id`) USING BTREE
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键ID（自增）',
+    `user_id` BIGINT DEFAULT NULL COMMENT '关联用户ID（逻辑关联）',
+    `enterprise_name` VARCHAR(255) DEFAULT NULL COMMENT '企业名称',
+    `your_position` VARCHAR(255) DEFAULT NULL COMMENT '你的职位',
+    `enterprise_scale` VARCHAR(255) DEFAULT NULL COMMENT '企业规模（如：100-500人）',
+    `enterprise_industry` VARCHAR(255) DEFAULT NULL COMMENT '企业所属行业（如：互联网/制造业）',
+    `enterprise_address` VARCHAR(255) DEFAULT NULL COMMENT '企业地址（省市区+详细地址）',
+    `email` VARCHAR(255) DEFAULT NULL COMMENT '申请人邮箱（用于联系验证）',
+    `is_deleted` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除标志（0-未删除，1-已删除）',
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb3
   COLLATE = utf8mb3_general_ci
