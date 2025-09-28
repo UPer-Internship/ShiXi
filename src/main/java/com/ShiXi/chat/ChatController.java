@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.Date;
@@ -101,5 +102,11 @@ public class ChatController {
     @Operation(summary = "添加联系人")
     public Result addContactById(@RequestParam Long userId2,@RequestParam String contactType){
         return messageService.addContactById(userId2,contactType);
+    }
+
+    @PostMapping("/chat/uploadImage")
+    @Operation(summary = "上传聊天图片")
+    public Result uploadChatImage(@RequestParam("imageFile") MultipartFile imageFile){
+        return messageService.uploadChatImage(imageFile);
     }
 }

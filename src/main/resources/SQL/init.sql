@@ -255,6 +255,7 @@ CREATE TABLE `message`
     `sender_id`   bigint                                                NOT NULL,
     `receiver_id` bigint                                                NOT NULL,
     `content`     text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+    `type`        varchar(20) DEFAULT 'text' COMMENT '消息类型：text-文本，image-图片，file-文件',
     `send_time`   datetime                                              NULL DEFAULT CURRENT_TIMESTAMP,
     `is_read`     tinyint(1)                                            NULL DEFAULT 0 COMMENT '是否已读（0:未读 1:已读）',
     `is_deleted`  tinyint(1)                                            NULL DEFAULT 0 COMMENT '是否删除（0:未删除 1:已删除）',

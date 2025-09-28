@@ -3,6 +3,7 @@ package com.ShiXi.chat.service;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.chat.entity.ChatMessage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface MessageService extends IService<ChatMessage> {
 
@@ -69,4 +70,11 @@ public interface MessageService extends IService<ChatMessage> {
      * @return
      */
     Result addContactById(Long userId2,String contactType);
+
+    /**
+     * 上传聊天图片
+     * @param imageFile 图片文件
+     * @return url
+     */
+    Result uploadChatImage(MultipartFile imageFile);
 }
