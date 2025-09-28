@@ -30,6 +30,7 @@ public class PositionQueryController {
      * @param page 页码，默认为1
      * @param pageSize 每页大小，默认为10
      * @param type 岗位类型：正职、兼职、实习（必传，不传默认为正职）
+     * @param status 岗位状态：0-不可见，1-可见（可选，不传则查询所有状态）
      * @return 分页查询结果
      */
     @GetMapping("/myPublishedJobs")
@@ -37,8 +38,9 @@ public class PositionQueryController {
     public Result pageQueryMyPublishedJobs(
             @Parameter(description = "页码") @RequestParam(value = "page", defaultValue = "1") Integer page,
             @Parameter(description = "每页大小") @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @Parameter(description = "岗位类型：正职、兼职、实习（不传默认为正职）") @RequestParam(value = "type", defaultValue = "正职") String type) {
-        return positionQueryService.pageQueryMyPublishedJobs(page, pageSize, type);
+            @Parameter(description = "岗位类型：正职、兼职、实习（不传默认为兼职）") @RequestParam(value = "type", defaultValue = "兼职") String type,
+            @Parameter(description = "岗位状态：0-不可见，1-可见 不填-全部（可选）") @RequestParam(value = "status", required = false) Integer status) {
+        return positionQueryService.pageQueryMyPublishedJobs(page, pageSize, type, status);
     }
     
     /**
@@ -52,6 +54,9 @@ public class PositionQueryController {
      * @param category 职位分类筛选（可选）
      * @param salaryMin 最低薪资筛选（可选）
      * @param salaryMax 最高薪资筛选（可选）
+     * @param educationRequirement 学历要求筛选（可选）
+     * @param industry 行业筛选（可选）
+     * @param enterpriseScale 公司规模筛选（可选）
      * @return 搜索结果
      */
     @GetMapping("/searchJobs")
@@ -64,8 +69,11 @@ public class PositionQueryController {
             @Parameter(description = "省份筛选") @RequestParam(value = "province", required = false) String province,
             @Parameter(description = "城市筛选") @RequestParam(value = "city", required = false) String city,
             @Parameter(description = "职位分类筛选") @RequestParam(value = "category", required = false) String category,
-            @Parameter(description = "最低薪资") @RequestParam(value = "salaryMin", required = false) Double salaryMin,
-            @Parameter(description = "最高薪资") @RequestParam(value = "salaryMax", required = false) Double salaryMax) {
-        return positionQueryService.searchJobs(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax);
+            @Parameter(description = "最低薪资，月薪，单位：元/月") @RequestParam(value = "salaryMin", required = false) Double salaryMin,
+            @Parameter(description = "最高薪资，月薪，单位：元/月") @RequestParam(value = "salaryMax", required = false) Double salaryMax,
+            @Parameter(description = "学历要求筛选") @RequestParam(value = "educationRequirement", required = false) String educationRequirement,
+            @Parameter(description = "行业筛选") @RequestParam(value = "industry", required = false) String industry,
+            @Parameter(description = "公司规模筛选") @RequestParam(value = "enterpriseScale", required = false) String enterpriseScale) {
+        return positionQueryService.searchJobs(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
     }
 }
