@@ -42,7 +42,7 @@ public class JobPartTime {
     @JSONField
     private List<String> tag; // 标签列表，使用FastJSON序列化存储
 
-    private Integer status; // 状态 0/1 可见/不可见
+    private Integer status; // 状态 0/1 不可见/可见
 
     @TableLogic
     private Integer isDeleted; // 逻辑删除 0/1 未删除/删除
