@@ -182,7 +182,8 @@ public class PositionQueryServiceImpl implements PositionQueryService {
     @Override
     public Result searchJobs(String keyword, Integer page, Integer pageSize, String type,
                              String province, String city, String category,
-                             Double salaryMin, Double salaryMax) {
+                             Double salaryMin, Double salaryMax,
+                             String educationRequirement, String industry, String enterpriseScale) {
         try {
             // 参数校验
             if (page == null || page < 1) {
@@ -203,13 +204,13 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                 if (!isValidPositionType(type)) {
                     return Result.fail("岗位类型只能是：正职、兼职、实习");
                 }
-                PageResult result = searchJobsByType(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax);
+                PageResult result = searchJobsByType(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
                 return Result.ok(result);
             } else {
                 // 搜索所有类型的岗位
-                List<JobVO> fullTimeJobs = searchJobsByTypeInternal(keyword, "正职", province, city, category, salaryMin, salaryMax);
-                List<JobVO> partTimeJobs = searchJobsByTypeInternal(keyword, "兼职", province, city, category, salaryMin, salaryMax);
-                List<JobVO> internshipJobs = searchJobsByTypeInternal(keyword, "实习", province, city, category, salaryMin, salaryMax);
+                List<JobVO> fullTimeJobs = searchJobsByTypeInternal(keyword, "正职", province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
+                List<JobVO> partTimeJobs = searchJobsByTypeInternal(keyword, "兼职", province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
+                List<JobVO> internshipJobs = searchJobsByTypeInternal(keyword, "实习", province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
 
                 allJobs.addAll(fullTimeJobs);
                 allJobs.addAll(partTimeJobs);
@@ -243,7 +244,8 @@ public class PositionQueryServiceImpl implements PositionQueryService {
      */
     private PageResult searchJobsByType(String keyword, Integer page, Integer pageSize, String type,
                                         String province, String city, String category,
-                                        Double salaryMin, Double salaryMax) {
+                                        Double salaryMin, Double salaryMax,
+                                        String educationRequirement, String industry, String enterpriseScale) {
         switch (type) {
             case "正职" -> {
                 Page<JobFullTime> jobPage = new Page<>(page, pageSize);
@@ -258,6 +260,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                         .eq(StringUtils.hasText(category), JobFullTime::getCategory, category)
                         .ge(salaryMin != null, JobFullTime::getSalaryMin, salaryMin)
                         .le(salaryMax != null, JobFullTime::getSalaryMax, salaryMax)
+                        .like(StringUtils.hasText(educationRequirement), JobFullTime::getEducationRequirement, educationRequirement)
+                        .like(StringUtils.hasText(industry), JobFullTime::getIndustry, industry)
+                        .like(StringUtils.hasText(enterpriseScale), JobFullTime::getEnterpriseScale, enterpriseScale)
                         .orderByDesc(JobFullTime::getCreateTime)
                         .page(jobPage);
 
@@ -285,6 +290,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                         .eq(StringUtils.hasText(category), JobPartTime::getCategory, category)
                         .ge(salaryMin != null, JobPartTime::getSalaryMin, salaryMin)
                         .le(salaryMax != null, JobPartTime::getSalaryMax, salaryMax)
+                        .like(StringUtils.hasText(educationRequirement), JobPartTime::getEducationRequirement, educationRequirement)
+                        .like(StringUtils.hasText(industry), JobPartTime::getIndustry, industry)
+                        .like(StringUtils.hasText(enterpriseScale), JobPartTime::getEnterpriseScale, enterpriseScale)
                         .orderByDesc(JobPartTime::getCreateTime)
                         .page(jobPage);
 
@@ -312,6 +320,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                         .eq(StringUtils.hasText(category), JobInternship::getCategory, category)
                         .ge(salaryMin != null, JobInternship::getSalaryMin, salaryMin)
                         .le(salaryMax != null, JobInternship::getSalaryMax, salaryMax)
+                        .like(StringUtils.hasText(educationRequirement), JobInternship::getEducationRequirement, educationRequirement)
+                        .like(StringUtils.hasText(industry), JobInternship::getIndustry, industry)
+                        .like(StringUtils.hasText(enterpriseScale), JobInternship::getEnterpriseScale, enterpriseScale)
                         .orderByDesc(JobInternship::getCreateTime)
                         .page(jobPage);
 
@@ -337,7 +348,8 @@ public class PositionQueryServiceImpl implements PositionQueryService {
      */
     private List<JobVO> searchJobsByTypeInternal(String keyword, String type,
                                                  String province, String city, String category,
-                                                 Double salaryMin, Double salaryMax) {
+                                                 Double salaryMin, Double salaryMax,
+                                                 String educationRequirement, String industry, String enterpriseScale) {
         switch (type) {
             case "正职" -> {
                 List<JobFullTime> jobs = jobFullTimeService.lambdaQuery()
@@ -351,6 +363,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                         .eq(StringUtils.hasText(category), JobFullTime::getCategory, category)
                         .ge(salaryMin != null, JobFullTime::getSalaryMin, salaryMin)
                         .le(salaryMax != null, JobFullTime::getSalaryMax, salaryMax)
+                        .like(StringUtils.hasText(educationRequirement), JobFullTime::getEducationRequirement, educationRequirement)
+                        .like(StringUtils.hasText(industry), JobFullTime::getIndustry, industry)
+                        .like(StringUtils.hasText(enterpriseScale), JobFullTime::getEnterpriseScale, enterpriseScale)
                         .orderByDesc(JobFullTime::getCreateTime)
                         .list();
 
@@ -375,6 +390,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                         .eq(StringUtils.hasText(category), JobPartTime::getCategory, category)
                         .ge(salaryMin != null, JobPartTime::getSalaryMin, salaryMin)
                         .le(salaryMax != null, JobPartTime::getSalaryMax, salaryMax)
+                        .like(StringUtils.hasText(educationRequirement), JobPartTime::getEducationRequirement, educationRequirement)
+                        .like(StringUtils.hasText(industry), JobPartTime::getIndustry, industry)
+                        .like(StringUtils.hasText(enterpriseScale), JobPartTime::getEnterpriseScale, enterpriseScale)
                         .orderByDesc(JobPartTime::getCreateTime)
                         .list();
 
@@ -399,6 +417,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                         .eq(StringUtils.hasText(category), JobInternship::getCategory, category)
                         .ge(salaryMin != null, JobInternship::getSalaryMin, salaryMin)
                         .le(salaryMax != null, JobInternship::getSalaryMax, salaryMax)
+                        .like(StringUtils.hasText(educationRequirement), JobInternship::getEducationRequirement, educationRequirement)
+                        .like(StringUtils.hasText(industry), JobInternship::getIndustry, industry)
+                        .like(StringUtils.hasText(enterpriseScale), JobInternship::getEnterpriseScale, enterpriseScale)
                         .orderByDesc(JobInternship::getCreateTime)
                         .list();
 

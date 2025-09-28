@@ -52,6 +52,9 @@ public class PositionQueryController {
      * @param category 职位分类筛选（可选）
      * @param salaryMin 最低薪资筛选（可选）
      * @param salaryMax 最高薪资筛选（可选）
+     * @param educationRequirement 学历要求筛选（可选）
+     * @param industry 行业筛选（可选）
+     * @param enterpriseScale 公司规模筛选（可选）
      * @return 搜索结果
      */
     @GetMapping("/searchJobs")
@@ -64,8 +67,11 @@ public class PositionQueryController {
             @Parameter(description = "省份筛选") @RequestParam(value = "province", required = false) String province,
             @Parameter(description = "城市筛选") @RequestParam(value = "city", required = false) String city,
             @Parameter(description = "职位分类筛选") @RequestParam(value = "category", required = false) String category,
-            @Parameter(description = "最低薪资") @RequestParam(value = "salaryMin", required = false) Double salaryMin,
-            @Parameter(description = "最高薪资") @RequestParam(value = "salaryMax", required = false) Double salaryMax) {
-        return positionQueryService.searchJobs(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax);
+            @Parameter(description = "最低薪资，月薪，单位：元/月") @RequestParam(value = "salaryMin", required = false) Double salaryMin,
+            @Parameter(description = "最高薪资，月薪，单位：元/月") @RequestParam(value = "salaryMax", required = false) Double salaryMax,
+            @Parameter(description = "学历要求筛选") @RequestParam(value = "educationRequirement", required = false) String educationRequirement,
+            @Parameter(description = "行业筛选") @RequestParam(value = "industry", required = false) String industry,
+            @Parameter(description = "公司规模筛选") @RequestParam(value = "enterpriseScale", required = false) String enterpriseScale) {
+        return positionQueryService.searchJobs(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
     }
 }

@@ -31,9 +31,13 @@ public interface PositionQueryService {
      * @param category 职位分类筛选（可选）
      * @param salaryMin 最低薪资筛选（可选）
      * @param salaryMax 最高薪资筛选（可选）
+     * @param educationRequirement 学历要求筛选（可选）
+     * @param industry 行业筛选（可选）
+     * @param enterpriseScale 公司规模筛选（可选）
      * @return 搜索结果
      */
     Result searchJobs(String keyword, Integer page, Integer pageSize, String type, 
                      String province, String city, String category, 
-                     Double salaryMin, Double salaryMax);
+                     Double salaryMin, Double salaryMax,
+                     String educationRequirement, String industry, String enterpriseScale);
 }
