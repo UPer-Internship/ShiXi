@@ -16,9 +16,10 @@ public interface PositionQueryService {
      * @param page 页码
      * @param pageSize 每页大小
      * @param type 岗位类型：正职、兼职、实习（必传，不传默认为正职）
+     * @param status 岗位状态：0-不可见，1-可见（可选，不传则查询所有状态）
      * @return 分页查询结果
      */
-    Result pageQueryMyPublishedJobs(Integer page, Integer pageSize, String type);
+    Result pageQueryMyPublishedJobs(Integer page, Integer pageSize, String type, Integer status);
 
     /**
      * 分类分页模糊搜索岗位推荐(mysql版)

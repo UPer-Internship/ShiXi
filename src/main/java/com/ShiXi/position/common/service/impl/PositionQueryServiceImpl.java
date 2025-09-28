@@ -80,7 +80,7 @@ public class PositionQueryServiceImpl implements PositionQueryService {
     }
 
     @Override
-    public Result pageQueryMyPublishedJobs(Integer page, Integer pageSize, String type) {
+    public Result pageQueryMyPublishedJobs(Integer page, Integer pageSize, String type, Integer status) {
         try {
             // 参数校验
             if (page == null || page < 1) {
@@ -103,6 +103,11 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                 return Result.fail("岗位类型只能是：正职、兼职、实习");
             }
 
+            // 验证status参数的有效性（如果传了的话）
+            if (status != null && status != 0 && status != 1) {
+                return Result.fail("岗位状态只能是：0-不可见，1-可见");
+            }
+
             // 用户验证
             if (UserHolder.getUser() == null || UserHolder.getUser().getId() == null) {
                 return Result.fail("用户未登录或登录已过期");
@@ -116,6 +121,7 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                     Page<JobFullTime> jobPage = new Page<>(page, pageSize);
                     Page<JobFullTime> resultPage = jobFullTimeService.lambdaQuery()
                             .eq(JobFullTime::getPublisherId, currentUserId)
+                            .eq(status != null, JobFullTime::getStatus, status) // 新增状态筛选条件
                             .orderByDesc(JobFullTime::getCreateTime)
                             .page(jobPage);
 
@@ -134,6 +140,7 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                     Page<JobPartTime> jobPage = new Page<>(page, pageSize);
                     Page<JobPartTime> resultPage = jobPartTimeService.lambdaQuery()
                             .eq(JobPartTime::getPublisherId, currentUserId)
+                            .eq(status != null, JobPartTime::getStatus, status) // 新增状态筛选条件
                             .orderByDesc(JobPartTime::getCreateTime)
                             .page(jobPage);
 
@@ -152,6 +159,7 @@ public class PositionQueryServiceImpl implements PositionQueryService {
                     Page<JobInternship> jobPage = new Page<>(page, pageSize);
                     Page<JobInternship> resultPage = jobInternshipService.lambdaQuery()
                             .eq(JobInternship::getPublisherId, currentUserId)
+                            .eq(status != null, JobInternship::getStatus, status) // 新增状态筛选条件
                             .orderByDesc(JobInternship::getCreateTime)
                             .page(jobPage);
 
@@ -174,7 +182,7 @@ public class PositionQueryServiceImpl implements PositionQueryService {
             return Result.ok(pageResult);
 
         } catch (Exception e) {
-            log.error("分页查询我发布的岗位失败，page: {}, pageSize: {}, type: {}", page, pageSize, type, e);
+            log.error("分页查询我发布的岗位失败，page: {}, pageSize: {}, type: {}, status: {}", page, pageSize, type, status, e);
             return Result.fail("系统繁忙，请稍后重试");
         }
     }

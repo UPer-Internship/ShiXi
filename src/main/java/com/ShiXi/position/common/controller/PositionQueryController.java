@@ -30,6 +30,7 @@ public class PositionQueryController {
      * @param page 页码，默认为1
      * @param pageSize 每页大小，默认为10
      * @param type 岗位类型：正职、兼职、实习（必传，不传默认为正职）
+     * @param status 岗位状态：0-不可见，1-可见（可选，不传则查询所有状态）
      * @return 分页查询结果
      */
     @GetMapping("/myPublishedJobs")
@@ -37,8 +38,9 @@ public class PositionQueryController {
     public Result pageQueryMyPublishedJobs(
             @Parameter(description = "页码") @RequestParam(value = "page", defaultValue = "1") Integer page,
             @Parameter(description = "每页大小") @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-            @Parameter(description = "岗位类型：正职、兼职、实习（不传默认为正职）") @RequestParam(value = "type", defaultValue = "正职") String type) {
-        return positionQueryService.pageQueryMyPublishedJobs(page, pageSize, type);
+            @Parameter(description = "岗位类型：正职、兼职、实习（不传默认为兼职）") @RequestParam(value = "type", defaultValue = "兼职") String type,
+            @Parameter(description = "岗位状态：0-不可见，1-可见 不填-全部（可选）") @RequestParam(value = "status", required = false) Integer status) {
+        return positionQueryService.pageQueryMyPublishedJobs(page, pageSize, type, status);
     }
     
     /**
