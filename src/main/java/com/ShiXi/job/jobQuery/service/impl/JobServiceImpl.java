@@ -88,12 +88,12 @@ public class JobServiceImpl extends ServiceImpl<JobMapper, Job> implements JobSe
         if (jobPageQueryDTO.getTag() != null) {
             wrapper.like("tag", jobPageQueryDTO.getTag());
         }
-        if (jobPageQueryDTO.getOnboardTime() != null) {
-            wrapper.like("onboard_time", jobPageQueryDTO.getOnboardTime());
-        }
-        if (jobPageQueryDTO.getTotalTime() != null) {
-            wrapper.eq("total_time", jobPageQueryDTO.getTotalTime());
-        }
+//        if (jobPageQueryDTO.getOnboardTime() != null) {
+//            wrapper.like("onboard_time", jobPageQueryDTO.getOnboardTime());
+//        }
+//        if (jobPageQueryDTO.getTotalTime() != null) {
+//            wrapper.eq("total_time", jobPageQueryDTO.getTotalTime());
+//        }
         wrapper.orderByDesc("create_time");
 
         Page<Job> jobPage = new Page<>(page, pageSize);

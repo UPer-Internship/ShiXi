@@ -33,7 +33,7 @@ public class JobVO {
     
     private List<String> tag; // 标签列表
     
-    private Integer status; // 状态 0/1 可见/不可见
+    private Integer status; // 状态 0/1 不可见/可见
     
     private String category; // 职位
     

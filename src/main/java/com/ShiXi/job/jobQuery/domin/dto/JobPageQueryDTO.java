@@ -18,7 +18,8 @@ public class JobPageQueryDTO {
     private String industry;      // 行业（如互联网、金融等）
     private Double salaryMin;     // 薪资下限
     private Double salaryMax;     // 薪资上限
-    private String onboardTime;   // 到岗时间（如立即、1周内等）
     private String tag;           // 岗位标签，如“远程-线下-可转正”
-    private String totalTime;     // 实习总时长
+//    private String onboardTime;   // 到岗时间（如立即、1周内等）
+
+//    private String totalTime;     // 实习总时长
 }
