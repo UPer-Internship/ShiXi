@@ -65,7 +65,7 @@ public class JobController {
         totalTime = (totalTime != null && totalTime.trim().isEmpty()) ? null : totalTime;
 
         JobPageQueryDTO jobPageQueryDTO = new JobPageQueryDTO(page, pageSize, type, category, industry, salaryMin,
-                salaryMax, onboardTime, tag, totalTime);
+                salaryMax, tag);
         return jobService.pageQuery(jobPageQueryDTO);
     }
 

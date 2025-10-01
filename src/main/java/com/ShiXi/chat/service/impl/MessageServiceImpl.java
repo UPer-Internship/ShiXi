@@ -8,6 +8,8 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.ContactMapper;
 import com.ShiXi.common.mapper.MessageMapper;
 import com.ShiXi.common.mapper.UserMapper;
+import com.ShiXi.common.service.OSSUploadService;
+import com.ShiXi.common.utils.OSSUtil;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -15,9 +17,12 @@ import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +35,12 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     private ContactMapper contactMapper;
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private OSSUploadService ossUploadService;
+
+    // 聊天图片存储目录
+    private static final String CHAT_IMAGE_DIR = "chat/images/";
+
 
     @Override
     public Result saveMessage(ChatMessage message) {
@@ -220,5 +231,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             return Result.ok("添加联系人成功");
         }
         return Result.fail("该用户已添加");
+    }
+
+    @Override
+    public Result uploadChatImage(MultipartFile imageFile) {
+        String url = ossUploadService.uploadPicture(imageFile,CHAT_IMAGE_DIR);
+        if (url != null) {
+            return Result.ok(url);
+        } else {
+            return Result.fail("上传图片失败");
+        }
     }
 }
