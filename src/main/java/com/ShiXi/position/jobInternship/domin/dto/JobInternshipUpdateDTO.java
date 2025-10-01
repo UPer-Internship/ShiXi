@@ -24,6 +24,8 @@ public class JobInternshipUpdateDTO {
     
     private String district; // 区县
     
+    private String detailAddress; // 详细地址
+    
     private String type; // 正职/兼职/实习
     
     private List<String> tag; // 标签列表

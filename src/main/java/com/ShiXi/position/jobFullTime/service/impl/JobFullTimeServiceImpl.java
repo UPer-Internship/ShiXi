@@ -194,8 +194,12 @@ public class JobFullTimeServiceImpl extends ServiceImpl<JobFullTimeMapper, JobFu
             if (StringUtils.hasText(updateDTO.getCity())) {
                 existingJob.setCity(updateDTO.getCity());
             }
+            // 更新字段逻辑
             if (StringUtils.hasText(updateDTO.getDistrict())) {
                 existingJob.setDistrict(updateDTO.getDistrict());
+            }
+            if (StringUtils.hasText(updateDTO.getDetailAddress())) {
+                existingJob.setDetailAddress(updateDTO.getDetailAddress());
             }
             if (StringUtils.hasText(updateDTO.getType())) {
                 existingJob.setType(updateDTO.getType());
