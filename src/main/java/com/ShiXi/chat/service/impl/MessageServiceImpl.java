@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -132,6 +133,9 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
                 .eq("is_deleted", false)
                 .orderByDesc("last_contact_time"));
 
+        // 创建结果列表，包含联系人信息和最近消息
+        List<Map<String, Object>> result = new ArrayList<>();
+
         // 为每个联系人查询对应的用户信息
         for (Contact contact : contacts) {
             // 根据 contactUserId 查询用户信息
@@ -141,8 +145,26 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
                 contact.setContactUserName(user.getNickName());
                 contact.setContactUserIcon(user.getIcon());
             }
+
+            // 查询与该联系人的最近一条消息
+            ChatMessage latestMessage = messageMapper.selectOne(
+                    new QueryWrapper<ChatMessage>()
+                            .and(wrapper -> wrapper.eq("sender_id", userId).eq("receiver_id", contact.getContactUserId()))
+                            .or(wrapper -> wrapper.eq("sender_id", contact.getContactUserId()).eq("receiver_id", userId))
+                            .orderByDesc("send_time")
+                            .last("LIMIT 1")
+            );
+
+            // 构造返回结果
+            Map<String, Object> contactInfo = new HashMap<>();
+            contactInfo.put("contact", contact);
+            if (latestMessage != null) {
+                contactInfo.put("latestMessageContent", latestMessage.getContent());
+                contactInfo.put("latestMessageType", latestMessage.getType());
+            }
+            result.add(contactInfo);
         }
-        return Result.ok(contacts);
+        return Result.ok(result);
     }
 
 

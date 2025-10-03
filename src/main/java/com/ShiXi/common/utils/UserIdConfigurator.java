@@ -1,5 +1,10 @@
 package com.ShiXi.common.utils;
 
+import cn.hutool.core.util.StrUtil;
+import com.ShiXi.common.mapper.UserMapper;
+import com.ShiXi.user.common.entity.User;
+
+import javax.annotation.Resource;
 import javax.websocket.HandshakeResponse;
 import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
@@ -7,6 +12,9 @@ import javax.websocket.server.ServerEndpointConfig.Configurator;
 import java.util.Arrays;
 
 public class UserIdConfigurator extends Configurator {
+
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
@@ -20,8 +28,17 @@ public class UserIdConfigurator extends Configurator {
                     .findFirst()
                     .ifPresent(kv -> {
                         try {
-                            Long userId = Long.parseLong(kv[1]);
-                            sec.getUserProperties().put("userId", userId);
+                            String uuid = kv[1];
+                            if (StrUtil.isNotBlank(uuid)) {
+                                // 根据 uuid 查询用户
+                                User user = userMapper.selectOne(
+                                        new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<User>()
+                                                .eq(User::getUuid, uuid)
+                                );
+                                if (user != null) {
+                                    sec.getUserProperties().put("userId", user.getId());
+                                }
+                            }
                         } catch (NumberFormatException ignored) {
                         }
                     });
