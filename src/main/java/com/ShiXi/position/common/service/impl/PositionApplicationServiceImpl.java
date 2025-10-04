@@ -8,6 +8,7 @@ import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.position.common.domin.dto.ApplicationPageQueryDTO;
 import com.ShiXi.position.common.domin.dto.JobApplicationDTO;
+import com.ShiXi.position.common.domin.dto.PositionApplicationQueryDTO;
 import com.ShiXi.position.common.domin.vo.JobApplicationVO;
 import com.ShiXi.position.common.domin.vo.ReceivedApplicationVO;
 import com.ShiXi.position.common.entity.JobApplication;
@@ -201,71 +202,103 @@ public class PositionApplicationServiceImpl extends ServiceImpl<JobApplicationMa
     
 
     
+    @Override
+    public Result getApplicationsByPosition(PositionApplicationQueryDTO queryDTO) {
+        // 验证岗位是否存在且属于当前用户
+        Long currentUserId = UserHolder.getUser().getId();
+        Long publisherId = getPublisherIdByPosition(queryDTO.getPositionId(), queryDTO.getPositionType());
+        
+        if (publisherId == null) {
+            return Result.fail("岗位不存在");
+        }
+        
+        if (!publisherId.equals(currentUserId)) {
+            return Result.fail("无权限查看该岗位的投递简历");
+        }
+        
+        // 构建查询条件
+        LambdaQueryWrapper<JobApplication> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(JobApplication::getPositionId, queryDTO.getPositionId())
+                   .eq(JobApplication::getPositionType, queryDTO.getPositionType())
+                   .eq(JobApplication::getIsDeleted, 0);
+        
+        // 添加状态筛选条件
+        if (StringUtils.hasText(queryDTO.getStatus())) {
+            queryWrapper.eq(JobApplication::getStatus, queryDTO.getStatus());
+        }
+        
+        // 按投递时间倒序排列
+        queryWrapper.orderByDesc(JobApplication::getCreateTime);
+        
+        // 分页查询
+        Page<JobApplication> page = new Page<>(queryDTO.getPage(), queryDTO.getPageSize());
+        Page<JobApplication> applicationPage = this.page(page, queryWrapper);
+        
+        // 构建返回结果
+        List<ReceivedApplicationVO> voList = new ArrayList<>();
+        for (JobApplication application : applicationPage.getRecords()) {
+            ReceivedApplicationVO vo = buildReceivedApplicationVO(application);
+            voList.add(vo);
+        }
+        
+        // 构建分页结果
+        Page<ReceivedApplicationVO> resultPage = new Page<>();
+        resultPage.setRecords(voList);
+        resultPage.setTotal(applicationPage.getTotal());
+        resultPage.setCurrent(applicationPage.getCurrent());
+        resultPage.setSize(applicationPage.getSize());
+        resultPage.setPages(applicationPage.getPages());
+        
+        return Result.ok(resultPage);
+    }
+    
     /**
-     * 构建ReceivedApplicationVO对象
+     * 构建ReceivedApplicationVO对象，包含完整的简历信息
      */
     private ReceivedApplicationVO buildReceivedApplicationVO(JobApplication application) {
         try {
             ReceivedApplicationVO vo = new ReceivedApplicationVO();
+            
+            // 设置投递记录基本信息
             vo.setId(application.getId());
             vo.setPositionId(application.getPositionId());
+            vo.setPositionType(application.getPositionType());
             vo.setApplicantId(application.getApplicantId());
             vo.setStatus(application.getStatus());
             vo.setIsRead(application.getIsRead());
             vo.setCreateTime(application.getCreateTime());
             vo.setMessage(application.getMessage());
             
-            // 获取投递者信息
-            User applicant = userMapper.selectById(application.getApplicantId());
-            if (applicant != null) {
-                vo.setApplicantName(applicant.getName());
-                vo.setGender(applicant.getGender());
-                vo.setAvatar(applicant.getIcon());
-            }
-            
-            // 获取投递者简历信息
+            // 获取投递者的完整简历信息
             Resume resume = onlineResumeService.lambdaQuery()
                     .eq(Resume::getUserId, application.getApplicantId())
                     .one();
-            if (resume != null) {
-                vo.setPhone(resume.getPhone());
-                vo.setWechat(resume.getWechat());
-                vo.setExpectedPosition(resume.getExpectedPosition());
-                vo.setAdvantages(resume.getAdvantages());
-            }
             
-            // 获取岗位标题
-            String positionTitle = getPositionTitle(application.getPositionId(), application.getPositionType());
-            vo.setPositionTitle(positionTitle);
+            if (resume != null) {
+                // 设置简历完整信息
+                vo.setResumeId(resume.getId());
+                vo.setName(resume.getName());
+                vo.setPhone(resume.getPhone());
+                vo.setGender(resume.getGender());
+                vo.setBirthDate(resume.getBirthDate());
+                vo.setWechat(resume.getWechat());
+                vo.setAdvantages(resume.getAdvantages());
+                vo.setExpectedPosition(resume.getExpectedPosition());
+                vo.setEducationExperiences(resume.getEducationExperiences());
+                vo.setWorkAndInternshipExperiences(resume.getWorkAndInternshipExperiences());
+                vo.setProjectExperiences(resume.getProjectExperiences());
+                vo.setResumeLink(resume.getResumeLink());
+                vo.setResumeCreateTime(resume.getCreateTime());
+                vo.setResumeUpdateTime(resume.getUpdateTime());
+            } else {
+                log.warn("未找到投递者的简历信息，投递者ID: {}", application.getApplicantId());
+            }
             
             return vo;
+            
         } catch (Exception e) {
-            log.error("构建ReceivedApplicationVO失败", e);
+            log.error("构建ReceivedApplicationVO失败，投递记录ID: {}", application.getId(), e);
             return null;
-        }
-    }
-    
-    /**
-     * 获取岗位标题
-     */
-    private String getPositionTitle(Long positionId, String positionType) {
-        try {
-            switch (positionType) {
-                case "正职":
-                    JobFullTime fullTimeJob = jobFullTimeService.getById(positionId);
-                    return fullTimeJob != null ? fullTimeJob.getTitle() : "";
-                case "兼职":
-                    JobPartTime partTimeJob = jobPartTimeService.getById(positionId);
-                    return partTimeJob != null ? partTimeJob.getTitle() : "";
-                case "实习":
-                    JobInternship internshipJob = jobInternshipService.getById(positionId);
-                    return internshipJob != null ? internshipJob.getTitle() : "";
-                default:
-                    return "";
-            }
-        } catch (Exception e) {
-            log.error("获取岗位标题失败", e);
-            return "";
         }
     }
     

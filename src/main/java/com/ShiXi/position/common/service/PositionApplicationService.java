@@ -3,6 +3,7 @@ package com.ShiXi.position.common.service;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.position.common.domin.dto.ApplicationPageQueryDTO;
 import com.ShiXi.position.common.domin.dto.JobApplicationDTO;
+import com.ShiXi.position.common.domin.dto.PositionApplicationQueryDTO;
 import com.ShiXi.position.common.entity.JobApplication;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -31,4 +32,11 @@ public interface PositionApplicationService extends IService<JobApplication> {
      * @return 分页查询结果
      */
     Result getReceivedApplications(ApplicationPageQueryDTO queryDTO);
+    
+    /**
+     * 根据岗位分页查询投递该岗位的简历
+     * @param queryDTO 查询条件（包含岗位ID和岗位类型）
+     * @return 分页查询结果
+     */
+    Result getApplicationsByPosition(PositionApplicationQueryDTO queryDTO);
 }
