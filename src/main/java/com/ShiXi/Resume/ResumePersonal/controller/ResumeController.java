@@ -95,13 +95,80 @@ public class ResumeController {
         return onlineResumeService.getResumeByUuid(uuid);
     }
 
+
+
+
+
+    /**
+     * 上传简历附件到OSS
+     * @param file 简历附件文件
+     * @return 上传结果，包含OSS URL
+     */
+    @PostMapping("/uploadAttachment/v2")
+    @Operation(summary = "(新)上传简历附件")
+    public Result uploadResumeAttachmentV2(@RequestParam("file") MultipartFile file) {
+        return onlineResumeService.uploadResumeAttachmentV2(file);
+    }
+    /**
+     * 删除简历附件
+     * @param attachmentId 简历附件文件
+     * @return 成功状态
+     */
+    @PostMapping("/deleteAttachment")
+    @Operation(summary = "根据简历附件id删除简历附件")
+    public Result deleteAttachment(@RequestParam Long attachmentId) {
+        return onlineResumeService.deleteAttachment(attachmentId);
+    }
+
+    /**
+     * 查看简历附件列表
+     * @return 简历附件id列表
+     */
+    @PostMapping("/getAttachmentIds")
+    @Operation(summary = "查看简历附件的列表集合，返回简历附件的id集合")
+    public Result getAttachmentIds() {
+        return onlineResumeService.getAttachmentIds();
+    }
+
+    /**
+     * 查看简历附件列表
+     * @return 简历附件id列表
+     */
+    @PostMapping("/getAttachmentById")
+    @Operation(summary = "根据简历附件id获取简历附件url")
+    public Result getAttachmentById(Long attachmentId) {
+        return onlineResumeService.getAttachmentById(attachmentId);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     /**
      * 上传简历附件到OSS
      * @param file 简历附件文件
      * @return 上传结果，包含OSS URL
      */
     @PostMapping("/uploadAttachment")
-    @Operation(summary = "上传简历附件")
+    @Operation(summary = "(废弃)上传简历附件")
     public Result uploadResumeAttachment(@RequestParam("file") MultipartFile file) {
         return onlineResumeService.uploadResumeAttachment(file);
     }
@@ -112,60 +179,13 @@ public class ResumeController {
      * @return 附件OSS URL
      */
     @GetMapping("/getAttachmentUrl")
-    @Operation(summary = "获取简历附件URL")
+    @Operation(summary = "（废弃）根据简历id获取简历附件URL")
     public Result getResumeAttachmentUrl(@RequestParam Long resumeId) {
         return onlineResumeService.getResumeAttachmentUrl(resumeId);
     }
 
 
-//    @PostMapping("/resume/basicInfo")
-//    @ApiOperation("保存在线简历基本信息")
-//    public Result saveResumeInfo(@RequestBody StudentInfo studentInfo) {
-//        return onlineResumeService.saveResumeInfo(studentInfo);
-//    }
 
-//    /**
-//     * 保存在线简历经历信息
-//     * @param resumeExperience 经历信息（实习/工作/作品集）
-//     * @return
-//     */
-//    @PostMapping("/resume/experience")
-//    @ApiOperation("保存在线简历经历信息")
-//    public Result saveExperienceInfo(@RequestBody ResumeExperience resumeExperience) {
-//        return onlineResumeService.saveExperienceInfo(resumeExperience);
-//    }
-
-//    /**
-//     * 修改在线简历基本信息
-//     * @param studentInfo
-//     * @return
-//     */
-//    @PostMapping("/resume/changeBasicInfo")
-//    @ApiOperation("修改在线简历基本信息")
-//    public Result changeResumeInfo(@RequestBody StudentInfo studentInfo) {
-//        return onlineResumeService.changeResumeInfo(studentInfo);
-//    }
-//
-//    /**
-//     * 修改在线简历经历信息
-//     * @param resumeExperience 经历信息（实习/工作/作品集）
-//     * @return
-//     */
-//    @PostMapping("/resume/changeExperienceInfo")
-//    @ApiOperation("修改在线简历经历信息")
-//    public Result changeExperienceInfo(@RequestBody ResumeExperience resumeExperience) {
-//        return onlineResumeService.changeExperienceInfo(resumeExperience);
-//    }
-//
-//    /**
-//     * 获取在线简历信息
-//     * @return 在线简历的vo类
-//     */
-//    @GetMapping("/resume/myResume")
-//    @ApiOperation("获取在线简历信息")
-//    public Result getResumeInfo() {
-//        return onlineResumeService.getOnlineResume();
-//    }
 
 
 

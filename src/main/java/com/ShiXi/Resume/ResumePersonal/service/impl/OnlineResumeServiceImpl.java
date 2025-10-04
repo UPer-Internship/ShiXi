@@ -2,6 +2,8 @@ package com.ShiXi.Resume.ResumePersonal.service.impl;
 
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
+import com.ShiXi.Resume.ResumePersonal.entity.ResumeLink;
+import com.ShiXi.Resume.ResumePersonal.service.ResumeLinkService;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.domin.dto.PageResult;
 import com.ShiXi.Resume.ResumePersonal.domin.dto.UpdateResumeDTO;
@@ -16,6 +18,7 @@ import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.utils.OSSUtil;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.common.service.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -37,7 +40,8 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
 
     @Resource
     private UserService userService;
-
+    @Resource
+    private ResumeLinkService resumeLinkService;
     // 简历附件存储目录前缀
     private static final String RESUME_ATTACHMENT_DIR = "resume/attachments/";
 
@@ -344,6 +348,85 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
         }
 
         return Result.ok(resumeLink);
+    }
+
+    @Override
+    public Result uploadResumeAttachmentV2(MultipartFile file) {
+        try {
+            // 参数校验
+            if (file == null || file.isEmpty()) {
+                return Result.fail("请选择要上传的文件");
+            }
+
+            // 检查文件类型（支持常见的简历文件格式）
+            String originalFilename = file.getOriginalFilename();
+            if (!isValidResumeFile(originalFilename)) {
+                return Result.fail("只支持pdf、doc、docx格式的简历文件");
+            }
+
+            // 检查文件大小（限制为10MB）
+            if (file.getSize() > 10 * 1024 * 1024) {
+                return Result.fail("文件大小不能超过10MB");
+            }
+
+            // 获取当前用户ID
+            Long userId = UserHolder.getUser().getId();
+            if (userId == null) {
+                return Result.fail("用户未登录");
+            }
+
+            Resume resume = lambdaQuery().eq(Resume::getUserId, userId).one();
+
+            Long resumeId = resume.getId();
+
+            List<ResumeLink> ResumeLinkList = resumeLinkService.lambdaQuery().eq(ResumeLink::getResumeId, resumeId).list();
+
+            if(ResumeLinkList.size()>=3){
+                return Result.fail("最多允许上传三分简历");
+            }
+            // 上传到OSS
+            String fileUrl = ossUtil.uploadAvatar(file, RESUME_ATTACHMENT_DIR);
+            if (fileUrl == null) {
+                return Result.fail("文件上传失败");
+            }
+            ResumeLink resumeLink = new ResumeLink();
+            resumeLink.setResumeId(resumeId)
+                    .setResumeLink(fileUrl)
+                    .setUserId(userId);
+            resumeLinkService.save(resumeLink);
+            return Result.ok(fileUrl);
+
+        } catch (IOException e) {
+            log.error("上传简历附件失败", e);
+            return Result.fail("文件上传失败：" + e.getMessage());
+        } catch (Exception e) {
+            log.error("上传简历附件时发生未知错误", e);
+            return Result.fail("上传失败，请稍后重试");
+        }
+    }
+
+    @Override
+    public Result deleteAttachment(Long attachmentId) {
+        resumeLinkService.removeById(attachmentId);
+        return Result.ok();
+    }
+
+    @Override
+    public Result getAttachmentIds() {
+        Long userId = UserHolder.getUser().getId();
+        List<Long> ids = resumeLinkService.lambdaQuery()
+                .eq(ResumeLink::getUserId, userId)
+                .list()
+                .stream()
+                .map(ResumeLink::getId)
+                .toList();
+        return Result.ok(ids);
+    }
+
+    @Override
+    public Result getAttachmentById(Long attachmentId) {
+        ResumeLink attachment = resumeLinkService.lambdaQuery().eq(ResumeLink::getResumeId, attachmentId).one();
+        return Result.ok(attachment.getResumeLink());
     }
 
     /**
