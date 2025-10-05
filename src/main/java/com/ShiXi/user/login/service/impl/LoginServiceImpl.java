@@ -12,6 +12,7 @@ import com.ShiXi.common.service.OptionsService;
 import com.ShiXi.common.utils.HttpClientUtil;
 import com.ShiXi.common.utils.RegexUtils;
 import com.ShiXi.common.utils.UuidGenerator;
+import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.feishu.service.impl.FeishuService;
 import com.ShiXi.properties.WeChatProperties;
 import com.ShiXi.user.IdentityAuthentication.common.entity.CurrentIdentification;
@@ -300,6 +301,162 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
             throw new RuntimeException("获取微信openid失败");
         }
         return openid;
+    }
+
+    @Override
+    public Result sendChangePhoneCode(String phone, String type) {
+        if (RegexUtils.isPhoneInvalid(phone)) {
+            return Result.fail("手机号格式错误！");
+        }
+
+        // 如果是原手机号验证，需要检查是否为当前用户的手机号
+        if ("old".equals(type)) {
+            UserDTO user = UserHolder.getUser();
+            if (user == null) {
+                return Result.fail("请先登录");
+            }
+            User currentUser = getById(user.getId());
+            if (currentUser == null || !phone.equals(currentUser.getPhone())) {
+                return Result.fail("手机号不匹配");
+            }
+        }
+
+        // 如果是新手机号验证，需要检查手机号是否已被使用
+        if ("new".equals(type)) {
+            User existingUser = query().eq("phone", phone).one();
+            if (existingUser != null) {
+                return Result.fail("该手机号已被使用");
+            }
+        }
+
+        // 获取当前时间戳
+        long currentTime = System.currentTimeMillis();
+
+        // 选择对应的Redis key
+        String codeKey = "old".equals(type) ? LOGIN_CODE_KEY + phone : CHANGE_PHONE_NEW_CODE_KEY + phone;
+        String timeKey = codeKey + ":time";
+
+        // 从 Redis 获取该手机号上次发送验证码的时间
+        String lastSendTimeStr = stringRedisTemplate.opsForValue().get(timeKey);
+
+        if (lastSendTimeStr != null) {
+            long lastSendTime = Long.parseLong(lastSendTimeStr);
+            // 判断是否在60秒内已经发送过
+            if (currentTime - lastSendTime < 60_000) {
+                return Result.fail("请勿频繁发送验证码");
+            }
+        }
+
+        // 生成验证码
+        String code = RandomUtil.randomNumbers(6);
+
+        // 保存验证码到 Redis
+        stringRedisTemplate.opsForValue().set(codeKey, code, LOGIN_CODE_TTL, TimeUnit.MINUTES);
+
+        // 保存本次发送时间
+        stringRedisTemplate.opsForValue().set(timeKey, String.valueOf(currentTime), 60, TimeUnit.SECONDS);
+
+        // 发送验证码
+        log.debug("发送换绑手机号验证码成功，手机号：{}，类型：{}，验证码：{}", phone, type, code);
+        feishuService.sendTextMessage(phone + ":" + code + " (换绑" + ("old".equals(type) ? "原" : "新") + "手机号)");
+        
+        // 发送短信
+        Options sms = optionsService.lambdaQuery()
+                .eq(Options::getOptionName, "sms").one();
+        Integer status = sms.getOptionStatus();
+        if (status == 1) {
+            try {
+                Client client = smsClientConfig.createClient();
+                SendSmsRequest sendSmsRequest = new SendSmsRequest()
+                        .setPhoneNumbers(phone)
+                        .setSignName(SIGN_NAME)
+                        .setTemplateCode(LOGIN_CODE_TEMPLATE_CODE)
+                        .setTemplateParam("{\"code\":\"" + code + "\"}");
+
+                SendSmsResponse sendSmsResponse = client.sendSms(sendSmsRequest);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        
+        return Result.ok();
+    }
+
+    @Override
+    public Result verifyOldPhone(String phone, String code) {
+        UserDTO user = UserHolder.getUser();
+        if (user == null) {
+            return Result.fail("请先登录");
+        }
+
+        if (RegexUtils.isPhoneInvalid(phone)) {
+            return Result.fail("手机号格式错误！");
+        }
+
+        // 验证是否为当前用户的手机号
+        User currentUser = getById(user.getId());
+        if (currentUser == null || !phone.equals(currentUser.getPhone())) {
+            return Result.fail("手机号不匹配");
+        }
+
+        // 从redis获取验证码并校验
+        String cacheCode = stringRedisTemplate.opsForValue().get(LOGIN_CODE_KEY + phone);
+        if (cacheCode == null || !cacheCode.equals(code)) {
+            return Result.fail("验证码错误");
+        }
+
+        // 验证通过，设置原手机号验证状态
+        String verifyKey = CHANGE_PHONE_OLD_VERIFY_KEY + user.getId();
+        stringRedisTemplate.opsForValue().set(verifyKey, "verified", CHANGE_PHONE_VERIFY_TTL, TimeUnit.MINUTES);
+
+        return Result.ok("原手机号验证成功");
+    }
+
+    @Override
+    public Result changePhone(String newPhone, String code) {
+        UserDTO user = UserHolder.getUser();
+        if (user == null) {
+            return Result.fail("请先登录");
+        }
+
+        if (RegexUtils.isPhoneInvalid(newPhone)) {
+            return Result.fail("手机号格式错误！");
+        }
+
+        // 检查原手机号验证状态
+        String verifyKey = CHANGE_PHONE_OLD_VERIFY_KEY + user.getId();
+        String verifyStatus = stringRedisTemplate.opsForValue().get(verifyKey);
+        if (!"verified".equals(verifyStatus)) {
+            return Result.fail("请先验证原手机号");
+        }
+
+        // 检查新手机号是否已被使用
+        User existingUser = query().eq("phone", newPhone).one();
+        if (existingUser != null) {
+            return Result.fail("该手机号已被使用");
+        }
+
+        // 验证新手机号验证码
+        String cacheCode = stringRedisTemplate.opsForValue().get(CHANGE_PHONE_NEW_CODE_KEY + newPhone);
+        if (cacheCode == null || !cacheCode.equals(code)) {
+            return Result.fail("验证码错误");
+        }
+
+        // 更新用户手机号
+        User currentUser = getById(user.getId());
+        currentUser.setPhone(newPhone);
+        boolean updateResult = updateById(currentUser);
+
+        if (updateResult) {
+            // 清除验证状态和验证码缓存
+            stringRedisTemplate.delete(verifyKey);
+            stringRedisTemplate.delete(CHANGE_PHONE_NEW_CODE_KEY + newPhone);
+            stringRedisTemplate.delete(CHANGE_PHONE_NEW_CODE_KEY + newPhone + ":time");
+            
+            return Result.ok("手机号换绑成功");
+        } else {
+            return Result.fail("换绑失败，请重试");
+        }
     }
 
 }

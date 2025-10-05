@@ -12,4 +12,11 @@ public interface LoginService extends IService<User> {
     Result loginByWechat(String code, String phone);
 
     Result logout();
+    
+    // 手机号换绑相关方法
+    Result sendChangePhoneCode(String phone, String type);
+    
+    Result verifyOldPhone(String phone, String code);
+    
+    Result changePhone(String newPhone, String code);
 }
