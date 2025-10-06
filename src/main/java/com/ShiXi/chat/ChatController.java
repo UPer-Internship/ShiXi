@@ -36,7 +36,9 @@ public class ChatController {
             OutputMessage outputMessage = new OutputMessage(
                     chatMessage.getContent(),
                     String.valueOf(chatMessage.getSenderId()),
-                    new Date().toString()
+                    new Date().toString(),
+                    chatMessage.getReceiverId(),
+                    chatMessage.getType()
             );
 
             // 转换为 JSON 字符串

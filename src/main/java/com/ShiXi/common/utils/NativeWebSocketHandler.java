@@ -79,7 +79,9 @@ public class NativeWebSocketHandler {
             OutputMessage outputMessage = new OutputMessage(
                     chatMessage.getContent(),
                     String.valueOf(senderId),
-                    new java.util.Date().toString()
+                    new java.util.Date().toString(),
+                    receiverId,
+                    chatMessage.getType()
             );
 
             // 广播给所有连接的客户端（可改为定向发送）
