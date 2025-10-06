@@ -73,4 +73,12 @@ public interface OnlineResumeService extends IService<Resume> {
      * @return 附件OSS URL
      */
     Result getResumeAttachmentUrl(Long resumeId);
+
+    Result uploadResumeAttachmentV2(MultipartFile file);
+
+    Result deleteAttachment(Long attachmentId);
+
+    Result getAttachmentIds();
+
+    Result getAttachmentById(Long attachmentId);
 }
