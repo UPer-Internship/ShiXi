@@ -61,4 +61,40 @@ public class loginController {
     public Result logout() {
         return loginService.logout();
     }
+    
+    /**
+     * 发送换绑手机号验证码
+     * @param phone 手机号
+     * @param type 类型：old-原手机号，new-新手机号
+     * @return
+     */
+    @PostMapping("/sendChangePhoneCode")
+    @Operation(summary="发送换绑手机号验证码")
+    public Result sendChangePhoneCode(@RequestParam("phone")String phone, @RequestParam("type")String type) {
+        return loginService.sendChangePhoneCode(phone, type);
+    }
+
+    /**
+     * 验证原手机号
+     * @param phone 原手机号
+     * @param code 验证码
+     * @return 验证结果
+     */
+    @PostMapping("/verifyOldPhone")
+    @Operation(summary="验证原手机号")
+    public Result verifyOldPhone(@RequestParam("phone")String phone, @RequestParam("code")String code) {
+        return loginService.verifyOldPhone(phone, code);
+    }
+
+    /**
+     * 换绑新手机号
+     * @param newPhone 新手机号
+     * @param code 新手机号验证码
+     * @return 换绑结果
+     */
+    @PostMapping("/changePhone")
+    @Operation(summary="换绑手机号")
+    public Result changePhone(@RequestParam("newPhone")String newPhone, @RequestParam("code")String code) {
+        return loginService.changePhone(newPhone, code);
+    }
 }
