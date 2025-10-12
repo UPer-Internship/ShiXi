@@ -5,6 +5,7 @@ import com.ShiXi.chat.entity.ChatMessage;
 import com.ShiXi.chat.entity.OutputMessage;
 import com.ShiXi.chat.service.MessageService;
 import com.ShiXi.common.utils.NativeWebSocketHandler;
+import com.ShiXi.common.utils.UserHolder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,11 +32,12 @@ public class ChatController {
     @PostMapping("/chat/sendMessage")
     @Operation(summary = "发送消息")
     public void sendMessage(@RequestBody ChatMessage chatMessage) {
+        Long userId = UserHolder.getUser().getId();
         try {
             // 构造输出消息
             OutputMessage outputMessage = new OutputMessage(
                     chatMessage.getContent(),
-                    String.valueOf(chatMessage.getSenderId()),
+                    userId,
                     new Date().toString(),
                     chatMessage.getReceiverId(),
                     chatMessage.getType()

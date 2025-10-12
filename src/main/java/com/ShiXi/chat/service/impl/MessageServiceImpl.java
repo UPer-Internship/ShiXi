@@ -126,11 +126,15 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Override
     public Result getContactListByType(String contactType) {
         Long userId = UserHolder.getUser().getId();
+
+        LocalDateTime fifteenDaysAgo = LocalDateTime.now().minusDays(15);
+
         //查询联系人列表
         List<Contact> contacts = contactMapper.selectList(new QueryWrapper<Contact>()
                 .eq("user_id", userId)
                 .eq("contact_type", contactType)
                 .eq("is_deleted", false)
+                .ge("last_contact_time", fifteenDaysAgo)
                 .orderByDesc("last_contact_time"));
 
         // 创建结果列表，包含联系人信息和最近消息
