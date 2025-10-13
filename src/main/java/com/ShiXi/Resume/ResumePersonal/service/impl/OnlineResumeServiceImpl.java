@@ -425,7 +425,7 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
 
     @Override
     public Result getAttachmentById(Long attachmentId) {
-        ResumeLink attachment = resumeLinkService.lambdaQuery().eq(ResumeLink::getResumeId, attachmentId).one();
+        ResumeLink attachment = resumeLinkService.lambdaQuery().eq(ResumeLink::getId, attachmentId).one();
         return Result.ok(attachment.getResumeLink());
     }
 
