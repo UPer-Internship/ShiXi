@@ -5,17 +5,17 @@ import lombok.Data;
 @Data
 public class OutputMessage {
     private String content;
-    private String sender;
+    private Long senderId;
     private String time; // 使用字符串格式化时间以便于前端处理
-    private Long receiver;  // 接收者ID
+    private Long receiverId;  // 接收者ID
     private String type;  // 消息类型
 
 
-    public OutputMessage(String content, String sender, String time, Long receiver, String type) {
+    public OutputMessage(String content, long senderId, String time, Long receiverId, String type) {
         this.content = content;
-        this.sender = sender;
+        this.senderId = senderId;
         this.time = time;
-        this.receiver = receiver;
+        this.receiverId = receiverId;
         this.type = type;
     }
 
@@ -27,12 +27,12 @@ public class OutputMessage {
         this.content = content;
     }
 
-    public String getSender() {
-        return sender;
+    public long getSenderId() {
+        return senderId;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setSenderId(long senderId) {
+        this.senderId = senderId;
     }
 
     public String getTime() {
@@ -43,12 +43,12 @@ public class OutputMessage {
         this.time = time;
     }
 
-    public Long getReceiver() {
-        return receiver;
+    public Long getReceiverId() {
+        return receiverId;
     }
 
-    public void setReceiver(Long receiver) {
-        this.receiver = receiver;
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
     }
 
     public String getType() {

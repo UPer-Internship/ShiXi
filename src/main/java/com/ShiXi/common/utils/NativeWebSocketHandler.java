@@ -72,13 +72,13 @@ public class NativeWebSocketHandler {
             ObjectMapper mapper = new ObjectMapper();
             ChatMessage chatMessage = mapper.readValue(message, ChatMessage.class);
 
-            Long senderId = chatMessage.getSenderId();
+            Long senderId = this.userId;
             Long receiverId = chatMessage.getReceiverId();
 
             // 构造输出消息
             OutputMessage outputMessage = new OutputMessage(
                     chatMessage.getContent(),
-                    String.valueOf(senderId),
+                    senderId,
                     new java.util.Date().toString(),
                     receiverId,
                     chatMessage.getType()
