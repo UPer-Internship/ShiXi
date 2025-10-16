@@ -4,6 +4,8 @@ import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.domin.dto.PageResult;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.position.common.domin.vo.JobVO;
+import com.ShiXi.position.common.entity.JobApplication;
+import com.ShiXi.position.common.service.PositionApplicationService;
 import com.ShiXi.position.common.service.PositionQueryService;
 import com.ShiXi.position.jobFullTime.entity.JobFullTime;
 import com.ShiXi.position.jobFullTime.service.JobFullTimeService;
@@ -35,6 +37,9 @@ public class PositionQueryServiceImpl implements PositionQueryService {
 
     @Resource
     private JobInternshipService jobInternshipService;
+
+    @Resource
+    private PositionApplicationService positionApplicationService;
 
     @Override
     public Result getJobByIdAndType(Long id, String type) {
@@ -451,5 +456,90 @@ public class PositionQueryServiceImpl implements PositionQueryService {
      */
     private boolean isValidPositionType(String type) {
         return "正职".equals(type) || "兼职".equals(type) || "实习".equals(type);
+    }
+
+    @Override
+    public Result getJobsAppliedToPublisher(Long publisherId) {
+        try {
+            // 参数校验
+            if (publisherId == null) {
+                return Result.fail("发布者ID不能为空");
+            }
+
+            // 获取当前用户ID
+            Long currentUserId = UserHolder.getUser().getId();
+
+            // 查询我投递给该发布者的所有岗位记录
+            List<JobApplication> applications = positionApplicationService.lambdaQuery()
+                    .eq(JobApplication::getApplicantId, currentUserId)
+                    .eq(JobApplication::getPublisherId, publisherId)
+                    .eq(JobApplication::getIsDeleted, 0)
+                    .list();
+
+            if (applications.isEmpty()) {
+                return Result.ok(new ArrayList<>());
+            }
+
+            // 根据岗位ID和类型查询具体的岗位信息
+            List<JobVO> jobList = new ArrayList<>();
+            for (JobApplication application : applications) {
+                JobVO jobVO = getJobVOByIdAndType(application.getPositionId(), application.getPositionType());
+                if (jobVO != null) {
+                    jobList.add(jobVO);
+                }
+            }
+
+            log.info("查询我投递给发布者{}的岗位信息成功，共{}个岗位", publisherId, jobList.size());
+            return Result.ok(jobList);
+
+        } catch (Exception e) {
+            log.error("查询我投递给发布者的岗位信息失败，发布者ID: {}", publisherId, e);
+            return Result.fail("查询失败，请稍后重试");
+        }
+    }
+
+    /**
+     * 根据岗位ID和类型获取岗位详细信息
+     */
+    private JobVO getJobVOByIdAndType(Long positionId, String positionType) {
+        try {
+            JobVO jobVO = new JobVO();
+            
+            switch (positionType) {
+                case "正职":
+                    JobFullTime fullTimeJob = jobFullTimeService.getById(positionId);
+                    if (fullTimeJob != null) {
+                        BeanUtils.copyProperties(fullTimeJob, jobVO);
+                        jobVO.setType(positionType);
+                        return jobVO;
+                    }
+                    break;
+                case "兼职":
+                    JobPartTime partTimeJob = jobPartTimeService.getById(positionId);
+                    if (partTimeJob != null) {
+                        BeanUtils.copyProperties(partTimeJob, jobVO);
+                        jobVO.setType(positionType);
+                        return jobVO;
+                    }
+                    break;
+                case "实习":
+                    JobInternship internshipJob = jobInternshipService.getById(positionId);
+                    if (internshipJob != null) {
+                        BeanUtils.copyProperties(internshipJob, jobVO);
+                        jobVO.setType(positionType);
+                        return jobVO;
+                    }
+                    break;
+                default:
+                    log.warn("不支持的岗位类型: {}", positionType);
+                    break;
+            }
+            
+            return null;
+            
+        } catch (Exception e) {
+            log.error("根据ID和类型获取岗位信息失败，岗位ID: {}, 岗位类型: {}", positionId, positionType, e);
+            return null;
+        }
     }
 }

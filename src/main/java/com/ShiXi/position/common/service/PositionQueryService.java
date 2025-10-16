@@ -41,4 +41,11 @@ public interface PositionQueryService {
                      String province, String city, String category, 
                      Double salaryMin, Double salaryMax,
                      String educationRequirement, String industry, String enterpriseScale);
+
+    /**
+     * 查询我投递给某个人的所有岗位信息
+     * @param publisherId 岗位发布者ID
+     * @return 岗位信息列表
+     */
+    Result getJobsAppliedToPublisher(Long publisherId);
 }
