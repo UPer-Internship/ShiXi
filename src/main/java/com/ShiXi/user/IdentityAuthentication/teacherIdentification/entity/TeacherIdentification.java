@@ -42,7 +42,7 @@ public class TeacherIdentification implements Serializable {
     private String college;
     
     // 入职时间
-    private LocalDate joinDate;
+    private String joinDate;
     
     // 邮箱地址
     private String email;
