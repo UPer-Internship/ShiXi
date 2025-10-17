@@ -77,7 +77,7 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
     @Resource
     UuidGenerator uuidGenerator;
 
-    private static final String DEFAULT_AVTAR_URL="https://dev-env-oss.oss-cn-hangzhou.aliyuncs.com/avatar/up-active1.png";
+    private static final String DEFAULT_AVTAR_URL="https://dev-env-oss.oss-cn-hangzhou.aliyuncs.com/avatar/c8db90b6-ebf5-413b-8f14-d46bf7bef56e.png";
     @Override
     public Result loginByPhone(String phone, String code) {
         if (RegexUtils.isPhoneInvalid(phone)) {
