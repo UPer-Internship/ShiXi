@@ -63,37 +63,18 @@ public class JobBrowsingHistoryServiceImpl extends ServiceImpl<JobBrowsingHistor
             if (!positionExists) {
                 return Result.fail("岗位不存在");
             }
-            
-            // 检查是否已有相同的浏览记录，如果有则更新时间
-            JobBrowsingHistory existingRecord = lambdaQuery()
-                    .eq(JobBrowsingHistory::getUserId, userId)
-                    .eq(JobBrowsingHistory::getPositionId, jobBrowsingHistoryDTO.getPositionId())
-                    .eq(JobBrowsingHistory::getPositionType, jobBrowsingHistoryDTO.getPositionType())
-                    .one();
-            
-            if (existingRecord != null) {
-                // 更新现有记录的时间
-                boolean success = lambdaUpdate()
-                        .eq(JobBrowsingHistory::getId, existingRecord.getId())
-                        .update();
-                if (success) {
-                    return Result.ok("浏览记录更新成功");
-                } else {
-                    return Result.fail("浏览记录更新失败");
-                }
+
+            // 创建新的浏览记录（每次请求都新增）
+            JobBrowsingHistory browsingHistory = new JobBrowsingHistory();
+            browsingHistory.setUserId(userId);
+            browsingHistory.setPositionId(jobBrowsingHistoryDTO.getPositionId());
+            browsingHistory.setPositionType(jobBrowsingHistoryDTO.getPositionType());
+
+            boolean success = save(browsingHistory);
+            if (success) {
+                return Result.ok("浏览记录保存成功");
             } else {
-                // 创建新的浏览记录
-                JobBrowsingHistory browsingHistory = new JobBrowsingHistory();
-                browsingHistory.setUserId(userId);
-                browsingHistory.setPositionId(jobBrowsingHistoryDTO.getPositionId());
-                browsingHistory.setPositionType(jobBrowsingHistoryDTO.getPositionType());
-                
-                boolean success = save(browsingHistory);
-                if (success) {
-                    return Result.ok("浏览记录保存成功");
-                } else {
-                    return Result.fail("浏览记录保存失败");
-                }
+                return Result.fail("浏览记录保存失败");
             }
         } catch (Exception e) {
             log.error("记录岗位浏览失败", e);
