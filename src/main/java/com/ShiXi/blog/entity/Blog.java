@@ -24,39 +24,19 @@ public class Blog implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
-     * 商户id
-     */
-    private Long shopId;
-    /**
      * 用户id
      */
     private Long userId;
-    /**
-     * 用户图标
-     */
-    @TableField(exist = false)
-    private String icon;
-    /**
-     * 用户姓名
-     */
-    @TableField(exist = false)
-    private String name;
-    /**
-     * 是否点赞过了
-     */
-    @TableField(exist = false)
-    private Boolean isLike;
-
     /**
      * 标题
      */
     private String title;
 
     /**
-     * 探店的照片，最多9张，多张以","隔开
+     * 探店的照片，最多9张，
      */
     private String images;
-
+    private String cover;
     /**
      * 探店的文字描述
      */
@@ -65,12 +45,12 @@ public class Blog implements Serializable {
     /**
      * 点赞数量
      */
-    private Integer liked;
+    private Integer likes = 0;
 
     /**
      * 评论数量
      */
-    private Integer comments;
+    private Integer comments = 0;
 
     /**
      * 创建时间

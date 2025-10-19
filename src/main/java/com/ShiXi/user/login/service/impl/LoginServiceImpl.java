@@ -149,6 +149,8 @@ public class LoginServiceImpl extends ServiceImpl<UserMapper, User> implements L
         // 3.符合，生成验证码
         String code = RandomUtil.randomNumbers(6);
 
+
+
         // 4.保存验证码到 session
         stringRedisTemplate.opsForValue().set(LOGIN_CODE_KEY + phone, code, LOGIN_CODE_TTL, TimeUnit.MINUTES);
 
