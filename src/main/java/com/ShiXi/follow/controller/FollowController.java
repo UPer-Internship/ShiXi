@@ -24,11 +24,23 @@ public class FollowController {
     public Result follow(@RequestParam Long bloggerId) {
         return followService.follow(bloggerId);
     }
+    @GetMapping("/myFollowerAmount")
+    public Result myFollowerAmount() {
+        return followService.myFollowerAmount();
+    }
+    @GetMapping("/userFollowerAmount")
+    public Result userFollowerAmount(Long userId) {
+        return followService.userFollowerAmount(userId);
+    }
 
     @GetMapping("/myFollowerList")
     public Result myFollowerList() {
+        return followService.myFollowerList();
     }
     @GetMapping("/UserFollowerList")
-    public Result UserFollowerList() {
+    public Result UserFollowerList(@RequestParam Long userId) {
+        return followService.UserFollowerList(userId);
     }
+
+
 }

@@ -12,6 +12,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> implements FollowService {
@@ -56,5 +57,31 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
             save(follow);
             return Result.ok("关注成功"); // 返回操作后的状态（已点赞）
         }
+    }
+
+    @Override
+    public Result myFollowerList() {
+        Long userId = UserHolder.getUser().getId();
+        List<Follow> followList = lambdaQuery().eq(Follow::getBloggerId, userId).list();
+        return Result.ok(followList);
+    }
+
+    @Override
+    public Result UserFollowerList(Long userId) {
+        List<Follow> followList = lambdaQuery().eq(Follow::getBloggerId, userId).list();
+        return Result.ok(followList);
+    }
+
+    @Override
+    public Result myFollowerAmount() {
+        Long userId = UserHolder.getUser().getId();
+        Long count = lambdaQuery().eq(Follow::getBloggerId, userId).count();
+        return Result.ok(count);
+    }
+
+    @Override
+    public Result userFollowerAmount(Long userId) {
+        Long count = lambdaQuery().eq(Follow::getBloggerId, userId).count();
+        return Result.ok(count);
     }
 }
