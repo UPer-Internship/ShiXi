@@ -13,18 +13,22 @@ public class FollowController {
     @Resource
     private FollowService followService;
 
-    @PutMapping("/{id}/{isFollow}")
-    public Result follow(@PathVariable("id") Long followUserId, @PathVariable("isFollow") Boolean isFollow) {
-        return followService.follow(followUserId, isFollow);
+
+    @GetMapping("/isMeFollowed")
+    public Result isMeFollowed(@RequestParam Long bloggerId ) {
+        boolean isFollowed= followService.isMeFollowed(bloggerId);
+        return Result.ok(isFollowed);
     }
 
-    @GetMapping("/or/not/{id}")
-    public Result isFollow(@PathVariable("id") Long followUserId) {
-        return followService.isFollow(followUserId);
+    @PutMapping("/follow")
+    public Result follow(@RequestParam Long bloggerId) {
+        return followService.follow(bloggerId);
     }
 
-    @GetMapping("/common/{id}")
-    public Result followCommons(@PathVariable("id") Long id){
-        return followService.followCommons(id);
+    @GetMapping("/myFollowerList")
+    public Result myFollowerList() {
+    }
+    @GetMapping("/UserFollowerList")
+    public Result UserFollowerList() {
     }
 }

@@ -58,7 +58,7 @@ public class BlogController {
         return blogLikeService.likeBlog(id);
     }
 
-    @GetMapping("/isLikedBlog")
+    @GetMapping("/me/isLikedBlog")
     private Result isLikedBlog(@RequestParam("id") Long id) {
         boolean isLiked = blogLikeService.isLikedBlog(id);
         return Result.ok(isLiked);

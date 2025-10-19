@@ -1,23 +1,17 @@
 package com.ShiXi.follow.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.ShiXi.common.domin.dto.Result;
-import com.ShiXi.user.common.domin.dto.UserDTO;
 import com.ShiXi.follow.entity.Follow;
 import com.ShiXi.common.mapper.FollowMapper;
 import com.ShiXi.follow.service.FollowService;
 import com.ShiXi.user.common.service.UserService;
 import com.ShiXi.common.utils.UserHolder;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> implements FollowService {
@@ -27,63 +21,40 @@ public class FollowServiceImpl extends ServiceImpl<FollowMapper, Follow> impleme
     @Resource
     private UserService userService;
 
-    @Override
-    public Result follow(Long followUserId, Boolean isFollow) {
-        // 1.获取登录用户
-        Long userId = UserHolder.getUser().getId();
-        String key = "follows:" + userId;
-        // 1.判断到底是关注还是取关
-        if (isFollow) {
-            // 2.关注，新增数据
-            Follow follow = new Follow();
-            follow.setUserId(userId);
-            follow.setFollowUserId(followUserId);
-            boolean isSuccess = save(follow);
-            if (isSuccess) {
-                // 把关注用户的id，放入redis的set集合 sadd userId followerUserId
-                stringRedisTemplate.opsForSet().add(key, followUserId.toString());
-            }
-        } else {
-            // 3.取关，删除 delete from tb_follow where user_id = ? and follow_user_id = ?
-            boolean isSuccess = remove(new QueryWrapper<Follow>()
-                    .eq("user_id", userId).eq("follow_user_id", followUserId));
-            if (isSuccess) {
-                // 把关注用户的id从Redis集合中移除
-                stringRedisTemplate.opsForSet().remove(key, followUserId.toString());
-            }
-        }
-        return Result.ok();
-    }
+
 
     @Override
-    public Result isFollow(Long followUserId) {
+    public boolean isMeFollowed(Long bloggerId) {
         // 1.获取登录用户
         Long userId = UserHolder.getUser().getId();
-        // 2.查询是否关注 select count(*) from tb_follow where user_id = ? and follow_user_id = ?
-        Long count = query().eq("user_id", userId).eq("follow_user_id", followUserId).count();
+        Long count = lambdaQuery().eq(Follow::getBloggerId, bloggerId)
+                .eq(Follow::getFollowerId, userId)
+                .count();
         // 3.判断
-        return Result.ok(count > 0);
+        return count > 0;
     }
 
+
+
     @Override
-    public Result followCommons(Long id) {
-        // 1.获取当前用户
+    public Result follow(Long bloggerId) {
         Long userId = UserHolder.getUser().getId();
-        String key = "follows:" + userId;
-        // 2.求交集
-        String key2 = "follows:" + id;
-        Set<String> intersect = stringRedisTemplate.opsForSet().intersect(key, key2);
-        if (intersect == null || intersect.isEmpty()) {
-            // 无交集
-            return Result.ok(Collections.emptyList());
+        boolean isFollowed = isMeFollowed(bloggerId);
+        if(isFollowed){
+            // 3. 已点赞 → 取消点赞（删除记录）
+            LambdaQueryWrapper<Follow> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(Follow::getFollowerId, userId)
+                    .eq(Follow::getBloggerId, bloggerId);
+            remove(queryWrapper);
+            return Result.ok( "取消关注成功"); // 返回操作后的状态（未点赞）
         }
-        // 3.解析id集合
-        List<Long> ids = intersect.stream().map(Long::valueOf).collect(Collectors.toList());
-        // 4.查询用户
-        List<UserDTO> users = userService.listByIds(ids)
-                .stream()
-                .map(user -> BeanUtil.copyProperties(user, UserDTO.class))
-                .collect(Collectors.toList());
-        return Result.ok(users);
+        else{
+            // 4. 未点赞 → 执行点赞（新增记录）
+            Follow follow = new Follow();
+            follow.setFollowerId(userId);
+            follow.setBloggerId(bloggerId);
+            save(follow);
+            return Result.ok("关注成功"); // 返回操作后的状态（已点赞）
+        }
     }
 }
