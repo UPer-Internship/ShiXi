@@ -1,4 +1,4 @@
-package com.ShiXi.blog.domin.dto;
+package com.ShiXi.common.domin.dto;
 
 import lombok.Data;
 

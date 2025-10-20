@@ -41,6 +41,12 @@ public class BlogController {
         return blogService.pageQueryMyBlog(reqDTO);
     }
 
+    @PutMapping("/deleteBlog")
+    public Result deleteBlog(@RequestParam("id") Long id) {
+        // 修改点赞数量
+        return blogService.deleteBlog(id);
+    }
+
     @GetMapping("/queryBlogListByUserId")
 
     public Result queryBlogListByUserId(@RequestBody UserBlogListPageQueryReqDTO reqDTO) {

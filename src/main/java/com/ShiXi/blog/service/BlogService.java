@@ -18,4 +18,6 @@ public interface BlogService extends IService<Blog> {
     Result queryBlogById(Long id);
 
     Result queryBlogListByUserId(UserBlogListPageQueryReqDTO reqDTO);
+
+    Result deleteBlog(Long id);
 }

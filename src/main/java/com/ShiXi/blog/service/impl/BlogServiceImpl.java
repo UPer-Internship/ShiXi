@@ -193,5 +193,11 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         return Result.ok(voList);
     }
 
+    @Override
+    public Result deleteBlog(Long id) {
+        removeById(id);
+        return Result.ok();
+    }
+
 
 }
