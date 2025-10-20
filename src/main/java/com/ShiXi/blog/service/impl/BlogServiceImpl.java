@@ -1,11 +1,11 @@
 package com.ShiXi.blog.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.blog.domin.dto.MyBlogListPageQueryReqDTO;
 import com.ShiXi.blog.domin.dto.UserBlogListPageQueryReqDTO;
 import com.ShiXi.blog.domin.vo.BlogVO;
 import com.ShiXi.blog.domin.vo.MyBlogListVO;
+import com.ShiXi.blog.service.BlogLikeService;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.blog.entity.Blog;
@@ -17,7 +17,6 @@ import com.ShiXi.common.utils.UserHolder;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -45,12 +43,14 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Resource
     private OSSUploadService ossUploadService;
+    @Resource
+    private BlogLikeService blogLikeService;
 
-
-    private static final String BLOG_ROOT = "blog/";
-    private static final String COVER_DIR = "cover/"; // 封面图子目录
-    private static final String CONTENT_DIR = "content/"; // 内容图子目录
-    private static final String USER_DIR = "user/";
+    private static final String BLOG_IMAGE = "blog_image/";
+    private static final String BLOG_PREFIX = "blog_id:";
+    private static final String COVER_DIR = "cover_image/"; // 封面图子目录
+    private static final String CONTENT_DIR = "content_images/"; // 内容图子目录
+    private static final String USER_DIR = "user_id:";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -72,7 +72,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         }
 
         // 初始化OSS路径（按用户+博客ID分层）
-        String baseOssDir = BLOG_ROOT + USER_DIR + userId + "/" + blogId + "/";
+        String baseOssDir = BLOG_IMAGE +BLOG_PREFIX+ blogId+ "/";
         String coverOssDir = baseOssDir + COVER_DIR; // 封面图路径
         String contentOssDir = baseOssDir + CONTENT_DIR; // 内容图路径
 
@@ -197,6 +197,9 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
 
     @Override
     public Result deleteBlog(Long id) {
+        //TODO 关联评论和点赞都要删除
+        Blog blog = lambdaQuery().eq(Blog::getId, id).one();
+
         removeById(id);
         return Result.ok();
     }

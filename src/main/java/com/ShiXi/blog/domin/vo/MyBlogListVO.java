@@ -8,5 +8,6 @@ public class MyBlogListVO {
     private Long id;
     private String title;
     private String content;
-    private List<String> images;
+    private String cover;
+
 }
