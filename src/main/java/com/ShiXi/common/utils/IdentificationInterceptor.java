@@ -37,6 +37,15 @@ public class IdentificationInterceptor implements HandlerInterceptor {
             }
         }
         
+        // 游客身份限制：无法投递简历
+        if (identification   == 0) {
+            // 限制游客访问投递简历相关接口
+            if (requestURI.startsWith("/position/application/apply")) {
+                response.setStatus(403);
+                return false;
+            }
+        }
+        
         return true;
     }
 }
