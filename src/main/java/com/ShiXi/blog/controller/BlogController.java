@@ -1,5 +1,6 @@
 package com.ShiXi.blog.controller;
 
+import com.ShiXi.blog.domin.dto.HotBlogPageQueryReqDTO;
 import com.ShiXi.blog.domin.dto.MyBlogListPageQueryReqDTO;
 import com.ShiXi.blog.domin.dto.UserBlogListPageQueryReqDTO;
 import com.ShiXi.blog.service.BlogLikeService;
@@ -39,6 +40,16 @@ public class BlogController {
         return blogService.publishBlog(title,content,cover,images);
 
     }
+
+    @PostMapping("/queryHotBlogs")
+    public Result queryHotBlogs(@RequestBody HotBlogPageQueryReqDTO reqDTO){
+        return blogService.queryHotBlogs(reqDTO);
+    }
+
+//    @PostMapping("/querySubscribe")
+//    public Result querySubscribe(@RequestBody ){
+//        return blogService.querySubscribe();
+//    }
 
     @GetMapping("/queryMyBlogList")
     @Operation(summary = "查询我发布的帖子列表，有页号和页面大小两个参数pageNum pageSize")
