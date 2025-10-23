@@ -78,6 +78,20 @@
             <version>5.8.22</version>
         </dependency>
 
+        <!-- Spring Boot 测试核心依赖：包含 @SpringBootTest、JUnit 5、Mock 工具等 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope> <!-- 仅测试环境生效，不打包到生产 -->
+            <!-- 排除 JUnit 4 避免版本冲突（Spring Boot 2.2+ 默认用 JUnit 5） -->
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -157,6 +171,10 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
         </dependency>
 
     </dependencies>

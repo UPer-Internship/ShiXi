@@ -1,5 +1,6 @@
 package com.ShiXi.blog.controller;
 
+import com.ShiXi.blog.ScheduledJob.ScoreCalculator;
 import com.ShiXi.blog.domin.dto.HotBlogPageQueryReqDTO;
 import com.ShiXi.blog.domin.dto.MyBlogListPageQueryReqDTO;
 import com.ShiXi.blog.domin.dto.UserBlogListPageQueryReqDTO;
@@ -29,6 +30,8 @@ public class BlogController {
     private BlogService blogService;
     @Resource
     private BlogLikeService blogLikeService;
+    @Resource
+    private ScoreCalculator scoreCalculator;
     @PostMapping("/publish")
     @Operation(summary = "帖子发布接口，标题，正文，封面图片，内容图片（允许9张）")
     public Result publishBlog(
@@ -46,10 +49,6 @@ public class BlogController {
         return blogService.queryHotBlogs(reqDTO);
     }
 
-//    @PostMapping("/querySubscribe")
-//    public Result querySubscribe(@RequestBody ){
-//        return blogService.querySubscribe();
-//    }
 
     @GetMapping("/queryMyBlogList")
     @Operation(summary = "查询我发布的帖子列表，有页号和页面大小两个参数pageNum pageSize")
@@ -88,5 +87,11 @@ public class BlogController {
         return Result.ok(isLiked);
     }
 
+    @GetMapping("/testSch")
+    private Result testSch() throws Exception {
+
+        scoreCalculator.ScoreCulJobHandler();
+        return Result.ok();
+    }
 
 }

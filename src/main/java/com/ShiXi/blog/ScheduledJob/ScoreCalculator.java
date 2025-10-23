@@ -6,12 +6,9 @@ import com.ShiXi.blog.ScheduledJob.domin.dto.BlogScoreUpdateDTO;
 import com.ShiXi.blog.service.BlogService;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -26,7 +23,7 @@ public class ScoreCalculator {
     @Resource
     private BlogService blogService;
     @Resource
-    private StringRedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
     // 分批大小
     private static final int BATCH_SIZE = 500;
     // 时间范围：1年内
@@ -92,7 +89,7 @@ public class ScoreCalculator {
             if (!allBlogIds.isEmpty()) {
                 // 查询评分最高的前200条ID（可根据业务调整数量）
                 List<Long> topBlogIds = blogService.listTopBlogIdsByScore(200);
-                redisTemplate.opsForValue().set(
+                stringRedisTemplate.opsForValue().set(
                         REDIS_TOP_KEY,
                         JSONUtil.toJsonStr(topBlogIds),
                         REDIS_EXPIRE_HOURS,

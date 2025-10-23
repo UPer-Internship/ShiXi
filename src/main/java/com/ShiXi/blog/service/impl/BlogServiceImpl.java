@@ -11,7 +11,13 @@ import com.ShiXi.blog.domin.dto.MyBlogListPageQueryReqDTO;
 import com.ShiXi.blog.domin.dto.UserBlogListPageQueryReqDTO;
 import com.ShiXi.blog.domin.vo.BlogVO;
 import com.ShiXi.blog.domin.vo.MyBlogListVO;
+import com.ShiXi.blog.entity.BlogLike;
 import com.ShiXi.blog.service.BlogLikeService;
+import com.ShiXi.comment.entity.Comment;
+import com.ShiXi.comment.entity.CommentReply;
+import com.ShiXi.comment.service.CommentLikeService;
+import com.ShiXi.comment.service.CommentReplyService;
+import com.ShiXi.comment.service.CommentService;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.service.OSSUploadService;
 import com.ShiXi.blog.entity.Blog;
@@ -54,10 +60,15 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     private FollowService followService;
 
     @Resource
+    private CommentLikeService commentLikeService;
+    @Resource
     private OSSUploadService ossUploadService;
     @Resource
     private BlogLikeService blogLikeService;
-
+    @Resource
+    private CommentReplyService commentReplyService;
+    @Resource
+    private CommentService commentService;
     private static final String BLOG_IMAGE = "blog_image/";
     private static final String BLOG_PREFIX = "blog_id:";
     private static final String COVER_DIR = "cover_image/"; // 封面图子目录
@@ -213,10 +224,33 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
     }
 
     @Override
+    @Transactional
     public Result deleteBlog(Long id) {
         //TODO 关联评论和点赞都要删除
         Blog blog = lambdaQuery().eq(Blog::getId, id).one();
+        Long userId = UserHolder.getUser().getId();
+        if(!blog.getUserId().equals(userId)) {
+            return Result.fail("无法删除他人的帖子");
+        }
+        //删除对应点赞记录
+        blogLikeService.lambdaUpdate().eq(BlogLike::getBlogId, id).remove();
+        //删除所有对应的一级评论
+        List<Long> commentIds = commentService.lambdaQuery()
+                .eq(Comment::getBlogId, id)
+                .select(Comment::getId).list()
+                .stream()
+                .map(Comment::getId)         // 提取每个评论的ID
+                .toList(); // 收集为List<Long>
 
+        //删除所有二级评论（基于一级评论ID关联）
+        if (!commentIds.isEmpty()) {
+            commentReplyService.lambdaUpdate()
+                    .in(CommentReply::getCommentId, commentIds)
+                    .remove();
+
+            // 4. 删除所有一级评论（使用查询到的评论ID列表）
+            commentService.removeByIds(commentIds);
+        }
         removeById(id);
         return Result.ok();
     }
@@ -248,9 +282,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 List<Long> cachePartIds = topBlogIds.subList(start, cacheSize);
 
                 List<Blog> cachePartBlogs = listByIds(cachePartIds);
-                List<BlogVO> cachePartVOs=new ArrayList<>();
-                BeanUtils.copyProperties(cachePartBlogs, cachePartVOs);
-//                List<BlogVO> cachePartVOs = convertToVO(listByIds(cachePartIds));
+                List<BlogVO> cachePartVOs = convertToVO(cachePartBlogs);
                 int cachePartSize = cachePartVOs.size();
 
                 // 3.2 计算还需要从数据库补充的数量
@@ -268,6 +300,22 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
         log.warn("推荐缓存未命中，直接查询数据库");
         List<BlogVO> BlogVOs = pageRecommendFromDb(new Page<>(current, pageSize));
         return Result.ok(BlogVOs);
+    }
+
+
+    public List<BlogVO> convertToVO(List<Blog> blogs) {
+        return blogs.stream().map(blog -> {
+            BlogVO vo = new BlogVO();
+            vo.setId(blog.getId());
+            vo.setTitle(blog.getTitle());
+            vo.setCover(blog.getCover());
+            vo.setLikes(blog.getLikes());
+            vo.setComments(blog.getComments());
+            vo.setCreateTime(blog.getCreateTime());
+            vo.setUserId(blog.getUserId());
+            // 按需添加其他前端需要的字段（如摘要、图片数量等）
+            return vo;
+        }).collect(Collectors.toList());
     }
 
 
@@ -303,9 +351,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements Bl
                 .last("LIMIT " + needMore);
 
         List<Blog> blogs = list(queryWrapper);
-        List<BlogVO> blogVOs=new ArrayList<>();
-        BeanUtils.copyProperties(blogs, blogVOs);
-        return blogVOs;
+        return convertToVO(blogs);
     }
 
 

@@ -40,12 +40,40 @@ public class CommentLikeServiceImpl extends ServiceImpl<CommentLikeMapper, Comme
     @Override
     public Result likeComment(IsCommentLikeReqDTO reqDTO) {
         boolean isLiked = isCommentLike(reqDTO);
+        Long userId = UserHolder.getUser().getId();
+        //取消点赞
         if(isLiked){
-
+            //二级评论
+            if(reqDTO.getReplyId()!=null){
+                lambdaUpdate().eq(CommentLike::getCommentId, reqDTO.getCommentId())
+                        .eq(CommentLike::getUserId, userId)
+                        .eq(CommentLike::getReplyId, reqDTO.getReplyId())
+                        .remove();
+                return Result.ok();
+            }
+            //一级评论
+            lambdaUpdate().eq(CommentLike::getCommentId, reqDTO.getCommentId())
+                    .eq(CommentLike::getUserId, userId)
+                    .isNull(CommentLike::getReplyId)
+                    .remove();
+            return Result.ok();
         }
+        //点赞
         else{
-
+            if(reqDTO.getReplyId()!=null){
+                CommentLike commentLike = new CommentLike();
+                commentLike.setCommentId(reqDTO.getCommentId())
+                        .setReplyId(reqDTO.getReplyId())
+                        .setUserId(userId);
+                save(commentLike);
+                return Result.ok(commentLike);
+            }
+            //一级评论
+            CommentLike commentLike = new CommentLike();
+            commentLike.setCommentId(reqDTO.getCommentId())
+                    .setUserId(userId);
+            save(commentLike);
+            return Result.ok(commentLike);
         }
-        return null;
     }
 }

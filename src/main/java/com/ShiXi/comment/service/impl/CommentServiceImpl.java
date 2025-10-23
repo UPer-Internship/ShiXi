@@ -72,7 +72,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     public Result deleteComment(Long commentId) {
+        Long userId = UserHolder.getUser().getId();
         Comment comment = lambdaQuery().eq(Comment::getId, commentId).one();
+        if(!comment.getUserId().equals(userId)){
+            return Result.fail("无法删除别人的评论");
+        }
         String image = comment.getImage();
         if (image != null) {
             ossUploadService.deletePicture(image);

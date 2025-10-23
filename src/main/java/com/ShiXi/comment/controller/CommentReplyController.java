@@ -1,13 +1,11 @@
 package com.ShiXi.comment.controller;
 
+import com.ShiXi.comment.domin.dto.pageQueryCommentReplyReqDTO;
 import com.ShiXi.comment.service.CommentReplyService;
 import com.ShiXi.comment.service.CommentService;
 import com.ShiXi.common.domin.dto.Result;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -33,8 +31,14 @@ public class CommentReplyController {
     @PostMapping("/deleteReply")
     public Result replyComment(
             @RequestParam("replyId") Long replyId
-
     ) {
         return commentReplyService.deleteReply(replyId);
+    }
+
+    @PostMapping("/pageQueryCommentReply")
+    public Result pageQueryCommentReply(
+            @RequestBody pageQueryCommentReplyReqDTO reqDTO
+    ) {
+        return commentReplyService.pageQueryCommentReply(reqDTO);
     }
 }
