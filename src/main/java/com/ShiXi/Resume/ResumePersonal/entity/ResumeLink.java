@@ -21,6 +21,8 @@ public class ResumeLink {
 
     private Long userId;
 
-    private String resumeLink;// 手机号
+    private String resumeLink;
+
+    private String attachmentName;
 
 }
