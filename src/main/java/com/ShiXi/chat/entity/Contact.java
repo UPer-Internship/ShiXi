@@ -22,6 +22,9 @@ public class Contact implements Serializable {
     private String remark;
     private String contactType;
     private LocalDateTime lastContactTime;
+    private Integer exchangeStatus;
+    private Integer chatStatus;
+    private Integer messagesCount;
     @TableLogic
     private Integer isDeleted; // 逻辑删除标志，0-未删除，1-已删除
     private Integer isRead;
@@ -31,4 +34,10 @@ public class Contact implements Serializable {
     private String contactUserName;
     @TableField(exist = false)
     private String contactUserIcon;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
 }

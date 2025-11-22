@@ -84,6 +84,11 @@ CREATE TABLE `contact`
     `is_deleted`        tinyint(1)                                                    NULL DEFAULT 0 COMMENT '逻辑删除标志，0-未删除，1-已删除',
     `is_read`           tinyint(1)                                                    NULL DEFAULT 0 COMMENT '是否已读（0:未读 1:已读）',
     `contact_type`      varchar(20) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci  NULL DEFAULT 'PERSONAL' COMMENT '联系人类型：WORK-工作好友，PERSONAL-普通好友',
+    `exchange_status`   tinyint(1)                                                    NULL DEFAULT 0 COMMENT '交换状态：0-未交换，1-已交换',
+    `chat_status`       tinyint(1)                                                    NULL DEFAULT 0 COMMENT '联系人状态：0-限制发消息，1-互相发消息',
+    `messages_count`    tinyint(1)                                                    NULL DEFAULT 0 COMMENT '已发消息数',
+    `create_time`       datetime                                                      NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`       datetime                                                      NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE INDEX `uk_user_contact` (`user_id` ASC, `contact_user_id` ASC) USING BTREE
 ) ENGINE = InnoDB
@@ -780,5 +785,15 @@ CREATE TABLE `position_favorite`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_0900_ai_ci COMMENT ='新的岗位收藏表，对应position模块';
+
+CREATE TABLE `settings` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键',
+    `user_id` BIGINT NOT NULL COMMENT '关联用户ID',
+    `privacy_stranger` TINYINT NOT NULL DEFAULT 2 COMMENT '陌生人隐私权限：0=无法查看主页，1=可查看但不可加好友发消息，2=对陌生人友好',
+    `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_user_id` (`user_id`) COMMENT '唯一约束：每个用户仅一条设置记录'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户设置表';
 
 SET FOREIGN_KEY_CHECKS = 1;

@@ -7,15 +7,20 @@ import com.ShiXi.chat.service.MessageService;
 import com.ShiXi.common.domin.dto.Result;
 import com.ShiXi.common.mapper.ContactMapper;
 import com.ShiXi.common.mapper.MessageMapper;
+import com.ShiXi.common.mapper.SettingsMapper;
 import com.ShiXi.common.mapper.UserMapper;
 import com.ShiXi.common.service.OSSUploadService;
+import com.ShiXi.common.utils.NativeWebSocketHandler;
 import com.ShiXi.common.utils.OSSUtil;
 import com.ShiXi.common.utils.UserHolder;
+import com.ShiXi.settings.entity.Settings;
+import com.ShiXi.settings.service.SettingsService;
 import com.ShiXi.user.common.entity.User;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.baomidou.mybatisplus.extension.toolkit.SqlRunner;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,7 +42,11 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
     @Resource
     private UserMapper userMapper;
     @Resource
+    private SettingsService settingsService;
+    @Resource
     private OSSUploadService ossUploadService;
+    @Resource
+    private ObjectMapper objectMapper;
 
     // 聊天图片存储目录
     private static final String CHAT_IMAGE_DIR = "chat/images/";
@@ -48,6 +57,46 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
         message.setSendTime(LocalDateTime.now());
         Long userId = UserHolder.getUser().getId();
         message.setSenderId(userId);
+        //如果用户对对方的设置状态为0,则限制消息3条
+        Contact contact1 = contactMapper.selectOne(new QueryWrapper<Contact>()
+                .eq("user_id", userId)
+                .eq("contact_user_id", message.getReceiverId()));
+
+        Contact contact2 = contactMapper.selectOne(new QueryWrapper<Contact>()
+                .eq("user_id", message.getReceiverId())
+                .eq("contact_user_id", userId));
+
+        if(contact1 == null || contact2 == null){
+            return Result.fail("不存在联系人");
+        }
+
+        if(contact1.getChatStatus()==0){
+            if(contact1.getMessagesCount()>=3){
+                notifyLimitReached(userId);
+                return Result.fail("可发消息数达上限");
+            }
+            contact1.setMessagesCount(contact1.getMessagesCount()+1);
+        }else if(contact1.getChatStatus()==1){
+            if(contact2.getChatStatus()==0){
+                contact2.setChatStatus(1);
+            }
+            if(contact1.getMessagesCount()<3) {
+                contact1.setMessagesCount(contact1.getMessagesCount() + 1);
+            }
+        }
+
+        if(message.getType().equals("file")){
+            contact1.setExchangeStatus(1);
+            contact2.setExchangeStatus(1);
+        }
+
+        contactMapper.update(contact1,new UpdateWrapper<Contact>()
+                .eq("user_id", userId)
+                .eq("contact_user_id", message.getReceiverId()));
+
+        contactMapper.update(contact2,new UpdateWrapper<Contact>()
+                .eq("user_id", message.getReceiverId())
+                .eq("contact_user_id", userId));
 
         boolean save = save(message);
         if(save){
@@ -60,6 +109,19 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             return Result.ok();
         }
         return Result.fail("保存失败");
+    }
+
+    private void notifyLimitReached(Long userId) {
+        try {
+            Map<String, Object> notification = new HashMap<>();
+            notification.put("type", "message_limit_reached");
+            notification.put("message", "您已达到未回复联系人消息上限");
+
+            String notificationJson = objectMapper.writeValueAsString(notification);
+            NativeWebSocketHandler.sendToUser(userId, notificationJson);
+        } catch (Exception e) {
+            log.error("Failed to send limit reached notification to user: {}");
+        }
     }
 
     @Override
@@ -83,12 +145,16 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
             contact1.setContactUserId(userId2);
             contact1.setLastContactTime(LocalDateTime.now());
             contact1.setContactType(contactType);
+            contact1.setChatStatus(0);
+            contact1.setMessagesCount(0);
             contactMapper.insert(contact1);
             Contact contact2 = new Contact();
             contact2.setUserId(userId2);
             contact2.setContactUserId(userId1);
             contact2.setLastContactTime(LocalDateTime.now());
             contact2.setContactType(contactType);
+            contact2.setChatStatus(1);
+            contact2.setMessagesCount(0);
             contactMapper.insert(contact2);
         }
     }
@@ -166,9 +232,33 @@ public class MessageServiceImpl extends ServiceImpl<MessageMapper, ChatMessage> 
                 contactInfo.put("latestMessageContent", latestMessage.getContent());
                 contactInfo.put("latestMessageType", latestMessage.getType());
             }
+            // 添加关系状态标识
+            String relationshipStatus = determineRelationshipStatus(contact, userId);
+            contactInfo.put("relationshipStatus", relationshipStatus);
+
             result.add(contactInfo);
         }
         return Result.ok(result);
+    }
+
+    private String determineRelationshipStatus(Contact contact, Long currentUserId) {
+        // 新招呼（对方发过消息但我从未回复）
+        if (contact.getMessagesCount() == 0) {
+            return "newGreeting";
+        }
+
+        // 有交换关系
+        if (contact.getChatStatus() == 1 && contact.getExchangeStatus() == 1) {
+            return "exchanged";
+        }
+
+        // 仅沟通（自由交流但未交换）
+        if (contact.getChatStatus() == 1) {
+            return "communicating";
+        }
+
+        // 默认状态（限制交流）
+        return "all";
     }
 
 
