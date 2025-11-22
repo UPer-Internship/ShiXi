@@ -1,6 +1,5 @@
 package com.ShiXi.Resume.ResumePersonal.service.impl;
 
-import cn.hutool.json.JSON;
 import cn.hutool.json.JSONUtil;
 import com.ShiXi.Resume.ResumePersonal.entity.ResumeLink;
 import com.ShiXi.Resume.ResumePersonal.service.ResumeLinkService;
@@ -12,13 +11,11 @@ import com.ShiXi.Resume.ResumePersonal.domin.vo.ResumeVO;
 import com.ShiXi.Resume.ResumePersonal.domin.vo.ResumePublicVO;
 import com.ShiXi.Resume.ResumePersonal.entity.Resume;
 import com.ShiXi.common.mapper.ResumeExperienceMapper;
-import com.ShiXi.common.mapper.StudentInfoMapper;
 import com.ShiXi.Resume.ResumePersonal.service.OnlineResumeService;
 import com.ShiXi.common.utils.UserHolder;
 import com.ShiXi.common.utils.OSSUtil;
 import com.ShiXi.user.common.entity.User;
 import com.ShiXi.user.common.service.UserService;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -351,7 +348,7 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
     }
 
     @Override
-    public Result uploadResumeAttachmentV2(MultipartFile file) {
+    public Result uploadResumeAttachmentV2(MultipartFile file,String attachmentName) {
         try {
             // 参数校验
             if (file == null || file.isEmpty()) {
@@ -375,11 +372,11 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
                 return Result.fail("用户未登录");
             }
 
-            Resume resume = lambdaQuery().eq(Resume::getUserId, userId).one();
+//            Resume resume = lambdaQuery().eq(Resume::getUserId, userId).one();
 
-            Long resumeId = resume.getId();
+//            Long resumeId = resume.getId();
 
-            List<ResumeLink> ResumeLinkList = resumeLinkService.lambdaQuery().eq(ResumeLink::getResumeId, resumeId).list();
+            List<ResumeLink> ResumeLinkList = resumeLinkService.lambdaQuery().eq(ResumeLink::getUserId,userId).list();
 
             if(ResumeLinkList.size()>=3){
                 return Result.fail("最多允许上传三分简历");
@@ -390,8 +387,8 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
                 return Result.fail("文件上传失败");
             }
             ResumeLink resumeLink = new ResumeLink();
-            resumeLink.setResumeId(resumeId)
-                    .setResumeLink(fileUrl)
+            resumeLink.setResumeLink(fileUrl)
+                    .setAttachmentName(attachmentName)
                     .setUserId(userId);
             resumeLinkService.save(resumeLink);
             return Result.ok(fileUrl);
@@ -414,18 +411,14 @@ public class OnlineResumeServiceImpl extends ServiceImpl<ResumeExperienceMapper,
     @Override
     public Result getAttachmentIds() {
         Long userId = UserHolder.getUser().getId();
-        List<Long> ids = resumeLinkService.lambdaQuery()
-                .eq(ResumeLink::getUserId, userId)
-                .list()
-                .stream()
-                .map(ResumeLink::getId)
-                .toList();
-        return Result.ok(ids);
+        List<ResumeLink> list = resumeLinkService.lambdaQuery().eq(ResumeLink::getUserId, userId)
+                .list();
+        return Result.ok(list);
     }
 
     @Override
     public Result getAttachmentById(Long attachmentId) {
-        ResumeLink attachment = resumeLinkService.lambdaQuery().eq(ResumeLink::getResumeId, attachmentId).one();
+        ResumeLink attachment = resumeLinkService.lambdaQuery().eq(ResumeLink::getId, attachmentId).one();
         return Result.ok(attachment.getResumeLink());
     }
 

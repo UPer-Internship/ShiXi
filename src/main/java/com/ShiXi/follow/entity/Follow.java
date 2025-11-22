@@ -27,12 +27,12 @@ public class Follow implements Serializable {
     /**
      * 用户id
      */
-    private Long userId;
+    private Long bloggerId;
 
     /**
      * 关联的用户id
      */
-    private Long followUserId;
+    private Long followerId;
 
     /**
      * 创建时间

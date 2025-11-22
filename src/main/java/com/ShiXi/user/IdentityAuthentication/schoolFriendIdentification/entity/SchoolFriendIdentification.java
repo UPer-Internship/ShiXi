@@ -30,7 +30,7 @@ public class SchoolFriendIdentification implements Serializable {
 
     private String gender;
 
-    private LocalDate birthDate;
+    private String birthDate;
 
 
     private String educationLevel;
@@ -42,10 +42,10 @@ public class SchoolFriendIdentification implements Serializable {
     private String major;
 
 
-    private LocalDate enrollmentDate;
+    private String enrollmentDate;
 
 
-    private LocalDate graduationDate;
+    private String graduationDate;
 
     // 毕业证书
     private String pictureMaterialUrl;

@@ -76,4 +76,16 @@ public class PositionQueryController {
             @Parameter(description = "公司规模筛选") @RequestParam(value = "enterpriseScale", required = false) String enterpriseScale) {
         return positionQueryService.searchJobs(keyword, page, pageSize, type, province, city, category, salaryMin, salaryMax, educationRequirement, industry, enterpriseScale);
     }
+
+    /**
+     * 查询我投递给某个人的所有岗位信息
+     * @param publisherId 岗位发布者ID
+     * @return 岗位信息列表
+     */
+    @GetMapping("/myApplicationsToPublisher")
+    @Operation(summary = "查询我投递给某个人的所有岗位信息")
+    public Result getJobsAppliedToPublisher(
+            @Parameter(description = "岗位发布者ID") @RequestParam Long publisherId) {
+        return positionQueryService.getJobsAppliedToPublisher(publisherId);
+    }
 }

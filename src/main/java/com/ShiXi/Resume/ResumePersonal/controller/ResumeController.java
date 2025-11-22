@@ -106,8 +106,8 @@ public class ResumeController {
      */
     @PostMapping("/uploadAttachment/v2")
     @Operation(summary = "(新)上传简历附件")
-    public Result uploadResumeAttachmentV2(@RequestParam("file") MultipartFile file) {
-        return onlineResumeService.uploadResumeAttachmentV2(file);
+    public Result uploadResumeAttachmentV2(@RequestParam("file") MultipartFile file,@RequestParam("attachmentName")String attachmentName) {
+        return onlineResumeService.uploadResumeAttachmentV2(file,attachmentName);
     }
     /**
      * 删除简历附件
