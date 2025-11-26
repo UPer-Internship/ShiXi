@@ -18,10 +18,9 @@ public class MvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         //TODO 权限拦截器 权限身份已经保留在Userholder当中 获取用户当前使用的身份
 
-        // 身份认证拦截器
-        registry.addInterceptor(new IdentificationInterceptor())
-                .addPathPatterns("/**")
-                .order(2);
+
+        // token刷新的拦截器
+        registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns("/**").order(0);
 
         //登录拦截器 输入restful风格拦截
         registry.addInterceptor(new LoginInterceptor())
@@ -37,10 +36,19 @@ public class MvcConfig implements WebMvcConfigurer {
                         "/student/**",
                         "/ws/**",
                         "/application/**",
-                        "/doc.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/swagger-resources/**","/doc.html#/home"
+                        "/doc.html", "/swagger-ui/**", "/v3/api-docs/**", "/webjars/**", "/swagger-resources/**","/doc.html#/home",
+                        "/resume/recommendation/recommendByCategory",
+                        "/position/query/searchJobs",
+                        "/blog/queryHotBlogs"
                 ).order(1);
-        // token刷新的拦截器
-        registry.addInterceptor(new RefreshTokenInterceptor(stringRedisTemplate)).addPathPatterns("/**").order(0);
+
+        // 身份认证拦截器
+        registry.addInterceptor(new IdentificationInterceptor())
+                .addPathPatterns("/**")
+                .order(2);
+
+
+
 
 
     }
